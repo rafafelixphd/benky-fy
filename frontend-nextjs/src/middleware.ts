@@ -24,6 +24,44 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Development bypass - allow access without authentication in development
+  if (process.env.NODE_ENV === "development") {
+    // Set a development session cookie if none exists
+    const session = request.cookies.get("benkyfy_session");
+    if (!session) {
+      const response = NextResponse.next();
+      const devSessionData = {
+        user: {
+          id: "dev-user",
+          name: "Development User",
+          email: "dev@example.com",
+          picture: "/user_icon.svg",
+          joinDate: new Date().toISOString().split("T")[0],
+          currentLevel: "Beginner",
+          totalStudyTime: "0 hours",
+          streakDays: 0,
+          totalWordsLearned: 0,
+          favoriteModules: ["Hiragana", "Basic Words", "Common Phrases"],
+        },
+        provider: "development",
+        authenticated: true,
+        expires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+      };
+
+      response.cookies.set({
+        name: "benkyfy_session",
+        value: JSON.stringify(devSessionData),
+        httpOnly: false, // Allow JavaScript access in development
+        secure: false,
+        sameSite: "lax",
+        maxAge: 24 * 60 * 60, // 24 hours
+        path: "/",
+      });
+
+      return response;
+    }
+  }
+
   // Get session token from cookies
   const session = request.cookies.get("benkyfy_session");
 

@@ -12,14 +12,17 @@ import { InputSettings } from "./input-settings";
 import { WordTypeSelector } from "./word-type-selector";
 import { DisplayConfig } from "./display-config";
 import { InputConfig } from "./input-config";
+import { ModuleSelector } from "./module-selector";
 import { getModuleType } from "../input/helpers/module-type";
 
 // Export custom configuration components
 export { WordTypeSelector } from "./word-type-selector";
 export { DisplayConfig } from "./display-config";
 export { InputConfig } from "./input-config";
+export { ModuleSelector } from "./module-selector";
 export { CustomFlashcardSettingsModal } from "./custom-flashcard-settings-modal";
 export type { CustomFlashcardSettings } from "./custom-flashcard-settings-modal";
+export type { ModuleConfig } from "./module-selector";
 
 export function SettingsModal({ moduleName, onClose }: SettingsModalProps) {
   const { getSettings, updateSettings } = useSettingsStore();

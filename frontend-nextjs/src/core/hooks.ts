@@ -6,83 +6,89 @@ import type { UserSettings } from "./api-client";
 
 // Authentication hooks
 export const useAuth = () => {
+  // Development mode - return synchronous data
+  if (process.env.NODE_ENV === "development") {
+    return {
+      data: {
+        authenticated: true,
+        user: {
+          id: "dev-user",
+          name: "Development User",
+          email: "dev@example.com",
+          picture: "/user_icon.svg",
+          joinDate: new Date().toISOString().split("T")[0],
+          currentLevel: "Beginner",
+          totalStudyTime: "0 hours",
+          streakDays: 0,
+          totalWordsLearned: 0,
+          favoriteModules: ["Hiragana", "Basic Words", "Common Phrases"],
+          provider: "development",
+        },
+        session_keys: ["user"],
+        google_authorized: true,
+      },
+      isLoading: false,
+      error: null,
+    };
+  }
+
   return useQuery({
     queryKey: ["auth"],
     queryFn: async () => {
       try {
-        // Try to get session from cookie first
-        const cookies = document.cookie.split(";");
-        console.log("All cookies:", cookies);
-        const sessionCookie = cookies.find((c) =>
-          c.trim().startsWith("benkyfy_session="),
-        );
-        console.log("Found session cookie:", sessionCookie);
 
-        if (sessionCookie) {
-          try {
-            const cookieValue = sessionCookie.split("=")[1];
-            console.log("Cookie value:", cookieValue);
-            const sessionData = JSON.parse(decodeURIComponent(cookieValue));
-            console.log("Parsed session data:", sessionData);
+        // Try to get session from cookie first (only on client side)
+        if (typeof document !== "undefined") {
+          const cookies = document.cookie.split(";");
+          console.log("All cookies:", cookies);
+          const sessionCookie = cookies.find((c) =>
+            c.trim().startsWith("benkyfy_session="),
+          );
+          console.log("Found session cookie:", sessionCookie);
 
-            // Check if session is expired
-            if (sessionData.expires && sessionData.expires > Date.now()) {
-              return {
-                authenticated: true,
-                user: {
-                  ...sessionData.user,
-                  joinDate:
-                    sessionData.user.joinDate ||
-                    new Date().toISOString().split("T")[0],
-                  currentLevel: sessionData.user.currentLevel || "Beginner",
-                  totalStudyTime: sessionData.user.totalStudyTime || "0 hours",
-                  streakDays: sessionData.user.streakDays || 0,
-                  totalWordsLearned: sessionData.user.totalWordsLearned || 0,
-                  favoriteModules: sessionData.user.favoriteModules || [
-                    "Hiragana",
-                    "Basic Words",
-                    "Common Phrases",
-                  ],
-                  provider: sessionData.provider || "google",
-                },
-                session_keys: ["user"],
-                google_authorized: sessionData.provider === "google",
-              };
+          if (sessionCookie) {
+            try {
+              const cookieValue = sessionCookie.split("=")[1];
+              console.log("Cookie value:", cookieValue);
+              const sessionData = JSON.parse(decodeURIComponent(cookieValue));
+              console.log("Parsed session data:", sessionData);
+
+              // Check if session is expired
+              if (sessionData.expires && sessionData.expires > Date.now()) {
+                return {
+                  authenticated: true,
+                  user: {
+                    ...sessionData.user,
+                    joinDate:
+                      sessionData.user.joinDate ||
+                      new Date().toISOString().split("T")[0],
+                    currentLevel: sessionData.user.currentLevel || "Beginner",
+                    totalStudyTime: sessionData.user.totalStudyTime || "0 hours",
+                    streakDays: sessionData.user.streakDays || 0,
+                    totalWordsLearned: sessionData.user.totalWordsLearned || 0,
+                    favoriteModules: sessionData.user.favoriteModules || [
+                      "Hiragana",
+                      "Basic Words",
+                      "Common Phrases",
+                    ],
+                    provider: sessionData.provider || "google",
+                  },
+                  session_keys: ["user"],
+                  google_authorized: sessionData.provider === "google",
+                };
+              }
+            } catch (parseError) {
+              console.error("Failed to parse session cookie:", parseError);
             }
-          } catch (parseError) {
-            console.error("Failed to parse session cookie:", parseError);
           }
         }
 
-        // Development fallback - only if no cookie exists
-        if (
-          process.env.NODE_ENV === "development" &&
-          !cookies.find((c) => c.trim().startsWith("benkyfy_session="))
-        ) {
-          console.log("Using development fallback - no session cookie found");
-          return {
-            authenticated: true,
-            user: {
-              name: "Test User",
-              email: "test@example.com",
-              picture: "/user_icon.svg",
-              joinDate: new Date().toISOString().split("T")[0],
-              currentLevel: "Beginner",
-              totalStudyTime: "0 hours",
-              streakDays: 0,
-              totalWordsLearned: 0,
-              favoriteModules: ["Hiragana", "Basic Words", "Common Phrases"],
-              provider: "development",
-            },
-            session_keys: ["user"],
-            google_authorized: true,
-          };
-        }
-
-        // Fallback to backend check
-        const response = await apiClient.checkAuth();
-        if (response.success && response.data?.authenticated) {
-          return response.data;
+        // Skip backend check in development to avoid API errors
+        if (process.env.NODE_ENV !== "development") {
+          const response = await apiClient.checkAuth();
+          if (response.success && response.data?.authenticated) {
+            return response.data;
+          }
         }
       } catch (error) {
         console.error("Auth check failed:", error);
