@@ -78,6 +78,7 @@ export default function FlashcardsModulePage() {
               alt="BenkoFY logo"
               width={60}
               height={36}
+              sizes="60px"
               className="cursor-pointer hover:opacity-80 transition-opacity"
               unoptimized
               priority

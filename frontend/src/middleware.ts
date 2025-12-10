@@ -13,11 +13,10 @@ const publicPaths = [
 ];
 
 export function middleware(request: NextRequest) {
-  
-  console.log("[API] You hit middleware");
-
+  console.log("[MW]", request.method, request.nextUrl.pathname, "env:", process.env.NODE_ENV);
 
   if (process.env.NODE_ENV === "development" || process.env.AUTH_BYPASS === "true") {
+    console.log("[MW] Development mode: Bypassing authentication");
     const isAuthRoute =
       request.nextUrl.pathname.startsWith("/api/auth/google") ||
       request.nextUrl.pathname === "/auth/login";

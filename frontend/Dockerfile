@@ -14,10 +14,12 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+
+RUN ls -la
+RUN pwd
 COPY frontend/ .
 
 # Environment variables will be set at runtime
-
 RUN npm run build
 
 # Production image, copy all the files and run next
@@ -46,4 +48,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# CMD ["node", "server.js"]
+CMD ["node", "server.js"]
