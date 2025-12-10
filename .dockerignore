@@ -62,3 +62,39 @@ LICENSE
 # Development
 values.env
 *.env
+
+# benky-fy/.dockerignore (build.context: .)
+
+# VCS / OS
+.git
+.gitignore
+.DS_Store
+
+# Env files (avoid leaking secrets)
+.env
+.env.local
+.env.*.local
+
+# Frontend (Next.js)
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+**/.cache
+**/coverage
+
+# Backend (Flask/Python)
+**/venv
+**/.venv
+**/__pycache__/
+**/.pytest_cache
+**/.mypy_cache
+*/coverage
+**/*.pyc
+
+# Logs
+**/*.log
+**/logs/
+
+# Data (mounted at runtime, not needed in build context)
+datum/

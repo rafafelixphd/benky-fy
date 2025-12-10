@@ -1,3 +1,5 @@
+// benky-fy/frontend/src/middleware.ts
+
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -11,25 +13,24 @@ const publicPaths = [
 ];
 
 export function middleware(request: NextRequest) {
-  // Check if the path is public
-  const isPublicPath = publicPaths.some(
-    (path) =>
-      request.nextUrl.pathname === path || // Exact match
-      request.nextUrl.pathname.startsWith("/api/") || // All API routes
-      request.nextUrl.pathname.startsWith(path + "/"), // Subpaths
-  );
+  
+  console.log("[API] You hit middleware");
 
-  // Allow public paths without session
-  if (isPublicPath) {
-    return NextResponse.next();
-  }
 
-  // Development bypass - allow access without authentication in development
-  if (process.env.NODE_ENV === "development") {
-    // Set a development session cookie if none exists
+  if (process.env.NODE_ENV === "development" || process.env.AUTH_BYPASS === "true") {
+    const isAuthRoute =
+      request.nextUrl.pathname.startsWith("/api/auth/google") ||
+      request.nextUrl.pathname === "/auth/login";
+
     const session = request.cookies.get("benkyfy_session");
+
+    // If hitting auth routes in dev/debug, skip Google and go home
+    const response = isAuthRoute
+      ? NextResponse.redirect(new URL("/home", request.url))
+      : NextResponse.next();
+
+    // Ensure dev session exists
     if (!session) {
-      const response = NextResponse.next();
       const devSessionData = {
         user: {
           id: "dev-user",
@@ -45,27 +46,37 @@ export function middleware(request: NextRequest) {
         },
         provider: "development",
         authenticated: true,
-        expires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+        expires: Date.now() + 24 * 60 * 60 * 1000,
       };
 
       response.cookies.set({
         name: "benkyfy_session",
         value: JSON.stringify(devSessionData),
-        httpOnly: false, // Allow JavaScript access in development
+        httpOnly: false,
         secure: false,
         sameSite: "lax",
-        maxAge: 24 * 60 * 60, // 24 hours
+        maxAge: 24 * 60 * 60,
         path: "/",
       });
-
-      return response;
     }
+
+    return response;
   }
 
-  // Get session token from cookies
-  const session = request.cookies.get("benkyfy_session");
+  // Existing public-path logic
+  const isPublicPath = publicPaths.some(
+    (path) =>
+      request.nextUrl.pathname === path ||
+      request.nextUrl.pathname.startsWith("/api/") ||
+      request.nextUrl.pathname.startsWith(path + "/"),
+  );
 
-  // Redirect to login if no session
+  if (isPublicPath) {
+    return NextResponse.next();
+  }
+
+  // Enforce session in non-public paths
+  const session = request.cookies.get("benkyfy_session");
   if (!session) {
     const loginUrl = new URL("/auth/login", request.url);
     return NextResponse.redirect(loginUrl);
@@ -75,14 +86,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    "/((?!_next/static|_next/image|favicon.ico|public/).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|public/).*)"],
 };

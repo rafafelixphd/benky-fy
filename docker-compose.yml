@@ -71,7 +71,9 @@ services:
       dockerfile: frontend/Dockerfile
     container_name: benky-fy-frontend
     environment:
-      NODE_ENV: production
+      # NODE_ENV: production
+      NODE_ENV: development
+      # AUTH_BYPASS: 1
       PORT: 3000
       # Backend API URL (internal Docker network)
       FLASK_API_URL: ${FLASK_API_URL:-http://backend:8080}
@@ -79,8 +81,8 @@ services:
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
-    depends_on:
-      - backend
+    # depends_on:
+      # - backend
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     healthcheck:
@@ -89,9 +91,14 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules 
     networks:
       - benky-fy-network
     restart: unless-stopped
+    command: ["npm", "run", "dev"]
+
 
   # Nginx Reverse Proxy (optional - comment out if not needed)
   nginx:

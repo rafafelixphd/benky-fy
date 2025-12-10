@@ -13,7 +13,7 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy and install requirements
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
@@ -35,8 +35,6 @@ WORKDIR /app
 
 # Copy only necessary application files
 COPY backend/ ./backend/
-COPY datum/ ./datum/
-COPY run.py .
 
 # Create app symlink for backward compatibility with run.py imports
 RUN ln -s backend app

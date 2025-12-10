@@ -133,12 +133,14 @@ export function ModuleSelector({ modules, onModulesChange }: ModuleSelectorProps
     setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
   };
 
+  const [isSectionExpanded, setIsSectionExpanded] = useState(true);
+
   return (
     <SettingsSection
       title="Module Selection"
-      icon="📚"
-      color="purple"
-      isExpanded={true}
+      isExpanded={isSectionExpanded}
+      onToggle={() => setIsSectionExpanded(!isSectionExpanded)}
+      indicatorColor="bg-purple-500"
     >
       <div className="space-y-4">
         {/* Module Categories */}
