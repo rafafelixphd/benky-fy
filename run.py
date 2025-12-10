@@ -1,4 +1,8 @@
-from app import create_app
+# Try importing from backend first, fallback to app for backward compatibility
+try:
+    from backend import create_app
+except ImportError:
+    from app import create_app
 import os
 from dotenv import load_dotenv
 

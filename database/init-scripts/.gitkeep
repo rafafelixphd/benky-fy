@@ -1,0 +1,2 @@
+# Place database initialization SQL scripts here
+# They will run automatically on first database container start

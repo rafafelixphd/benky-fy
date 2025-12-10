@@ -34,9 +34,12 @@ ENV PATH="/opt/venv/bin:$PATH"
 WORKDIR /app
 
 # Copy only necessary application files
-COPY app/ ./app/
+COPY backend/ ./backend/
 COPY datum/ ./datum/
 COPY run.py .
+
+# Create app symlink for backward compatibility with run.py imports
+RUN ln -s backend app
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash app && \

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import CustomFlashcardPage from '../../../../app/flashcards/custom/page';
+import CustomFlashcardPage from '../page';
 
 // Mock the auth hook
 jest.mock('@/core/hooks', () => ({
