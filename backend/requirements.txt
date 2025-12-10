@@ -10,3 +10,4 @@ gunicorn==21.2.0
 oauthlib==3.2.2
 itsdangerous==2.1.2
 psycopg2-binary==2.9.9
+colorama==0.4.6

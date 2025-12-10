@@ -3,6 +3,10 @@ from flask import Blueprint
 import time
 from datetime import datetime
 
+from ..logger import get_logger
+
+logger = get_logger(__name__)
+
 # Create API blueprint
 bp = Blueprint('v2_health_api', __name__)
 api = Api(bp, 
@@ -54,9 +58,11 @@ class HealthCheck(Resource):
             response_time_ms = (time.time() - start_time) * 1000
             health_status['response_time_ms'] = round(response_time_ms, 2)
             
+            logger.info(f"[HEALTH] Health check passed - {response_time_ms:.2f}ms")
             return health_status, 200
             
         except Exception as e:
+            logger.error(f"[HEALTH] Health check failed: {str(e)}")
             return {
                 'status': 'degraded',
                 'version': API_VERSION,

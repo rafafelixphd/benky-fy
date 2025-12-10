@@ -2,6 +2,10 @@ from flask import Response, json
 import gzip
 from functools import wraps
 
+from ..logger import get_logger
+
+logger = get_logger(__name__)
+
 def compress_json(f):
     """Decorator to compress JSON responses if client accepts gzip."""
     @wraps(f)
@@ -21,6 +25,7 @@ def compress_json(f):
             response.headers['Content-Type'] = 'application/json'
             response.headers['Content-Encoding'] = 'gzip'
             
+            logger.debug(f"[COMPRESS] Compressed JSON response: {len(json_str)} -> {len(gzip_buffer)} bytes")
             return response
         return resp
     return wrapped

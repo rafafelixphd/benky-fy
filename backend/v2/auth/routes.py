@@ -3,6 +3,10 @@ from flask import Blueprint, session, request
 from datetime import datetime
 import json
 
+from ..logger import get_logger
+
+logger = get_logger(__name__)
+
 # Create API blueprint
 bp = Blueprint('v2_auth_api', __name__)
 api = Api(bp, 
@@ -102,9 +106,6 @@ class UpsertUserResource(Resource):
     def post(self):
         """Create new user or update existing user from Google OAuth."""
         from backend.v2.models import db, User
-        import logging
-        
-        logger = logging.getLogger(__name__)
         
         data = request.get_json()
         

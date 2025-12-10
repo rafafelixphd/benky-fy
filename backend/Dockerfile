@@ -33,8 +33,11 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Set working directory
 WORKDIR /app
 
-# Copy only necessary application files
+# Copy application files
 COPY backend/ ./backend/
+
+# Install backend as editable package
+RUN pip install -e ./backend
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash app && \
