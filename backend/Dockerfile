@@ -36,9 +36,6 @@ WORKDIR /app
 # Copy only necessary application files
 COPY backend/ ./backend/
 
-# Create app symlink for backward compatibility with run.py imports
-RUN ln -s backend app
-
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash app && \
     chown -R app:app /app
@@ -48,13 +45,12 @@ USER app
 EXPOSE 8080
 
 # Set environment variables
-ENV FLASK_APP=run.py
 ENV FLASK_ENV=production
 ENV PORT=8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+    CMD curl -f http://localhost:8080/v2/health || exit 1
 
 # Run the application
-CMD ["python", "run.py"]
+CMD ["python", "-m", "backend.app"]

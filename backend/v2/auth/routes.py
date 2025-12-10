@@ -101,7 +101,7 @@ class UpsertUserResource(Resource):
     @api.marshal_with(upsert_user_response_model)
     def post(self):
         """Create new user or update existing user from Google OAuth."""
-        from app.models import db, User
+        from backend.v2.models import db, User
         import logging
         
         logger = logging.getLogger(__name__)
