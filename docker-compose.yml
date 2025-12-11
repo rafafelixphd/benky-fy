@@ -34,14 +34,16 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     container_name: benky-fy-backend
+    command: ["flask", "run", "--debug", "--reload", "--host=0.0.0.0", "--port=8080"]
     environment:
       # Database connection
       DB_HOST: database
       DB_PORT: 5432
-      DB_NAME: ${DB_NAME:-benkyfy_db}
-      DB_USER: ${DB_USER:-benkyfy_user}
-      DB_PASSWORD: ${DB_PASSWORD:?Database password required}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
       # Flask configuration
+      FLASK_APP: backend.app
       FLASK_ENV: ${FLASK_ENV:-production}
       FLASK_SECRET_KEY: ${FLASK_SECRET_KEY:?Flask secret key required}
       PORT: 8080
@@ -50,19 +52,19 @@ services:
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
       # CORS origins
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:80}
-    depends_on:
-      database:
-        condition: service_healthy
+    depends_on: []
+      # database:
+        # condition: service_healthy
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     volumes:
-      - ./datum:/app/datum:ro
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/v2/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - ./backend/:/app/backend/
+    # healthcheck:
+      # test: ["CMD", "curl", "-f", "http://localhost:8080/v2/health"]
+      # interval: 30s
+      # timeout: 10s
+      # retries: 3
+      # start_period: 40s
     networks:
       - benky-fy-network
     restart: unless-stopped
@@ -102,8 +104,6 @@ services:
     restart: unless-stopped
 
 
-
-
   # Nginx Reverse Proxy (optional - comment out if not needed)
   nginx:
     build:
@@ -118,11 +118,11 @@ services:
       - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    # healthcheck:
+      # test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      # interval: 30s
+      # timeout: 10s
+      # retries: 3
     networks:
       - benky-fy-network
     restart: unless-stopped

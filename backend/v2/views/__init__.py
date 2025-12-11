@@ -1,4 +1,4 @@
-from .health import bp as health_bp
-from .users import bp as users_bp
+from .api import router as api_router
+from .users import router as users_router
 
-__all__ = ["health_bp", "users_bp"]
+__all__ = ["api_router", "users_router"]

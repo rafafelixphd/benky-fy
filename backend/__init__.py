@@ -1,1 +1,3 @@
-__version__ = "2.0.0"
+from .v2 import __version__
+
+__all__ = ["__version__"]

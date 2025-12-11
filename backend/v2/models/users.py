@@ -1,55 +1,35 @@
-from flask import session
+# models/user.py
+from datetime import datetime
 
-from ..logger import get_logger
-from ..models import User
-
-logger = get_logger(__name__)
+from ..config import db
 
 
-def get_current_user():
-    """Get currently authenticated user from session."""
-    user_id = session.get("user_id")
-    if not user_id:
-        logger.info("[USERS] No user in session")
-        return None
+class User(db.Model):
+    __tablename__ = "users"
 
-    user = User.query.get(user_id)
-    if user:
-        logger.info(f"[USERS] Loaded current user {user.email} (id={user.id})")
-    else:
-        logger.warning(f"[USERS] Session user_id={user_id} not found in database")
+    id = db.Column(db.Integer, primary_key=True)
+    google_id = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    email = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    name = db.Column(db.String(255), nullable=False)
+    picture = db.Column(db.String(512))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
 
-    return user
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "google_id": self.google_id,
+            "email": self.email,
+            "name": self.name,
+            "picture": self.picture,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
 
-
-def get_user_by_id(user_id: int):
-    """Get user by ID."""
-    user = User.query.get(user_id)
-    if user:
-        logger.info(f"[USERS] Loaded user {user.email} (id={user.id})")
-    else:
-        logger.warning(f"[USERS] User id={user_id} not found")
-
-    return user
-
-
-def get_user_by_email(email: str):
-    """Get user by email."""
-    user = User.query.filter_by(email=email).first()
-    if user:
-        logger.info(f"[USERS] Loaded user {user.email} (id={user.id})")
-    else:
-        logger.warning(f"[USERS] User email={email} not found")
-
-    return user
-
-
-def get_user_by_google_id(google_id: str):
-    """Get user by Google ID."""
-    user = User.query.filter_by(google_id=google_id).first()
-    if user:
-        logger.info(f"[USERS] Loaded user {user.email} (id={user.id})")
-    else:
-        logger.warning(f"[USERS] User google_id={google_id} not found")
-
-    return user
+    def __repr__(self):
+        return f"<User id={self.id} email={self.email} name={self.name}>"

@@ -1,41 +1,44 @@
+# app.py
 import os
 
 from flask import Flask
-from flask_cors import CORS
+
+from v2.config import Config, init_database
+from v2.logger import get_logger
+from v2.routes import init_routes
+
+
+def setup_cors(app):
+    from flask_cors import CORS
+
+    # Config.ALLOWED_ORIGINS comes in as a CSV string → split to list
+    origins = app.config["ALLOWED_ORIGINS"].split(",")
+
+    CORS(app, origins=origins, supports_credentials=True)
+
+    app.logger.info(f"[CORS] Enabled for origins: {origins}")
 
 
 def create_app():
-    """Application factory."""
-    from backend.v2.logger import setup_logger
-
-    logger = setup_logger("benkyfy")
-
     app = Flask(__name__)
+    app.config.from_object(Config)
+    app.add_url_rule("/", "index", lambda: "{'benkyfy': 'ok'}")
 
-    allowed_origins = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
-    CORS(app, origins=allowed_origins, supports_credentials=True)
-    logger.info(f"[INIT] CORS enabled for origins: {allowed_origins}")
+    setup_cors(app)
 
-    from backend.v2 import init_v2_app
-
-    init_v2_app(app)
-
-    logger.info("[INIT] Application created successfully")
+    init_routes(app)
+    init_database(app)
     return app
 
 
 if __name__ == "__main__":
-    from backend.v2.logger import get_logger
+    logger = get_logger()
 
-    logger = get_logger(__name__)
-
+    logger.info("Starting Benky-fy Backend (app2.py)...")
     app = create_app()
-    port = int(os.environ.get("PORT", 8080))
-    logger.info(f"[START] Starting server on port {port}")
-    app.run(host="0.0.0.0", port=port)
 
-if __name__ == "__main__":
-    app = create_app()
+    logger.info("Setting up run ...")
+
+    app.run(port=8080, debug=True)
     port = int(os.environ.get("PORT", 8080))
-    logger.info(f"[START] Starting on port {port}")
     app.run(host="0.0.0.0", port=port)

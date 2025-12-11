@@ -82,7 +82,7 @@ def setup_logger(
     return logger
 
 
-def get_logger(name: str) -> logging.Logger:
+def get_logger(name: str = "benkyfy") -> logging.Logger:
     """
     Get or create a logger instance.
 
