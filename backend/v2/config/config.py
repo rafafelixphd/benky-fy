@@ -41,6 +41,8 @@ class Config:
         if DB_PASSWORD
         else f"postgresql://{DB_USER}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     )
+    # Seed database with initial data on startup
+    ENABLE_DB_SEED = os.getenv("ENABLE_DB_SEED", "false").lower() == "true"
 
     # --------------------------------------------------
     # GOOGLE OAUTH

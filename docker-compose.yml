@@ -52,6 +52,8 @@ services:
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
       # CORS origins
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:80}
+      # Enable database seeding
+      ENABLE_DB_SEED: "true"
     depends_on: []
       # database:
         # condition: service_healthy

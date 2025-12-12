@@ -3,7 +3,7 @@ import os
 
 from flask import Flask
 
-from v2.config import Config, init_database
+from v2.config import Config, init_database, init_seed_database
 from v2.logger import get_logger
 from v2.routes import init_routes
 
@@ -27,7 +27,8 @@ def create_app():
     setup_cors(app)
 
     init_routes(app)
-    init_database(app)
+    db = init_database(app)
+    init_seed_database(app, db)
     return app
 
 

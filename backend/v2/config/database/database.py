@@ -1,12 +1,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from ..logger import get_logger
+from ...logger import get_logger
 
-db = SQLAlchemy()
 logger = get_logger()
-
-__all__ = ["db", "init_database"]
+db = SQLAlchemy()
 
 
 def init_database(app: Flask, create_tables: bool = False):
@@ -28,3 +26,5 @@ def init_database(app: Flask, create_tables: bool = False):
 
     else:
         logger.info("[DB] Table creation skipped (create_tables=False)")
+
+    return db

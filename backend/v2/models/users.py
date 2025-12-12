@@ -1,7 +1,7 @@
 # models/user.py
 from datetime import datetime
 
-from ..config import db
+from ..config.database import db
 
 
 class User(db.Model):

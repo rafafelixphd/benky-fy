@@ -2,7 +2,8 @@
 from datetime import datetime
 from typing import Optional
 
-from ..config import SessionContext, db
+from ..config import SessionContext
+from ..config.database import db
 from ..logger import get_logger
 from ..models import User
 
@@ -16,6 +17,7 @@ class UserController:
         self.ctx = ctx
 
     def check_auth(self):
+        logger.info(f"[USERS] Auth check for user_id={self.ctx.user_id}")
         if not self.ctx.user_id:
             return {
                 "authenticated": False,
@@ -50,6 +52,7 @@ class UserController:
         return user.to_dict(), 200
 
     def get_user_by_id(self, user_id: int):
+        logger.info(f"[USERS] Get user by id={user_id}")
         user = User.query.get(user_id)
         if not user:
             logger.warning(f"[USERS] User id={user_id} not found")
