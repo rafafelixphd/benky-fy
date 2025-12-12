@@ -1,5 +1,4 @@
 # config/session_context.py
-from flask import session
 
 
 class SessionContext:
@@ -11,5 +10,7 @@ class SessionContext:
         self.google_authorized = bool(session.get("google_token"))
         self.session_keys = list(session.keys())
 
-    def get_feature_flag(self, name: str, default=None):
-        return session.get(f"feature_{name}", default)
+        self._session = session
+
+    def get(self, key, default=None):
+        return self._session.get(key, default)

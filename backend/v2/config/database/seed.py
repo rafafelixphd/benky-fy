@@ -41,14 +41,15 @@ def normalize_row(model, row: dict):
 
         # infer datetime
         if hasattr(model, col):
-            col_type = str(type(getattr(model, col).type))
+            column = getattr(model, col)
+            col_type = str(column.type)  # Get the string representation of the column type
         else:
             data[col] = val
             continue
 
-        if "DateTime" in col_type and val:
+        if "DateTime" in col_type and val is not None:
             data[col] = parse_dt(val)
-        elif "Integer" in col_type and val:
+        elif "Integer" in col_type and val is not None:
             data[col] = int(val)
         else:
             data[col] = val

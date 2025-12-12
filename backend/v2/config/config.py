@@ -54,3 +54,12 @@ class Config:
     # CORS
     # --------------------------------------------------
     ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000")
+
+    # --------------------------------------------------
+    # Session Security
+    # --------------------------------------------------
+
+    SESSION_COOKIE_SECURE = FLASK_ENV == "production"  # HTTPS only in prod
+    SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access
+    SESSION_COOKIE_SAMESITE = "Lax"  # CSRF protection
+    PERMANENT_SESSION_LIFETIME = 86400  # 24 hours

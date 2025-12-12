@@ -21,8 +21,36 @@ router.add_url_rule(
 )
 
 router.add_url_rule(
+    "/users/me",
+    endpoint="get_current_user",
+    view_func=make_handler(UserController.get_current_user, UserController),
+    methods=["GET"],
+)
+
+router.add_url_rule(
     "/auth/google",
     endpoint="upsert_user",
     view_func=make_handler(UserController.upsert_user, UserController),
+    methods=["POST"],
+)
+
+router.add_url_rule(
+    "/auth/register",
+    endpoint="register_user",
+    view_func=make_handler(UserController.register_user, UserController),
+    methods=["POST"],
+)
+
+router.add_url_rule(
+    "/auth/login",
+    endpoint="login_user",
+    view_func=make_handler(UserController.login_user, UserController),
+    methods=["POST"],
+)
+
+router.add_url_rule(
+    "/auth/logout",
+    endpoint="logout_user",
+    view_func=make_handler(UserController.logout_user, UserController),
     methods=["POST"],
 )

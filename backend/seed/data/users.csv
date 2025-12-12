@@ -1,6 +1,5 @@
-id,google_id,email,name,picture,created_at,updated_at
-1,google-oauth2|1001,alice@example.com,Alice Tanaka,https://example.com/pic/alice.jpg,2025-01-10T12:00:00Z,2025-01-10T12:00:00Z
-2,google-oauth2|1002,bob@example.com,Bob Martins,https://example.com/pic/bob.jpg,2025-01-11T09:30:00Z,2025-02-01T08:12:00Z
-3,google-oauth2|1003,carla@example.com,Carla Suzuki,https://example.com/pic/carla.jpg,2025-02-02T15:45:00Z,2025-02-10T07:00:00Z
-4,google-oauth2|1004,dan@example.com,Dan Ribeiro,,2025-02-20T10:00:00Z,2025-03-01T11:22:00Z
-5,google-oauth2|1005,emma@example.com,Emma Kato,https://example.com/pic/emma.jpg,2025-03-05T18:10:00Z,2025-03-05T18:10:00Z
+id,google_id,email,name,picture,password_hash,auth_provider,created_at,updated_at
+1,118234567890123456789,alice@example.com,Alice Johnson,https://lh3.googleusercontent.com/a/default-user,,google,2025-01-15T10:30:00,2025-01-15T10:30:00
+2,,bob@example.com,Bob Smith,,pbkdf2:sha256$260000$abc123xyz$def456ghi,email,2025-01-20T14:22:15,2025-01-20T14:22:15
+3,987654321098765432,charlie@example.com,Charlie Brown,https://lh3.googleusercontent.com/a/default-user,,google,2025-02-01T09:45:30,2025-02-01T09:45:30
+4,,diana@example.com,Diana Prince,,pbkdf2:sha256$260000$jkl789mno$pqr012stu,email,2025-02-05T16:10:45,2025-02-05T16:10:45

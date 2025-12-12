@@ -1,10 +1,4 @@
-version: '3.8'
-
-
-x-frontend-env: &frontend_env
-
-
-
+#docker-compose.yml
 services:
   # PostgreSQL Database
   database:
@@ -129,9 +123,11 @@ services:
       - benky-fy-network
     restart: unless-stopped
 
+
 volumes:
   postgres_data:
     driver: local
+
 
 networks:
   benky-fy-network:

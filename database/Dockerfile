@@ -4,6 +4,8 @@ FROM postgres:17-alpine
 # Copy initialization scripts
 COPY database/init-scripts/ /docker-entrypoint-initdb.d/
 
+RUN ls -la /docker-entrypoint-initdb.d/
+
 # Expose PostgreSQL port
 EXPOSE 5432
 
