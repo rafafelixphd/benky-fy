@@ -51,6 +51,7 @@ async function send(e){
   const res = await fetch(url, {
     method,
     headers: {'Content-Type':'application/json'},
+    credentials: 'include', // <--- This ensures cookies are sent!
     body,
   });
 

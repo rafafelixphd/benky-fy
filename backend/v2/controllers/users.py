@@ -1,13 +1,15 @@
 # controller/user.py
-from datetime import datetime
+import hashlib
+import secrets
+from datetime import datetime, timedelta
 from typing import Optional
 
-from flask import session
+from flask import request, session
 
 from ..config import SessionContext
 from ..config.database import db
 from ..logger import get_logger
-from ..models import User
+from ..models import User, UserSession
 
 logger = get_logger(__name__)
 
@@ -27,6 +29,40 @@ class UserController:
                 "session_keys": self.ctx.session_keys,
                 "google_authorized": self.ctx.google_authorized,
             }, 200
+
+        # Validate Session Security
+        if not self.ctx.session_hash or not self.ctx.browser_hash:
+            logger.warning(f"[USERS] Missing session hashes for user_id={self.ctx.user_id}")
+            self.logout_user()  # Invalid session state
+            return {"authenticated": False, "error": "Invalid session state"}, 401
+
+        # Check browser hash against current request
+        user_agent = request.headers.get("User-Agent", "")
+        current_browser_hash = hashlib.sha256(user_agent.encode()).hexdigest()
+
+        if self.ctx.browser_hash != current_browser_hash:
+            logger.warning(f"[USERS] Browser hash mismatch for user_id={self.ctx.user_id}")
+            self.logout_user()
+            return {"authenticated": False, "error": "Session invalid"}, 401
+
+        # Check database session
+        user_session = UserSession.query.filter_by(session_hash=self.ctx.session_hash, is_active=True).first()
+
+        if not user_session:
+            logger.warning(f"[USERS] Session not found in DB for user_id={self.ctx.user_id}")
+            self.logout_user()
+            return {"authenticated": False, "error": "Session expired"}, 401
+
+        if user_session.expires_at < datetime.utcnow():
+            logger.warning(f"[USERS] Session expired for user_id={self.ctx.user_id}")
+            user_session.is_active = False
+            db.session.commit()
+            self.logout_user()
+            return {"authenticated": False, "error": "Session expired"}, 401
+
+        # Session valid, touch expiration? (Optional: Sliding window)
+        # user_session.expires_at = datetime.utcnow() + timedelta(minutes=60)
+        # db.session.commit()
 
         return {
             "authenticated": True,
@@ -88,10 +124,31 @@ class UserController:
 
             db.session.commit()
 
+            # Create User Session
+            session_token = secrets.token_urlsafe(32)
+            session_hash = hashlib.sha256(session_token.encode()).hexdigest()
+
+            user_agent = request.headers.get("User-Agent", "")
+            browser_hash = hashlib.sha256(user_agent.encode()).hexdigest()
+            user_hash = hashlib.sha256(f"{user.id}:{user.email}".encode()).hexdigest()  # Simple user binding
+
+            new_session = UserSession(
+                user_id=user.id,
+                session_hash=session_hash,
+                user_hash=user_hash,
+                browser_hash=browser_hash,
+                expires_at=datetime.utcnow() + timedelta(minutes=60),
+            )
+            db.session.add(new_session)
+            db.session.commit()
+
             session["user_id"] = user.id
             session["user_email"] = user.email
             session["user_name"] = user.name
             session["user_picture"] = user.picture
+
+            session["session_hash"] = session_hash
+            session["browser_hash"] = browser_hash
 
             logger.info(f"[USERS] Upsert success: {email} (id={user.id}, is_new={is_new})")
             return {"is_new_user": is_new, "user": user.to_dict()}, 200
@@ -119,10 +176,31 @@ class UserController:
             db.session.add(user)
             db.session.commit()
 
+            # Create User Session
+            session_token = secrets.token_urlsafe(32)
+            session_hash = hashlib.sha256(session_token.encode()).hexdigest()
+
+            user_agent = request.headers.get("User-Agent", "")
+            browser_hash = hashlib.sha256(user_agent.encode()).hexdigest()
+            user_hash = hashlib.sha256(f"{user.id}:{user.email}".encode()).hexdigest()
+
+            new_session = UserSession(
+                user_id=user.id,
+                session_hash=session_hash,
+                user_hash=user_hash,
+                browser_hash=browser_hash,
+                expires_at=datetime.utcnow() + timedelta(minutes=60),
+            )
+            db.session.add(new_session)
+            db.session.commit()
+
             session["user_id"] = user.id
             session["user_email"] = user.email
             session["user_name"] = user.name
             session["user_picture"] = user.picture
+
+            session["session_hash"] = session_hash
+            session["browser_hash"] = browser_hash
 
             logger.info(f"[USERS] Registration success: {email} (id={user.id})")
             return {"user": user.to_dict(), "message": "Registration successful"}, 201
@@ -150,6 +228,27 @@ class UserController:
             session["user_name"] = user.name
             session["user_picture"] = user.picture
 
+            # Create User Session
+            session_token = secrets.token_urlsafe(32)
+            session_hash = hashlib.sha256(session_token.encode()).hexdigest()
+
+            user_agent = request.headers.get("User-Agent", "")
+            browser_hash = hashlib.sha256(user_agent.encode()).hexdigest()
+            user_hash = hashlib.sha256(f"{user.id}:{user.email}".encode()).hexdigest()
+
+            new_session = UserSession(
+                user_id=user.id,
+                session_hash=session_hash,
+                user_hash=user_hash,
+                browser_hash=browser_hash,
+                expires_at=datetime.utcnow() + timedelta(minutes=60),
+            )
+            db.session.add(new_session)
+            db.session.commit()
+
+            session["session_hash"] = session_hash
+            session["browser_hash"] = browser_hash
+
             logger.info(f"[USERS] Login success: {email}")
             return {"user": user.to_dict(), "message": "Login successful"}, 200
 
@@ -159,6 +258,14 @@ class UserController:
 
     def logout_user(self):
         logger.info(f"[USERS] Logout request for user_id={self.ctx.user_id}")
+
+        if self.ctx.session_hash:
+            user_session = UserSession.query.filter_by(
+                session_hash=self.ctx.session_hash,
+            ).first()
+            if user_session:
+                user_session.is_active = False
+                db.session.commit()
 
         session.clear()
 

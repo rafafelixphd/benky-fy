@@ -82,7 +82,7 @@ def setup_logger(
     return logger
 
 
-def get_logger(name: str = "benkyfy") -> logging.Logger:
+def get_logger(name: str = "benkyfy", namespace: Optional[str] = None) -> logging.Logger:
     """
     Get or create a logger instance.
 
@@ -92,6 +92,8 @@ def get_logger(name: str = "benkyfy") -> logging.Logger:
     Returns:
         Logger instance
     """
+    if namespace:
+        name = f"{name}/{namespace}"
     if name not in _loggers:
         return setup_logger(name)
     return _loggers[name]
