@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 
 from ...logger import get_logger
-from ...models import User
+from ...models import User, UserSession
 
 logger = get_logger()
 
@@ -15,6 +15,7 @@ logger.info(f"Seeding data from {DATA_DIR}")
 # Table-name → Model mapping
 MODEL_REGISTRY = {
     "users": User,
+    "user_sessions": UserSession,
 }
 
 
@@ -42,15 +43,17 @@ def normalize_row(model, row: dict):
         # infer datetime
         if hasattr(model, col):
             column = getattr(model, col)
-            col_type = str(column.type)  # Get the string representation of the column type
+            col_type = str(column.type).upper()  # Get the string representation of the column type and upper it
         else:
             data[col] = val
             continue
 
-        if "DateTime" in col_type and val is not None:
+        if "DATETIME" in col_type and val is not None:
             data[col] = parse_dt(val)
-        elif "Integer" in col_type and val is not None:
+        elif "INTEGER" in col_type and val is not None:
             data[col] = int(val)
+        elif "BOOLEAN" in col_type and val is not None:
+            data[col] = str(val).lower() in ("true", "1", "t", "yes")
         else:
             data[col] = val
 
@@ -77,6 +80,21 @@ def seed_table(table_name, model, csv_path, db):
         db.session.bulk_save_objects(objs)
         db.session.commit()
         print(f"Seeded {len(objs)} rows into {table_name}")
+
+        # Reset ID sequence for Postgres
+        if hasattr(model, "id"):
+            # For Postgres only: reset sequence to max(id) + 1
+            try:
+                db.session.execute(
+                    db.text(
+                        f"SELECT setval(pg_get_serial_sequence(\
+                            '{table_name}', 'id'), coalesce(max(id),0) + 1, false) \
+                        FROM {table_name};"
+                    )
+                )
+                db.session.commit()
+            except Exception as e:
+                logger.warning(f"Could not reset sequence for {table_name}: {e}")
     else:
         print(f"No new rows to seed for {table_name}")
 

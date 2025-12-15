@@ -9,7 +9,7 @@ router = Blueprint("users", __name__)
 router.add_url_rule(
     "/auth/check",
     endpoint="check_auth",
-    view_func=make_handler(UserController.check_auth, UserController),
+    view_func=make_handler(UserController.check_auth, UserController, auth_required=False),
     methods=["GET"],
 )
 
@@ -23,28 +23,28 @@ router.add_url_rule(
 router.add_url_rule(
     "/users/me",
     endpoint="get_current_user",
-    view_func=make_handler(UserController.get_current_user, UserController),
+    view_func=make_handler(UserController.get_current_user, UserController, False),
     methods=["GET"],
 )
 
 router.add_url_rule(
     "/auth/google",
     endpoint="upsert_user",
-    view_func=make_handler(UserController.upsert_user, UserController),
+    view_func=make_handler(UserController.upsert_user, UserController, auth_required=False),
     methods=["POST"],
 )
 
 router.add_url_rule(
     "/auth/register",
     endpoint="register_user",
-    view_func=make_handler(UserController.register_user, UserController),
+    view_func=make_handler(UserController.register_user, UserController, auth_required=False),
     methods=["POST"],
 )
 
 router.add_url_rule(
     "/auth/login",
     endpoint="login_user",
-    view_func=make_handler(UserController.login_user, UserController),
+    view_func=make_handler(UserController.login_user, UserController, auth_required=False),
     methods=["POST"],
 )
 
