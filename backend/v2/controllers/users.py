@@ -76,7 +76,7 @@ class UserController:
             "google_authorized": self.ctx.google_authorized,
         }, 200
 
-    def get_current_user(self):
+    def get_current_user(self, **kwargs):
         if not self.ctx.user_id:
             logger.warning("[USERS] Unauthenticated request")
             return {"error": "Not authenticated"}, 401
@@ -89,7 +89,7 @@ class UserController:
         logger.info(f"[USERS] Current user retrieved: {user.email}")
         return user.to_dict(), 200
 
-    def get_user_by_id(self, user_id: int):
+    def get_user_by_id(self, user_id: int, **kwargs):
         logger.info(f"[USERS] Get user by id={user_id}")
         user = User.query.get(user_id)
         if not user:
@@ -99,7 +99,7 @@ class UserController:
         logger.info(f"[USERS] User retrieved: {user.email} (id={user.id})")
         return user.to_dict(), 200
 
-    def upsert_user(self, google_id: str, email: str, name: str, picture: Optional[str] = None):
+    def upsert_user(self, google_id: str, email: str, name: str, picture: Optional[str] = None, **kwargs):
         logger.info(f"[USERS] Upsert request: {email} (google_id={google_id})")
 
         try:
@@ -158,7 +158,7 @@ class UserController:
             logger.error(f"[USERS] Upsert DB error for {email}: {e}", exc_info=True)
             return {"error": "Database error"}, 500
 
-    def register_user(self, email: str, name: str, password: str):
+    def register_user(self, email: str, name: str, password: str, **kwargs):
         logger.info(f"[USERS] Register request: {email}")
 
         if len(password) < 8:
@@ -210,7 +210,7 @@ class UserController:
             logger.error(f"[USERS] Registration DB error for {email}: {e}", exc_info=True)
             return {"error": "Database error"}, 500
 
-    def login_user(self, email: str, password: str):
+    def login_user(self, email: str, password: str, **kwargs):
         logger.info(f"[USERS] Login request: {email}")
 
         try:
@@ -256,7 +256,7 @@ class UserController:
             logger.error(f"[USERS] Login error for {email}: {e}", exc_info=True)
             return {"error": "Authentication error"}, 500
 
-    def logout_user(self):
+    def logout_user(self, **kwargs):
         logger.info(f"[USERS] Logout request for user_id={self.ctx.user_id}")
 
         if self.ctx.session_hash:

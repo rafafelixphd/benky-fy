@@ -24,6 +24,10 @@ def make_handler(method, controller_cls, auth_required=True):
             body = request.get_json() or {}
             route_params.update(body)
 
+        logger.info(f"{method=}")
+        logger.info(f"{controller=}")
+        logger.info(f"{args=}")
+        logger.info(f"{route_params=}")
         payload, status = method(controller, *args, **route_params)
         return jsonify(payload), status
 
