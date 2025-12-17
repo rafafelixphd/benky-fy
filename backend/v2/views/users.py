@@ -28,8 +28,8 @@ router.add_url_rule(
 )
 
 router.add_url_rule(
-    "/auth/google",
-    endpoint="upsert_user",
+    "/auth/upsert-user",
+    endpoint="upsert-user",
     view_func=make_handler(UserController.upsert_user, UserController, auth_required=False),
     methods=["POST"],
 )

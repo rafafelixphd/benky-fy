@@ -1,0 +1,45 @@
+# Backend Development Guide
+
+## 1. Architecture: Modular MVC
+The backend follows a strict **Model-View-Controller (MVC)** pattern, organized by feature modules within `backend/v2/`.
+
+- **M (Models)**: SQLAlchemy classes (`v2/models/`). Define schema and data logic.
+- **V (Views)**: Flask Blueprints (`v2/views/`). Handle routing, HTTP request/response.
+- **C (Controllers)**: Business logic classes (`v2/controllers/`). Bound to `SessionContext`.
+
+## 2. Key Components
+
+### SessionContext (`v2/config/session.py`)
+- Standardizes access to session data (`user_id`, `session_hash`, `browser_hash`).
+- Must be passed to every Controller.
+
+### Controllers (`v2/controllers/`)
+- Encapsulate all business logic.
+- **Wait**: Must accept `*args` and `**kwargs` in public methods to handle generic wrapper calls.
+- **Init**: `__init__(self, ctx: SessionContext)`.
+
+### Views (`v2/views/`)
+- Use `make_handler(method, controller_cls, auth_required=True)` wrapper.
+- `auth_required=True` (default): Enforces session/hash validation.
+- `auth_required=False`: For public routes (Login/Register).
+- **Do NOT** put business logic in views. Only routing and IO.
+
+### Security
+- **Secure By Default**: All API endpoints require a valid session (cookie + consistent User-Agent) unless opted out.
+- **Session**: Signed, HttpOnly, SameSite=Lax.
+
+## 3. Workflow: New Feature
+
+1.  **Model**: Define/Update SQLAlchemy model in `v2/models/`. Run migration.
+2.  **Controller**: Create/Update `NewController` in `v2/controllers/`.
+    - Implement methods accepting `**kwargs`.
+    - Use `self.ctx` for user info.
+3.  **View**: Create `v2/views/new_feature.py`.
+    - Define Blueprint.
+    - Map routes to Controller methods using `make_handler`.
+4.  **Register**: Add Blueprint to `v2/routes.py`.
+
+## 4. Best Practices
+- **Logging**: Use `logger = get_logger(__name__)`.
+- **Validation**: Validate inputs in Controller (or use schema lib).
+- **Error Handling**: Raise exceptions in Controller; Views/Global Error Handler catch them.

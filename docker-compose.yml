@@ -55,12 +55,12 @@ services:
       - "${BACKEND_PORT:-8080}:8080"
     volumes:
       - ./backend/:/app/backend/
-      # healthcheck:
-      # test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      # interval: 30s
-      # timeout: 10s
-      # retries: 3
-      # start_period: 40s
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - benky-fy-network
     restart: unless-stopped
@@ -74,7 +74,7 @@ services:
     command: [ "npm", "run", "dev" ]
     environment:
       NODE_ENV: development
-      AUTH_BYPASS: "true"
+      AUTH_BYPASS: "false"
       # NODE_ENV: production
       PORT: 3000
       FLASK_API_URL: ${FLASK_API_URL:-http://backend:8080}
@@ -112,11 +112,11 @@ services:
       - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
-      # healthcheck:
-      # test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
-      # interval: 30s
-      # timeout: 10s
-      # retries: 3
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - benky-fy-network
     restart: unless-stopped
