@@ -1,56 +1,101 @@
 # views/users.py
-from flask import Blueprint
+from flask import request, session
+from flask_restx import Namespace, Resource
 
+from ..config.session import SessionContext
 from ..controllers import UserController
-from .handler import make_handler
+from ..logger import get_logger
 
-router = Blueprint("users", __name__)
+logger = get_logger(namespace="views")
 
-router.add_url_rule(
-    "/auth/check",
-    endpoint="check_auth",
-    view_func=make_handler(UserController.check_auth, UserController, auth_required=False),
-    methods=["GET"],
-)
+ns = Namespace("users", description="User operations")
 
-router.add_url_rule(
-    "/users/<int:user_id>",
-    endpoint="get_user_by_id",
-    view_func=make_handler(UserController.get_user_by_id, UserController),
-    methods=["GET"],
-)
 
-router.add_url_rule(
-    "/users/me",
-    endpoint="get_current_user",
-    view_func=make_handler(UserController.get_current_user, UserController, False),
-    methods=["GET"],
-)
+# Helper to replicate make_handler logic slightly more idiomatically for Resources
+def get_context_and_controller():
+    ctx = SessionContext(session)
+    controller = UserController(ctx)
+    return ctx, controller
 
-router.add_url_rule(
-    "/auth/upsert-user",
-    endpoint="upsert-user",
-    view_func=make_handler(UserController.upsert_user, UserController, auth_required=False),
-    methods=["POST"],
-)
 
-router.add_url_rule(
-    "/auth/register",
-    endpoint="register_user",
-    view_func=make_handler(UserController.register_user, UserController, auth_required=False),
-    methods=["POST"],
-)
+def check_auth(controller):
+    auth_result, status = controller.check_auth()
+    if status != 200 or not auth_result.get("authenticated"):
+        return False
+    return True
 
-router.add_url_rule(
-    "/auth/login",
-    endpoint="login_user",
-    view_func=make_handler(UserController.login_user, UserController, auth_required=False),
-    methods=["POST"],
-)
 
-router.add_url_rule(
-    "/auth/logout",
-    endpoint="logout_user",
-    view_func=make_handler(UserController.logout_user, UserController),
-    methods=["POST"],
-)
+@ns.route("/auth/check")
+class AuthCheck(Resource):
+    def get(self):
+        ctx, controller = get_context_and_controller()
+        # auth_required=False in original
+        payload, status = controller.check_auth()
+        return payload, status
+
+
+@ns.route("/users/<int:user_id>")
+class UserById(Resource):
+    def get(self, user_id):
+        ctx, controller = get_context_and_controller()
+        if not check_auth(controller):
+            return {"error": "Unauthorized"}, 401
+
+        payload, status = controller.get_user_by_id(user_id)
+        return payload, status
+
+
+@ns.route("/users/me")
+class CurrentUser(Resource):
+    def get(self):
+        ctx, controller = get_context_and_controller()
+        # auth_required=False in original for this specific route?
+        # Original: make_handler(UserController.get_current_user, UserController, False)
+        # So yes, False.
+
+        payload, status = controller.get_current_user()
+        return payload, status
+
+
+@ns.route("/auth/upsert-user")
+class UpsertUser(Resource):
+    def post(self):
+        ctx, controller = get_context_and_controller()
+        # auth_required=False
+
+        body = request.get_json() or {}
+        payload, status = controller.upsert_user(**body)
+        return payload, status
+
+
+@ns.route("/auth/register")
+class RegisterUser(Resource):
+    def post(self):
+        ctx, controller = get_context_and_controller()
+        # auth_required=False
+
+        body = request.get_json() or {}
+        payload, status = controller.register_user(**body)
+        return payload, status
+
+
+@ns.route("/auth/login")
+class LoginUser(Resource):
+    def post(self):
+        ctx, controller = get_context_and_controller()
+        # auth_required=False
+
+        body = request.get_json() or {}
+        payload, status = controller.login_user(**body)
+        return payload, status
+
+
+@ns.route("/auth/logout")
+class LogoutUser(Resource):
+    def post(self):
+        ctx, controller = get_context_and_controller()
+        if not check_auth(controller):
+            return {"error": "Unauthorized"}, 401
+
+        payload, status = controller.logout_user()
+        return payload, status

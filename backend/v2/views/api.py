@@ -2,7 +2,11 @@
 from flask import Blueprint
 from flask_restx import Api
 
-from ... import __version__
+# Use absolute or specific import to avoid ambiguity
+from backend.v2 import __version__
+
+from .test_auth import ns as test_auth_ns
+from .users import ns as users_ns
 
 # API blueprint
 router = Blueprint("v2_api", __name__)
@@ -23,3 +27,6 @@ Documentation is available under `/v2/<namespace>/docs/`.
     doc="/docs/",  # final path → /v2/docs/
     prefix="/",  # routes stay clean; /v2 is applied via blueprint registration
 )
+
+api.add_namespace(users_ns)
+api.add_namespace(test_auth_ns)
