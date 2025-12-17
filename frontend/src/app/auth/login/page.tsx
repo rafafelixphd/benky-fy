@@ -50,8 +50,8 @@ export default function LoginPage() {
       const response = await apiClient.login({ email, password });
 
       if (response.success) {
-        // Redirect to dashboard or home
-        router.push("/dashboard");
+        // Redirect to modules
+        router.push("/modules");
       } else {
         setError(response.message || response.error || "Login failed");
       }

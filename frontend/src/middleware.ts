@@ -29,7 +29,7 @@ export function middleware(request: NextRequest) {
 
     // If hitting auth routes in dev/debug, skip Google and go home
     const response = isAuthRoute
-      ? NextResponse.redirect(new URL("/home", request.url))
+      ? NextResponse.redirect(new URL("/modules", request.url))
       : NextResponse.next();
 
     // Ensure dev session exists

@@ -162,6 +162,15 @@ class ApiClient {
       }
 
       const data = await response.json();
+
+      // If response is OK but 'success' is missing, assume success (legacy/backend mismatch adaptation)
+      if (response.ok && data.success === undefined) {
+        return {
+          ...data,
+          success: true
+        } as ApiResponse<T>;
+      }
+
       return data;
     } catch (error) {
       console.error("API request failed:", error);

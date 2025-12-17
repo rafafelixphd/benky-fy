@@ -38,8 +38,8 @@ export default function RegisterPage() {
             const response = await apiClient.register({ name, email, password });
 
             if (response.success) {
-                // Redirect to dashboard or home
-                router.push("/dashboard");
+                // Redirect to modules
+                router.push("/modules");
             } else {
                 setError(response.message || response.error || "Registration failed");
             }

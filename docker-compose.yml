@@ -73,9 +73,9 @@ services:
     container_name: benky-fy-frontend
     command: [ "npm", "run", "dev" ]
     environment:
-      NODE_ENV: development
-      AUTH_BYPASS: "false"
-      # NODE_ENV: production
+      # NODE_ENV: development
+      # AUTH_BYPASS: "false"
+      NODE_ENV: production
       PORT: 3000
       FLASK_API_URL: ${FLASK_API_URL:-http://backend:8080}
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
