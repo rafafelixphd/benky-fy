@@ -8,7 +8,7 @@ from ..logger import get_logger
 
 logger = get_logger(namespace="views")
 
-ns = Namespace("users", description="User operations")
+ns = Namespace("auth", description="Auth operations")
 
 
 # Helper to replicate make_handler logic slightly more idiomatically for Resources
@@ -31,40 +31,6 @@ class AuthCheck(Resource):
         ctx, controller = get_context_and_controller()
         # auth_required=False in original
         payload, status = controller.check_auth()
-        return payload, status
-
-
-@ns.route("/<int:user_id>")
-class UserById(Resource):
-    def get(self, user_id):
-        ctx, controller = get_context_and_controller()
-        if not check_auth(controller):
-            return {"error": "Unauthorized"}, 401
-
-        payload, status = controller.get_user_by_id(user_id)
-        return payload, status
-
-
-@ns.route("/me")
-class CurrentUser(Resource):
-    def get(self):
-        ctx, controller = get_context_and_controller()
-        # auth_required=False in original for this specific route?
-        # Original: make_handler(UserController.get_current_user, UserController, False)
-        # So yes, False.
-
-        payload, status = controller.get_current_user()
-        return payload, status
-
-
-@ns.route("/upsert-user")
-class UpsertUser(Resource):
-    def post(self):
-        ctx, controller = get_context_and_controller()
-        # auth_required=False
-
-        body = request.get_json() or {}
-        payload, status = controller.upsert_user(**body)
         return payload, status
 
 
@@ -98,4 +64,15 @@ class LogoutUser(Resource):
             return {"error": "Unauthorized"}, 401
 
         payload, status = controller.logout_user()
+        return payload, status
+
+
+@ns.route("/upsert-user")
+class UpsertUser(Resource):
+    def post(self):
+        ctx, controller = get_context_and_controller()
+        # auth_required=False
+
+        body = request.get_json() or {}
+        payload, status = controller.upsert_user(**body)
         return payload, status
