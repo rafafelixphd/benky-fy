@@ -6,14 +6,16 @@ import type { UserSettings } from "./api-client";
 
 // Authentication hooks
 export const useAuth = () => {
+  const enableBypass = (process.env.NODE_ENV === "development" && process.env.AUTH_BYPASS === "false");
+
   // Development mode - return synchronous data
-  if (process.env.NODE_ENV === "development") {
+  if (enableBypass) {
     return {
       data: {
         authenticated: true,
         user: {
           id: "dev-user",
-          name: "Development User",
+          name: "Hooks User",
           email: "dev@example.com",
           picture: "/user_icon.svg",
           joinDate: new Date().toISOString().split("T")[0],
@@ -36,59 +38,9 @@ export const useAuth = () => {
     queryKey: ["auth"],
     queryFn: async () => {
       try {
-
-        // Try to get session from cookie first (only on client side)
-        if (typeof document !== "undefined") {
-          const cookies = document.cookie.split(";");
-          console.log("All cookies:", cookies);
-          const sessionCookie = cookies.find((c) =>
-            c.trim().startsWith("benkyfy_session="),
-          );
-          console.log("Found session cookie:", sessionCookie);
-
-          if (sessionCookie) {
-            try {
-              const cookieValue = sessionCookie.split("=")[1];
-              console.log("Cookie value:", cookieValue);
-              const sessionData = JSON.parse(decodeURIComponent(cookieValue));
-              console.log("Parsed session data:", sessionData);
-
-              // Check if session is expired
-              if (sessionData.expires && sessionData.expires > Date.now()) {
-                return {
-                  authenticated: true,
-                  user: {
-                    ...sessionData.user,
-                    joinDate:
-                      sessionData.user.joinDate ||
-                      new Date().toISOString().split("T")[0],
-                    currentLevel: sessionData.user.currentLevel || "Beginner",
-                    totalStudyTime: sessionData.user.totalStudyTime || "0 hours",
-                    streakDays: sessionData.user.streakDays || 0,
-                    totalWordsLearned: sessionData.user.totalWordsLearned || 0,
-                    favoriteModules: sessionData.user.favoriteModules || [
-                      "Hiragana",
-                      "Basic Words",
-                      "Common Phrases",
-                    ],
-                    provider: sessionData.provider || "google",
-                  },
-                  session_keys: ["user"],
-                  google_authorized: sessionData.provider === "google",
-                };
-              }
-            } catch (parseError) {
-              console.error("Failed to parse session cookie:", parseError);
-            }
-          }
-        }
-
-        // Skip backend check in development to avoid API errors
-        if (process.env.NODE_ENV !== "development") {
-          const response = await apiClient.checkAuth();
-          if (response.success && response.data?.authenticated) {
-            return response.data;
-          }
+        const response = await apiClient.checkAuth();
+        if (response.success && response.authenticated) {
+          return response;
         }
       } catch (error) {
         console.error("Auth check failed:", error);

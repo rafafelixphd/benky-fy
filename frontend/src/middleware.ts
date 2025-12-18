@@ -37,7 +37,7 @@ export function middleware(request: NextRequest) {
       const devSessionData = {
         user: {
           id: "dev-user",
-          name: "Development User",
+          name: "Middleware User",
           email: "dev@example.com",
           picture: "/user_icon.svg",
           joinDate: new Date().toISOString().split("T")[0],

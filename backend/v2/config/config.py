@@ -59,6 +59,7 @@ class Config:
     # Session Security
     # --------------------------------------------------
 
+    SESSION_COOKIE_NAME = "benkyfy_session"
     SESSION_COOKIE_SECURE = FLASK_ENV == "production"  # HTTPS only in prod
     SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access
     SESSION_COOKIE_SAMESITE = "Lax"  # CSRF protection

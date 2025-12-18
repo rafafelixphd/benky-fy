@@ -183,7 +183,7 @@ class ApiClient {
 
   // Authentication endpoints
   async checkAuth(): Promise<ApiResponse<AuthResponse>> {
-    return this.request<AuthResponse>("/v2/auth/check-auth");
+    return this.request<AuthResponse>("/v2/auth/check");
   }
 
   async login(credentials: { email?: string; password?: string, provider?: string }): Promise<ApiResponse<AuthResponse>> {
