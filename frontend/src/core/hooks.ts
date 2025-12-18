@@ -39,9 +39,8 @@ export const useAuth = () => {
     queryFn: async () => {
       try {
         const response = await apiClient.checkAuth();
-        console.log("response: ", response);
-        if (response.success && response.authenticated) {
-          return response;
+        if (response.success && response.data?.authenticated) {
+          return response.data;
         }
       } catch (error) {
         console.error("Auth check failed:", error);

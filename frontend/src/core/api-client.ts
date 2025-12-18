@@ -166,9 +166,9 @@ class ApiClient {
       // If response is OK but 'success' is missing, assume success (legacy/backend mismatch adaptation)
       if (response.ok && data.success === undefined) {
         return {
-          ...data,
-          success: true
-        } as ApiResponse<T>;
+          success: true,
+          data: data as T
+        };
       }
 
       return data;
