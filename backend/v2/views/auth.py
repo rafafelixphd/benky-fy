@@ -13,6 +13,9 @@ ns = Namespace("auth", description="Auth operations")
 
 # Helper to replicate make_handler logic slightly more idiomatically for Resources
 def get_context_and_controller():
+    logger.debug(f"Headers: {request.headers}")
+    logger.debug(f"Cookies: {request.cookies}")
+    logger.info(f"Session: {session}")
     ctx = SessionContext(session)
     controller = UserController(ctx)
     return ctx, controller
@@ -29,7 +32,6 @@ def check_auth(controller):
 class AuthCheck(Resource):
     def get(self):
         ctx, controller = get_context_and_controller()
-        # auth_required=False in original
         payload, status = controller.check_auth()
         return payload, status
 

@@ -76,7 +76,6 @@ const learningModules: LearningModule[] = [
 
 export default function ModulesPage() {
   const { data: authData } = useAuth();
-  console.log("authData from page.txt", authData);
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden">
       <FloatingElements />

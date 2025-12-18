@@ -12,7 +12,7 @@ class Config:
     # --------------------------------------------------
     SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
     FLASK_ENV = os.environ.get("FLASK_ENV", "production")
-
+    DEBUG_ENV = os.environ.get("DEBUG_ENV", "false").lower() == "true"
     # --------------------------------------------------
     # DATABASE (PostgreSQL)
     # --------------------------------------------------

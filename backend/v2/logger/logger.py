@@ -1,4 +1,6 @@
+# logger.py
 import logging
+import os
 import sys
 from typing import Optional
 
@@ -67,6 +69,7 @@ def setup_logger(
         return _loggers[name]
 
     logger = logging.getLogger(name)
+    level = logging.DEBUG if os.environ.get("DEBUG_ENV", "false") == "true" else level
     logger.setLevel(level)
 
     if not logger.handlers:

@@ -11,7 +11,7 @@ from ..config.database import db
 from ..logger import get_logger
 from ..models import User, UserSession
 
-logger = get_logger(__name__)
+logger = get_logger(namespace="users")
 
 
 class UserController:
@@ -21,7 +21,7 @@ class UserController:
         self.ctx = ctx
 
     def check_auth(self):
-        logger.info(f"[USERS] Auth check for user_id={self.ctx.user_id}")
+        logger.debug(f"SessionContext.user_id: {self.ctx.user_id}")
         if not self.ctx.user_id:
             return {
                 "authenticated": False,
