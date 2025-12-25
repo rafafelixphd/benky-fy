@@ -258,3 +258,5 @@ yarn-error.log*
 next-env.d.ts
 **/.next/
 **/node_modules/
+**/package-lock.json
+./frontend/package-lock.json

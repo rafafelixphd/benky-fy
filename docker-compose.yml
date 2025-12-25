@@ -41,6 +41,7 @@ services:
       FLASK_ENV: ${FLASK_ENV:-production}
       FLASK_SECRET_KEY: ${FLASK_SECRET_KEY:?Flask secret key required}
       PORT: 8080
+      DEBUG_ENV: "true"
       # Google OAuth
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
@@ -55,12 +56,12 @@ services:
       - "${BACKEND_PORT:-8080}:8080"
     volumes:
       - ./backend/:/app/backend/
-      # healthcheck:
-      # test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      # interval: 30s
-      # timeout: 10s
-      # retries: 3
-      # start_period: 40s
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - benky-fy-network
     restart: unless-stopped
@@ -69,19 +70,20 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: frontend/Dockerfile.dev
+      dockerfile: frontend/Dockerfile
     container_name: benky-fy-frontend
-    command: [ "npm", "run", "dev" ]
+    # command: [ "npm", "run", "dev" ]
     environment:
-      NODE_ENV: development
-      AUTH_BYPASS: "true"
-      # NODE_ENV: production
+      # NODE_ENV: development
+      # AUTH_BYPASS: "false"
+      NODE_ENV: production
       PORT: 3000
       FLASK_API_URL: ${FLASK_API_URL:-http://backend:8080}
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
-    depends_on: [] # - backend
+    depends_on:
+      - backend
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     healthcheck:
@@ -90,8 +92,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    volumes:
-      - ./frontend/:/app/
+      # volumes:
+      # - ./frontend/:/app/
       # - ./frontend/src/:/app/src/
       # - ./frontend/public/:/app/public/
     networks:
@@ -112,11 +114,11 @@ services:
       - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
-      # healthcheck:
-      # test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
-      # interval: 30s
-      # timeout: 10s
-      # retries: 3
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - benky-fy-network
     restart: unless-stopped

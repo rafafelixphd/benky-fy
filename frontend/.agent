@@ -1,0 +1,52 @@
+# Frontend Development Guide
+
+## Project Structure
+- **Framework**: Next.js 15 (App Router)
+- **Styling**: Tailwind CSS, PostCSS
+- **State**: React Context (`user-context.tsx`), Hooks
+- **Language**: TypeScript
+
+## Directory Layout
+- `src/app`: App Router pages and layouts.
+- `src/components`: UI components. `common` for layout/shared, `ui` for base elements (likely Shadcn-like).
+- `src/core`: Core logic.
+  - `api-client.ts`: Singleton `apiClient` for backend requests. Handles `credentials: include`.
+  - `api-utils.ts`: Constants and utilities.
+- `src/modules`: Feature-specific logic? (Need to verify, assuming domain logic).
+
+## Key Patterns
+
+1.  **API Requests**:
+    - ALWAYS use `apiClient` from `src/core/api-client.ts`.
+    - Do NOT use `fetch` directly in components.
+    - `apiClient` methods return `Promise<ApiResponse<T>>`.
+    - Check `response.success` before using `response.data`.
+
+2.  **Authentication**:
+    - Backend-driven session (HttpOnly cookies).
+    - Session validation via `src/middleware.ts`.
+    - `apiClient` automatically sends credentials.
+    - Global 401 handling should redirect to login.
+
+3.  **Components**:
+    - Use `lucide-react` for icons.
+    - Use "use client" for interactive components.
+    - Prefer composition over prop drilling.
+
+4.  **Styling**:
+    - Use Tailwind utility classes.
+    - Primary colors: `primary-purple`, `secondary-purple`.
+    - Use `bg-gradient-to-br` for page backgrounds.
+    - Responsive design is mandatory.
+
+5.  **Creating New Features**:
+    - Add page in `src/app`.
+    - Add supporting components in `src/components`.
+    - Add API methods in `src/core/api-client.ts`.
+    - If protected, ensure middleware covers it.
+
+## Do's and Don'ts
+- **DO** use `credentials: 'include'` (handled by `apiClient`).
+- **DO** handle loading and error states in UI.
+- **DON'T** expose sensitive logic in client components.
+- **DON'T** hardcode API URLs; use environment variables via `api-client.ts`.

@@ -41,7 +41,10 @@ export async function GET(request: NextRequest) {
     const flaskApiUrl = process.env.FLASK_API_URL || "http://localhost:8080";
     const upsertResponse = await fetch(`${flaskApiUrl}/v2/auth/upsert-user`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": request.headers.get("user-agent") || "",
+      },
       body: JSON.stringify({
         google_id: payload.sub,
         email: payload.email,
@@ -88,22 +91,16 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(new URL("/home", getBaseUrl()));
 
     // Set secure HTTP-only cookie with user session
-    const sessionData = {
-      user,
-      provider: "google",
-      authenticated: true,
-      expires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
-    };
-
-    response.cookies.set({
-      name: "benkyfy_session",
-      value: JSON.stringify(sessionData),
-      httpOnly: false, // Allow JavaScript access in development
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60, // 24 hours
-      path: "/",
-    });
+    // Forward the session cookie from Flask backend
+    const setCookieHeader = upsertResponse.headers.get("set-cookie");
+    if (setCookieHeader) {
+      // Split potentially multiple cookies (though Flask usually sends one session cookie here)
+      // and append them to the response
+      const serverCookies = setCookieHeader.split(/,(?=\s*[^;]+=[^;]+)/);
+      serverCookies.forEach(cookie => {
+        response.headers.append("Set-Cookie", cookie.trim());
+      });
+    }
 
     return response;
   } catch (error) {

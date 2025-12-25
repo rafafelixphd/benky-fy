@@ -76,7 +76,6 @@ const learningModules: LearningModule[] = [
 
 export default function ModulesPage() {
   const { data: authData } = useAuth();
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden">
       <FloatingElements />
@@ -139,13 +138,12 @@ export default function ModulesPage() {
                         {module.name}
                       </h3>
                       <span
-                        className={`text-sm px-2 py-1 rounded ${
-                          module.status === "Available"
-                            ? "dark:bg-green-900 dark:text-green-200 bg-green-100 text-green-800"
-                            : module.status === "Mock Up"
-                              ? "dark:bg-blue-900 dark:text-blue-200 bg-blue-100 text-blue-800"
-                              : "dark:bg-yellow-900 dark:text-yellow-200 bg-yellow-100 text-yellow-800"
-                        }`}
+                        className={`text-sm px-2 py-1 rounded ${module.status === "Available"
+                          ? "dark:bg-green-900 dark:text-green-200 bg-green-100 text-green-800"
+                          : module.status === "Mock Up"
+                            ? "dark:bg-blue-900 dark:text-blue-200 bg-blue-100 text-blue-800"
+                            : "dark:bg-yellow-900 dark:text-yellow-200 bg-yellow-100 text-yellow-800"
+                          }`}
                       >
                         {module.status}
                       </span>

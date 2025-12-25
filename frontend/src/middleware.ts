@@ -7,6 +7,7 @@ import type { NextRequest } from "next/server";
 const publicPaths = [
   "/",
   "/auth/login",
+  "/auth/register",
   "/api/auth/google",
   "/api/auth/google/callback",
   "/auth/logout",
@@ -15,7 +16,10 @@ const publicPaths = [
 export function middleware(request: NextRequest) {
   console.log("[MW]", request.method, request.nextUrl.pathname, "env:", process.env.NODE_ENV);
 
-  if (process.env.NODE_ENV === "development" || process.env.AUTH_BYPASS === "true") {
+  // Bypass if AUTH_BYPASS is true, OR if we are in dev and it is NOT explicitly false
+  const enableBypass = process.env.AUTH_BYPASS === "true" || (process.env.NODE_ENV === "development" && process.env.AUTH_BYPASS !== "false");
+
+  if (enableBypass) {
     console.log("[MW] Development mode: Bypassing authentication");
     const isAuthRoute =
       request.nextUrl.pathname.startsWith("/api/auth/google") ||
@@ -25,7 +29,7 @@ export function middleware(request: NextRequest) {
 
     // If hitting auth routes in dev/debug, skip Google and go home
     const response = isAuthRoute
-      ? NextResponse.redirect(new URL("/home", request.url))
+      ? NextResponse.redirect(new URL("/modules", request.url))
       : NextResponse.next();
 
     // Ensure dev session exists
@@ -33,7 +37,7 @@ export function middleware(request: NextRequest) {
       const devSessionData = {
         user: {
           id: "dev-user",
-          name: "Development User",
+          name: "Middleware User",
           email: "dev@example.com",
           picture: "/user_icon.svg",
           joinDate: new Date().toISOString().split("T")[0],

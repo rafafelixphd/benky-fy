@@ -12,7 +12,7 @@ class Config:
     # --------------------------------------------------
     SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
     FLASK_ENV = os.environ.get("FLASK_ENV", "production")
-
+    DEBUG_ENV = os.environ.get("DEBUG_ENV", "false").lower() == "true"
     # --------------------------------------------------
     # DATABASE (PostgreSQL)
     # --------------------------------------------------
@@ -59,6 +59,7 @@ class Config:
     # Session Security
     # --------------------------------------------------
 
+    SESSION_COOKIE_NAME = "benkyfy_session"
     SESSION_COOKIE_SECURE = FLASK_ENV == "production"  # HTTPS only in prod
     SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access
     SESSION_COOKIE_SAMESITE = "Lax"  # CSRF protection
