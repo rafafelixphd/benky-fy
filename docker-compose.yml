@@ -73,7 +73,6 @@ services:
       dockerfile: frontend/Dockerfile
     container_name: benky-fy-frontend
     # command: [ "npm", "run", "dev" ]
-    command: [ "sleep", "100000000" ]
     environment:
       # NODE_ENV: development
       # AUTH_BYPASS: "false"
