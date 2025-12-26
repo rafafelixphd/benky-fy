@@ -2,9 +2,9 @@
 
 import React from "react";
 import { ProgressData, ProgressMetrics } from "../../types/ProgressTypes";
-import { UserSettings } from "@/core/api-client";
+import { UserSettings } from "@/services/api-client";
 import { ProgressBar } from "./ProgressBar";
-import { cn } from "@/core/utils";
+import { cn } from "@/services/utils";
 
 interface ProgressSectionProps {
   currentItem: number;
@@ -146,11 +146,11 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
                 className={cn(
                   "p-2 rounded-lg text-sm",
                   insight.type === "success" &&
-                    "bg-green-500/20 text-green-200 border border-green-500/30",
+                  "bg-green-500/20 text-green-200 border border-green-500/30",
                   insight.type === "warning" &&
-                    "bg-yellow-500/20 text-yellow-200 border border-yellow-500/30",
+                  "bg-yellow-500/20 text-yellow-200 border border-yellow-500/30",
                   insight.type === "info" &&
-                    "bg-blue-500/20 text-blue-200 border border-blue-500/30",
+                  "bg-blue-500/20 text-blue-200 border border-blue-500/30",
                 )}
               >
                 {insight.message}

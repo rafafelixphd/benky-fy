@@ -1,7 +1,7 @@
 'use client';
 
 import { LucideIcon } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Card } from '@/shared/components/ui/card';
 
 interface StatCardProps {
   label: string;

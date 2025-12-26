@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import { FuriganaProps } from "@/components/japanese/types/display";
+import { FuriganaProps } from "@/shared/components/japanese/types/display";
 
 const sizeClasses = {
   sm: {
@@ -56,7 +56,7 @@ export function FuriganaText({
   const shouldShowReading = hoverToShow ? isHovered : showReading;
 
   return (
-    <div 
+    <div
       className={`
         inline-flex flex-col ${sizeClass.gap} items-center
         ${styleClass.container} ${className}
@@ -67,7 +67,7 @@ export function FuriganaText({
       onMouseLeave={() => setIsHovered(false)}
     >
       {reading && (
-        <span 
+        <span
           className={`
             ${sizeClass.reading} ${styleClass.reading}
             text-primary-foreground/70

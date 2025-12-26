@@ -1,5 +1,5 @@
-import { FloatingElements } from "@/components/common/layout/background";
-import { Button } from "@/components/ui/button";
+import { FloatingElements } from "@/shared/components/common/layout/background";
+import { Button } from "@/shared/components//ui/button";
 import { BookOpen, Brain, Target, Zap } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";

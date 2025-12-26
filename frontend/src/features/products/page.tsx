@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { UserMenu } from "@/components/common/layout/navigation/user-menu";
-import { useAuth } from "@/core/hooks";
-import { FloatingElements } from "@/components/common/layout/background";
+import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
+import { useAuth } from "@/services/hooks";
+import { FloatingElements } from "@/shared/components/common/layout/background";
 import {
   BookOpen,
   Brain,
@@ -17,8 +17,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card } from "@/shared/components/ui/card";
+import { Button } from "@/shared/components/ui/button";
 
 type ModuleStatus = "Available" | "Mock Up" | "Coming Soon";
 

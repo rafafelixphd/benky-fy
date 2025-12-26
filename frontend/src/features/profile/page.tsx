@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AuthGuard } from "@/components/common/auth";
-import { UserMenu } from "@/components/common/layout/navigation/user-menu";
-import { useAuth } from "@/core/hooks";
-import type { UserData } from "@/types/user";
-import { FloatingElements } from "@/components/common/layout/background";
+import { AuthGuard } from "@/shared/components/common/auth";
+import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
+import { useAuth } from "@/services/hooks";
+import type { UserData } from "@/entities/user";
+import { FloatingElements } from "@/shared/components/common/layout/background";
 import {
   User,
   Calendar,
@@ -18,8 +18,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card } from "@/shared/components/ui/card";
+import { Button } from "@/shared/components/ui/button";
 
 export default function ProfilePage() {
   const { data: authData } = useAuth();

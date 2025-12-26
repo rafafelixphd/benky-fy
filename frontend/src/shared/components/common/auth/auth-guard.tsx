@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect } from "react";
-import { useAuth } from "@/core/hooks";
-import { apiClient } from "@/core/api-client";
-import { Button } from "@/components/ui/button";
+import { useAuth } from "@/services/hooks";
+import { apiClient } from "@/services/api-client";
+import { Button } from "@/shared/components/ui/button";
 import { Loader2 } from "lucide-react";
 
 interface AuthGuardProps {

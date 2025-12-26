@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { AnswerFeedback } from "../feedback";
-import { useValidateInput } from "@/core/hooks";
-import { validateAnswer, validateWithSettings, ValidationResult } from "@/core/validation";
-import { convertInputForField } from "@/core/romaji-conversion";
+import { useValidateInput } from "@/services/hooks";
+import { validateAnswer, validateWithSettings, ValidationResult } from "@/services/validation";
+import { convertInputForField } from "@/services/romaji-conversion";
 import { getModuleType } from "./helpers/module-type";
 import { MultiInputTable } from "./helpers/multi-input-table";
 import { TextInput } from "./text-input";

@@ -1,5 +1,5 @@
-import { FlashcardItem, UserSettings } from "@/core/api-client";
-import { ValidationResult } from "@/core/validation";
+import { FlashcardItem, UserSettings } from "@/services/api-client";
+import { ValidationResult } from "@/services/validation";
 
 export interface BaseFeedbackProps {
   item: FlashcardItem;

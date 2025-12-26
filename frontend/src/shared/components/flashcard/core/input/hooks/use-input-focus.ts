@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect, useState } from "react";
-import { UserSettings } from "@/core/api-client";
+import { UserSettings } from "@/services/api-client";
 import { getModuleType } from "../helpers/module-type";
 
 interface InputFocusState {

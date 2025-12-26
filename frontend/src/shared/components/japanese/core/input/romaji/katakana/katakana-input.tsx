@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRomajiConversion } from "../utils/conversion";
-import { RomajiInputProps } from "@/components/japanese/types/input";
+import { RomajiInputProps } from "@/shared/components/japanese/types/input";
 
 export function KatakanaInput({
   value,

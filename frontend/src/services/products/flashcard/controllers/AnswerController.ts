@@ -1,4 +1,4 @@
-import { ValidationResult } from "@/core/validation/core/ValidationResult";
+import { ValidationResult } from "@/services/validation/core/ValidationResult";
 import {
   AnswerSubmission,
   AnswerResult,

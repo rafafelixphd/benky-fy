@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { useTheme } from "./theme-context";
 import { ThemeToggleProps } from "./types";
-import { cn } from "@/core/utils";
+import { cn } from "@/services/utils";
 
 const variants = {
   default: "border-primary-purple/30 text-primary-purple hover:bg-primary-purple/10 dark:border-primary-purple/50 dark:text-primary-purple dark:hover:bg-primary-purple/20",

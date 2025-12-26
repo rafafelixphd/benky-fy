@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { UserMenu } from "@/components/common/layout/navigation/user-menu";
-import { useAuth } from "@/core/hooks";
-import { FloatingElements } from "@/components/common/layout/background";
+import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
+import { useAuth } from "@/services/hooks";
+import { FloatingElements } from "@/shared/components/common/layout/background";
 import {
   BookOpen,
   Check,
@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card } from "@/shared/components/ui/card";
+import { Button } from "@/shared/components/ui/button";
 
 const lessonContent = {
   title: "Japanese Writing Systems: Hiragana & Katakana",
@@ -132,11 +132,10 @@ export default function HiraganaKatakanaPage() {
                         {section.title}
                       </h3>
                       <span
-                        className={`text-sm px-2 py-1 rounded ${
-                          section.status === "Available"
-                            ? "dark:bg-green-900 dark:text-green-200 bg-green-100 text-green-800"
-                            : "dark:bg-yellow-900 dark:text-yellow-200 bg-yellow-100 text-yellow-800"
-                        }`}
+                        className={`text-sm px-2 py-1 rounded ${section.status === "Available"
+                          ? "dark:bg-green-900 dark:text-green-200 bg-green-100 text-green-800"
+                          : "dark:bg-yellow-900 dark:text-yellow-200 bg-yellow-100 text-yellow-800"
+                          }`}
                       >
                         {section.status}
                       </span>

@@ -1,6 +1,6 @@
 'use client';
 
-import { CharacterGridProps } from "@/components/japanese/types/display";
+import { CharacterGridProps } from "@/shared/components/japanese/types/display";
 
 export function CharacterGrid({
   characters,
@@ -12,7 +12,7 @@ export function CharacterGrid({
   className = "",
 }: CharacterGridProps) {
   return (
-    <div 
+    <div
       className={`grid gap-4 ${className}`}
       style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
     >
@@ -22,8 +22,8 @@ export function CharacterGrid({
           onClick={() => onCharacterClick?.(char.char)}
           className={`
             relative p-4 rounded-lg border transition-all duration-200
-            ${selectedChar === char.char 
-              ? 'bg-primary-purple/20 border-primary-purple/50 shadow-lg' 
+            ${selectedChar === char.char
+              ? 'bg-primary-purple/20 border-primary-purple/50 shadow-lg'
               : 'bg-background/10 border-primary-foreground/20 hover:bg-background/20'
             }
           `}
@@ -43,11 +43,11 @@ export function CharacterGrid({
               </span>
             )}
             {char.type && (
-              <span 
+              <span
                 className={`
                   absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded
-                  ${char.type === 'hiragana' 
-                    ? 'bg-blue-500/20 text-blue-200' 
+                  ${char.type === 'hiragana'
+                    ? 'bg-blue-500/20 text-blue-200'
                     : 'bg-purple-500/20 text-purple-200'
                   }
                 `}

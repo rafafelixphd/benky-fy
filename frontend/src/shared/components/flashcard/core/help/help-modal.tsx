@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { X, HelpCircle, Loader2 } from "lucide-react";
 
 interface HelpModalProps {

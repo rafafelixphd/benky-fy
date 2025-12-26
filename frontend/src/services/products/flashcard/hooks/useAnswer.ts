@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { AnswerController } from "../controllers/AnswerController";
-import { ValidationResult } from "@/core/validation/core/ValidationResult";
+import { ValidationResult } from "@/services/validation/core/ValidationResult";
 import { AnswerFeedback } from "../types/AnswerTypes";
 import { FlashcardItem } from "../types/FlashcardTypes";
 

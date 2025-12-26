@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import { FlashcardItem, ValidationRequest } from "@/core/api-client";
-import { useValidateInput } from "@/core/hooks";
-import { validateAnswer, validateWithSettings } from "@/core/validation";
-import { ValidationResult } from "@/core/validation/core/ValidationResult";
+import { FlashcardItem, ValidationRequest } from "@/services/api-client";
+import { useValidateInput } from "@/services/hooks";
+import { validateAnswer, validateWithSettings } from "@/services/validation";
+import { ValidationResult } from "@/services/validation/core/ValidationResult";
 
 interface UseAnswerValidationProps {
   enableServerValidation: boolean;

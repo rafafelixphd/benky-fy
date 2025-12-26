@@ -1,5 +1,5 @@
-import { FlashcardItem, UserSettings } from "@/core/api-client";
-import { ValidationResult } from "@/core/validation";
+import { FlashcardItem, UserSettings } from "@/services/api-client";
+import { ValidationResult } from "@/services/validation";
 
 export interface ModuleTypeInfo {
   hasKatakana: boolean;
@@ -13,12 +13,12 @@ export interface AnswerInputProps {
     answer:
       | string
       | {
-          english: string;
-          hiragana: string;
-          katakana?: string;
-          kanji?: string;
-          romaji?: string;
-        },
+        english: string;
+        hiragana: string;
+        katakana?: string;
+        kanji?: string;
+        romaji?: string;
+      },
     validationResult?: any,
   ) => void;
   onAdvance?: () => void;

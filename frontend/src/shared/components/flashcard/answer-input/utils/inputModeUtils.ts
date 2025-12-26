@@ -1,4 +1,4 @@
-import { UserSettings } from "@/core/api-client";
+import { UserSettings } from "@/services/api-client";
 
 /**
  * Input mode configuration interface

@@ -4,7 +4,7 @@ import {
   romajiToHiragana,
   romajiToKatakana,
   convertInputForField,
-} from "@/core/romaji-conversion";
+} from "@/services/romaji-conversion";
 
 /**
  * Custom hook for romaji conversion logic

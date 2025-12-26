@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo } from "react";
-import { useSettingsStore } from "@/core/settings-store";
-import { useUpdateSettings } from "@/core/hooks";
-import { Button } from "@/components/ui/button";
+import { useSettingsStore } from "@/services/settings-store";
+import { useUpdateSettings } from "@/services/hooks";
+import { Button } from "@/shared/components/ui/button";
 import { X, Settings as SettingsIcon } from "lucide-react";
 import { SettingsModalProps } from "../../types/settings";
 import { SettingsSection } from "./settings-section";

@@ -1,4 +1,4 @@
-import { ModuleTypeInfo } from "@/components/flashcard/types/input";
+import { ModuleTypeInfo } from "@/shared/components/flashcard/types/input";
 
 const defaultModuleType: ModuleTypeInfo = {
   hasKatakana: false,

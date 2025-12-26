@@ -8,7 +8,7 @@ import {
   ConjugationForm,
   Verb,
 } from "../core/ActivityValidator";
-import { UserSettings } from "@/core/api-client";
+import { UserSettings } from "@/services/api-client";
 import { ValidationResult } from "../core/ValidationResult";
 import { ValidatorFactory } from "../factories/ValidatorFactory";
 

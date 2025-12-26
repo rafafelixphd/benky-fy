@@ -3,7 +3,7 @@ import {
   AnswerSubmission,
   InputType,
 } from "../types/AnswerTypes";
-import { ValidationResult } from "@/core/validation/core/ValidationResult";
+import { ValidationResult } from "@/services/validation/core/ValidationResult";
 
 /**
  * AnswerModel - Data model for answer submissions and results
@@ -34,9 +34,9 @@ export class AnswerModel {
       "validationResult" in data
         ? data.validationResult
         : {
-            isCorrect: false,
-            feedback: ["No validation performed"],
-          };
+          isCorrect: false,
+          feedback: ["No validation performed"],
+        };
     this.timestamp =
       "timestamp" in data && data.timestamp
         ? new Date(data.timestamp)

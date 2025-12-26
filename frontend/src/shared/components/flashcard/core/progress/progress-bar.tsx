@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from "@/core/utils";
+import { cn } from "@/services/utils";
 import { ProgressBarProps } from "../../types/progress";
 
 export function ProgressBar({

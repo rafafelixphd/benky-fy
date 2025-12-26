@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { X, Settings as SettingsIcon } from "lucide-react";
 import { WordTypeSelector } from './word-type-selector';
 import { DisplayConfig } from './display-config';
@@ -61,19 +61,19 @@ const defaultSettings: CustomFlashcardSettings = {
     { id: "hiragana", name: "Hiragana", enabled: true, weight: 25, category: "foundations", difficulty: "Beginner", cardCount: 46 },
     { id: "katakana", name: "Katakana", enabled: true, weight: 25, category: "foundations", difficulty: "Beginner", cardCount: 46 },
     { id: "katakana_words", name: "Katakana Words", enabled: false, weight: 0, category: "foundations", difficulty: "Intermediate", cardCount: 20 },
-    
+
     // Numbers & Time
     { id: "numbers_basic", name: "Basic Numbers", enabled: true, weight: 20, category: "numbers-time", difficulty: "Beginner", cardCount: 10 },
     { id: "numbers_extended", name: "Extended Numbers", enabled: false, weight: 0, category: "numbers-time", difficulty: "Intermediate", cardCount: 20 },
     { id: "days_of_week", name: "Days of Week", enabled: true, weight: 15, category: "numbers-time", difficulty: "Beginner", cardCount: 7 },
     { id: "months_complete", name: "Months", enabled: false, weight: 0, category: "numbers-time", difficulty: "Beginner", cardCount: 12 },
-    
+
     // Essential Vocabulary
     { id: "greetings_essential", name: "Greetings", enabled: true, weight: 15, category: "essential-vocab", difficulty: "Beginner", cardCount: 15 },
     { id: "question_words", name: "Question Words", enabled: false, weight: 0, category: "essential-vocab", difficulty: "Beginner", cardCount: 12 },
     { id: "base_nouns", name: "Basic Nouns", enabled: false, weight: 0, category: "essential-vocab", difficulty: "Beginner", cardCount: 25 },
     { id: "colors_basic", name: "Colors", enabled: false, weight: 0, category: "essential-vocab", difficulty: "Beginner", cardCount: 10 },
-    
+
     // Grammar & Structure
     { id: "adjectives", name: "Adjectives", enabled: false, weight: 0, category: "grammar-structure", difficulty: "Intermediate", cardCount: 30 },
     { id: "verbs", name: "Japanese Verbs", enabled: false, weight: 0, category: "grammar-structure", difficulty: "Intermediate", cardCount: 50 },

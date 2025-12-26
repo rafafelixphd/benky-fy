@@ -1,4 +1,4 @@
-import { UserSettings } from "@/core/api-client";
+import { UserSettings } from "@/services/api-client";
 import { SettingsModel } from "../models/SettingsModel";
 import { InputType } from "../types/AnswerTypes";
 

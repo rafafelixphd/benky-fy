@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from "@/core/utils";
+import { cn } from "@/services/utils";
 import { CheckCircle, XCircle, SkipForward } from "lucide-react";
 import { AccuracyChartProps } from "../../types/progress";
 
@@ -18,15 +18,15 @@ export function AccuracyChart({
   return (
     <div className={cn("space-y-4", className)}>
       <div className="flex h-2 rounded-full overflow-hidden">
-        <div 
+        <div
           className="bg-emerald-500 transition-all duration-300"
           style={{ width: `${correctPercentage}%` }}
         />
-        <div 
+        <div
           className="bg-red-500 transition-all duration-300"
           style={{ width: `${incorrectPercentage}%` }}
         />
-        <div 
+        <div
           className="bg-yellow-500 transition-all duration-300"
           style={{ width: `${skippedPercentage}%` }}
         />

@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from "@/core/utils";
+import { cn } from "@/services/utils";
 import { Flame, Trophy } from "lucide-react";
 import { StreakIndicatorProps } from "../../types/progress";
 

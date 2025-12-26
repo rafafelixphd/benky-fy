@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { UserMenu } from "@/components/common/layout/navigation/user-menu";
-import { useAuth } from "@/core/hooks";
-import { FloatingElements } from "@/components/common/layout/background";
+import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
+import { useAuth } from "@/services/hooks";
+import { FloatingElements } from "@/shared/components/common/layout/background";
 import {
   Send,
   Bot,
@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 
 const dummyExercise = {
   english: "The cat is eating at the park",
@@ -202,11 +202,10 @@ export default function SentencesPage() {
                   {dummyExercise.improvements.map((improvement, i) => (
                     <div
                       key={i}
-                      className={`flex items-center gap-2 text-sm ${
-                        improvement.startsWith("✓")
-                          ? "text-green-400"
-                          : "text-blue-400"
-                      }`}
+                      className={`flex items-center gap-2 text-sm ${improvement.startsWith("✓")
+                        ? "text-green-400"
+                        : "text-blue-400"
+                        }`}
                     >
                       {improvement.startsWith("✓") ? (
                         <ThumbsUp className="w-4 h-4 flex-shrink-0" />

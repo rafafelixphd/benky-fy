@@ -1,6 +1,6 @@
 import { useRef, useCallback, useEffect, useState } from "react";
 import { getEnabledInputModes } from "../utils/inputModeUtils";
-import { UserSettings } from "@/core/api-client";
+import { UserSettings } from "@/services/api-client";
 
 /**
  * Custom hook for input focus management

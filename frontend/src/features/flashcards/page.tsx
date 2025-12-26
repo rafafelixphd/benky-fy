@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { AuthGuard } from "@/components/common/auth";
-import { UserMenu } from "@/components/common/layout/navigation/user-menu";
-import { useAuth } from "@/core/hooks";
-import { FloatingElements } from "@/components/common/layout/background";
+import { AuthGuard } from "@/shared/components/common/auth";
+import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
+import { useAuth } from "@/services/hooks";
+import { FloatingElements } from "@/shared/components/common/layout/background";
 import {
   BookOpen,
   Brain,
@@ -18,8 +18,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { CompactCard } from "@/components/flashcard/core/display/cards";
-import { Button } from "@/components/ui/button";
+import { CompactCard } from "@/shared/components/flashcard/core/display/cards";
+import { Button } from "@/shared/components/ui/button";
 
 const flashcardCategories = [
   {

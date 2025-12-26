@@ -1,7 +1,7 @@
-import { ValidationResult } from "@/core/validation/core/ValidationResult";
-import { AnswerSet } from "@/core/validation/core/ActivityValidator";
-import { UserSettings } from "@/core/api-client";
-import { ModuleValidatorFactory } from "@/core/validation/factories/ModuleValidatorFactory";
+import { ValidationResult } from "@/services/validation/core/ValidationResult";
+import { AnswerSet } from "@/services/validation/core/ActivityValidator";
+import { UserSettings } from "@/services/api-client";
+import { ModuleValidatorFactory } from "@/services/validation/factories/ModuleValidatorFactory";
 import { AnswerModel } from "../models/AnswerModel";
 
 /**
@@ -214,7 +214,7 @@ export class ValidationService {
     const averageAttempts =
       totalAnswers > 0
         ? answers.reduce((sum, answer) => sum + answer.attempts, 0) /
-          totalAnswers
+        totalAnswers
         : 0;
 
     return {

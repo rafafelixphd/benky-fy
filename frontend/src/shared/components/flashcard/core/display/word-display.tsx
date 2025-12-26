@@ -1,7 +1,7 @@
 'use client';
 
-import { FlashcardItem, UserSettings } from "@/core/api-client";
-import { FuriganaText, CharacterDisplay } from "@/components/japanese/core/display/furigana";
+import { FlashcardItem, UserSettings } from "@/services/api-client";
+import { FuriganaText, CharacterDisplay } from "@/shared/components/japanese/core/display/furigana";
 
 interface WordDisplayProps {
   item: FlashcardItem;
@@ -21,7 +21,7 @@ export function WordDisplay({
   const renderJapaneseText = (text: string, furigana?: string, hiragana?: string) => {
     const furiganaStyle = settings.furigana_style || "ruby";
     const isHoverMode = furiganaStyle === "hover";
-    
+
     if (text === item.kanji) {
       return (
         <div className="flex flex-col items-center gap-4">

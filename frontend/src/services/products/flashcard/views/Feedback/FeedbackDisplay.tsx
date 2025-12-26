@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ValidationResult } from "@/core/validation";
-import { cn } from "@/core/utils";
+import { ValidationResult } from "@/services/validation";
+import { cn } from "@/services/utils";
 import { AnswerFeedback } from "./AnswerFeedback";
 import { FloatingFeedback } from "./FloatingFeedback";
 

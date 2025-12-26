@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { UserMenu } from "@/components/common/layout/navigation/user-menu";
-import { useAuth } from "@/core/hooks";
-import { FloatingElements } from "@/components/common/layout/background";
+import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
+import { useAuth } from "@/services/hooks";
+import { FloatingElements } from "@/shared/components/common/layout/background";
 import { Send, Bot, User, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 
 const mockResponses = [
   {
@@ -161,11 +161,10 @@ export default function ChatPage() {
                       className={`space-y-2 ${msg.role === "user" ? "items-end" : "items-start"}`}
                     >
                       <div
-                        className={`rounded-lg p-4 ${
-                          msg.role === "user"
-                            ? "bg-primary-purple text-white dark:bg-primary-purple/80"
-                            : "bg-background/30 dark:bg-background/40 text-primary-foreground"
-                        }`}
+                        className={`rounded-lg p-4 ${msg.role === "user"
+                          ? "bg-primary-purple text-white dark:bg-primary-purple/80"
+                          : "bg-background/30 dark:bg-background/40 text-primary-foreground"
+                          }`}
                       >
                         <p className="whitespace-pre-wrap">{msg.content}</p>
                         {msg.translation && (

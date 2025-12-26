@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { FlashcardItem, UserSettings } from "@/core/api-client";
-import { cn } from "@/core/utils";
+import { FlashcardItem, UserSettings } from "@/services/api-client";
+import { cn } from "@/services/utils";
 import { WordDisplay } from './word-display';
 import { HintDisplay } from './hint-display';
 

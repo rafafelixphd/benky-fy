@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import { ValidationResult } from "@/core/validation/core/ValidationResult";
-import { ModuleValidatorFactory } from "@/core/validation/factories/ModuleValidatorFactory";
-import { AnswerSet } from "@/core/validation/core/ActivityValidator";
-import { FlashcardItem, UserSettings } from "@/core/api-client";
+import { ValidationResult } from "@/services/validation/core/ValidationResult";
+import { ModuleValidatorFactory } from "@/services/validation/factories/ModuleValidatorFactory";
+import { AnswerSet } from "@/services/validation/core/ActivityValidator";
+import { FlashcardItem, UserSettings } from "@/services/api-client";
 
 interface ValidationState {
   validationResult: ValidationResult | null;
@@ -87,7 +87,7 @@ export const useInputValidation = () => {
   ): ValidationResult => {
     const results = moduleValidator.validateMultipleInputs(userAnswers, answerSet);
     const allCorrect = results.every((r: ValidationResult) => r.isCorrect);
-    
+
     return {
       isCorrect: allCorrect,
       feedback: allCorrect ? ["All inputs correct!"] : ["Some inputs are incorrect"],

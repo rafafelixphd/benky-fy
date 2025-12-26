@@ -3,7 +3,7 @@
  */
 
 import { ValidationResult } from "./ValidationResult";
-import { UserSettings } from "@/core/api-client";
+import { UserSettings } from "@/services/api-client";
 
 /**
  * Answer set containing correct answers for different input types

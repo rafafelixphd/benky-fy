@@ -1,7 +1,7 @@
 'use client';
 
 import { AlertTriangle, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { ErrorDisplayProps } from "./types";
 
 export function ErrorDisplay({

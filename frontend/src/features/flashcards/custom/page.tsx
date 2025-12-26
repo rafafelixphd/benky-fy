@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { AuthGuard } from "@/components/common/auth";
-import { UserMenu } from "@/components/common/layout/navigation/user-menu";
-import { useAuth } from "@/core/hooks";
-import { FloatingElements } from "@/components/common/layout/background";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { AuthGuard } from "@/shared/components/common/auth";
+import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
+import { useAuth } from "@/services/hooks";
+import { FloatingElements } from "@/shared/components/common/layout/background";
+import { Button } from "@/shared/components/ui/button";
+import { Card } from "@/shared/components/ui/card";
 import {
   Settings,
   Play,
@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { CustomFlashcardSettingsModal, type CustomFlashcardSettings } from "@/components/flashcard/core/settings";
+import { CustomFlashcardSettingsModal, type CustomFlashcardSettings } from "@/shared/components/flashcard/core/settings";
 
 export default function CustomFlashcardPage() {
   const { data: authData } = useAuth();
@@ -40,31 +40,31 @@ export default function CustomFlashcardPage() {
       setShowSettings(true);
       return;
     }
-    
+
     setIsLoadingCards(true);
     setIsSessionActive(true);
-    
+
     try {
       // Get enabled modules
       const enabledModules = settings.modules.filter(module => module.enabled);
-      
+
       if (enabledModules.length === 0) {
         alert("Please select at least one module to start a session.");
         setIsSessionActive(false);
         setIsLoadingCards(false);
         return;
       }
-      
+
       // Load flashcards from each enabled module
       const allFlashcards: any[] = [];
-      
+
       for (const module of enabledModules) {
         try {
           const response = await fetch(`/api/v2/words/${module.id}`);
           if (response.ok) {
             const data = await response.json();
             const moduleCards = data.words || [];
-            
+
             // Add module info to each card
             const cardsWithModule = moduleCards.map((card: any) => ({
               ...card,
@@ -72,27 +72,27 @@ export default function CustomFlashcardPage() {
               moduleName: module.name,
               moduleWeight: module.weight,
             }));
-            
+
             allFlashcards.push(...cardsWithModule);
           }
         } catch (error) {
           console.error(`Failed to load flashcards from ${module.name}:`, error);
         }
       }
-      
+
       if (allFlashcards.length === 0) {
         alert("No flashcards found in the selected modules.");
         setIsSessionActive(false);
         setIsLoadingCards(false);
         return;
       }
-      
+
       // Shuffle flashcards
       const shuffledCards = allFlashcards.sort(() => Math.random() - 0.5);
-      
+
       setSessionFlashcards(shuffledCards);
       setCurrentCardIndex(0);
-      
+
     } catch (error) {
       console.error("Failed to start session:", error);
       alert("Failed to start session. Please try again.");
@@ -182,7 +182,7 @@ export default function CustomFlashcardPage() {
         {/* Main Content */}
         <div className="relative z-10 px-6 pb-6">
           <div className="max-w-4xl mx-auto">
-            
+
             {/* Configuration Status */}
             <Card className="bg-background/10 backdrop-blur-sm border-white/20 mb-6">
               <div className="p-6">
@@ -323,7 +323,7 @@ export default function CustomFlashcardPage() {
                                 {getCurrentCard()?.moduleName}
                               </span>
                             </div>
-                            
+
                             <div className="bg-white rounded-lg p-6 mb-4">
                               <h3 className="text-xl font-bold text-gray-800 mb-2">
                                 {getCurrentCard()?.kanji || getCurrentCard()?.hiragana || getCurrentCard()?.katakana}
@@ -334,12 +334,12 @@ export default function CustomFlashcardPage() {
                                 </p>
                               )}
                               <p className="text-lg text-gray-700">
-                                {Array.isArray(getCurrentCard()?.english) 
+                                {Array.isArray(getCurrentCard()?.english)
                                   ? getCurrentCard().english.join(", ")
                                   : getCurrentCard()?.english}
                               </p>
                             </div>
-                            
+
                             <div className="flex gap-3">
                               <Button
                                 onClick={nextCard}

@@ -3,19 +3,19 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Menu } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useRandomWord, useTrackAnswer, AnswerResult } from "@/core/hooks";
-import { validateAnswer } from "@/core/validation";
-import { useSettingsStore } from "@/core/settings-store";
-import { FlashcardDisplay } from "@/components/flashcard/core/display";
-import { AnswerInput } from "@/components/flashcard/core/input";
-import { ProgressSection } from "@/components/flashcard/core/progress";
-import { SettingsModal } from "@/components/flashcard/core/settings";
-import { FloatingFeedback } from "@/components/flashcard/core/feedback";
-import { HelpModal } from "@/components/flashcard/core/help";
-import { Statistics } from "@/components/flashcard/core/stats";
-import { NavigationHeader } from "@/components/common/layout/navigation";
-import { MobileMenu } from "@/components/ui/mobile-menu";
-import { Button } from "@/components/ui/button";
+import { useRandomWord, useTrackAnswer, AnswerResult } from "@/services/hooks";
+import { validateAnswer } from "@/services/validation";
+import { useSettingsStore } from "@/services/settings-store";
+import { FlashcardDisplay } from "@/shared/components/flashcard/core/display";
+import { AnswerInput } from "@/shared/components/flashcard/core/input";
+import { ProgressSection } from "@/shared/components/flashcard/core/progress";
+import { SettingsModal } from "@/shared/components/flashcard/core/settings";
+import { FloatingFeedback } from "@/shared/components/flashcard/core/feedback";
+import { HelpModal } from "@/shared/components/flashcard/core/help";
+import { Statistics } from "@/shared/components/flashcard/core/stats";
+import { NavigationHeader } from "@/shared/components/common/layout/navigation";
+import { MobileMenu } from "@/shared/components/ui/mobile-menu";
+import { Button } from "@/shared/components/ui/button";
 import { Loader2, Settings, HelpCircle, BarChart3 } from "lucide-react";
 
 export default function FlashcardPage() {
@@ -95,12 +95,12 @@ export default function FlashcardPage() {
       userAnswer:
         | string
         | {
-            english: string;
-            hiragana: string;
-            katakana?: string;
-            kanji?: string;
-            romaji?: string;
-          },
+          english: string;
+          hiragana: string;
+          katakana?: string;
+          kanji?: string;
+          romaji?: string;
+        },
       serverValidationResult?: any,
     ) => {
       if (!currentItem) return;
@@ -134,9 +134,9 @@ export default function FlashcardPage() {
         typeof userAnswer === "string"
           ? userAnswer
           : `${userAnswer.hiragana || ""} / ${userAnswer.english || ""}`.replace(
-              / \/ $/,
-              "",
-            );
+            / \/ $/,
+            "",
+          );
       setLastAnswer(answerString);
       setLastMatchedType(validationResult.matchedType);
       setLastConvertedAnswer(validationResult.convertedAnswer);
@@ -288,12 +288,12 @@ export default function FlashcardPage() {
                   },
                   ...(currentMode === "flashcard"
                     ? [
-                        {
-                          icon: Settings,
-                          label: "Settings",
-                          onClick: () => setShowSettings(true),
-                        },
-                      ]
+                      {
+                        icon: Settings,
+                        label: "Settings",
+                        onClick: () => setShowSettings(true),
+                      },
+                    ]
                     : []),
                 ]}
                 trigger={

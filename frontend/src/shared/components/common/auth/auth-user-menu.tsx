@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { User, LogOut } from "lucide-react";
 import { AuthUserMenuProps } from "./types";
 

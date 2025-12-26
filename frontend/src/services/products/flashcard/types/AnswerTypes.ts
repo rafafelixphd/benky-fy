@@ -2,7 +2,7 @@
  * AnswerTypes - Type definitions for answer system
  */
 
-import { ValidationResult } from "@/core/validation/core/ValidationResult";
+import { ValidationResult } from "@/services/validation/core/ValidationResult";
 
 /**
  * Input type enumeration

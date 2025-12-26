@@ -1,26 +1,26 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { UserSettings, FlashcardItem } from "@/core/api-client";
+import { UserSettings, FlashcardItem } from "@/services/api-client";
 import { MultiInputTable } from "./components/MultiInputTable";
 import { SubmitButton } from "./components/SubmitButton";
 import { useInputValidation } from "./hooks/useInputValidation";
 import { useRomajiConversion } from "./hooks/useRomajiConversion";
 import { useInputFocus } from "./hooks/useInputFocus";
 import { getEnabledInputModes } from "./utils/inputModeUtils";
-import { cn } from "@/core/utils";
+import { cn } from "@/services/utils";
 
 interface AnswerInputProps {
   onSubmit: (
     answer:
       | string
       | {
-          english: string;
-          hiragana: string;
-          katakana?: string;
-          kanji?: string;
-          romaji?: string;
-        },
+        english: string;
+        hiragana: string;
+        katakana?: string;
+        kanji?: string;
+        romaji?: string;
+      },
     validationResult?: any,
   ) => void;
   onAdvance?: () => void;

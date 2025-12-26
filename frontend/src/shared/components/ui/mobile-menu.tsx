@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 interface MobileMenuProps {
@@ -68,11 +68,10 @@ export function MobileMenu({
           top: menuPosition,
           right: "1rem",
         }}
-        className={`w-48 rounded-lg shadow-lg bg-background/95 backdrop-blur-md border border-primary-purple/10 transition-all duration-300 ease-in-out ${
-          isOpen
+        className={`w-48 rounded-lg shadow-lg bg-background/95 backdrop-blur-md border border-primary-purple/10 transition-all duration-300 ease-in-out ${isOpen
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-[10px] pointer-events-none"
-        }`}
+          }`}
       >
         <div className="py-1">
           {items.map((item, index) => {

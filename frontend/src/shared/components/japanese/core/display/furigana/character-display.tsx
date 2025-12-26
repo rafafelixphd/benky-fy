@@ -1,6 +1,6 @@
 'use client';
 
-import { CharacterDisplayProps } from "@/components/japanese/types/display";
+import { CharacterDisplayProps } from "@/shared/components/japanese/types/display";
 import { FuriganaText } from "./furigana-text";
 
 export function CharacterDisplay({

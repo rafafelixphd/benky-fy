@@ -1,5 +1,5 @@
-import { FlashcardItem, UserSettings } from "@/core/api-client";
-import { ValidationResult } from "@/core/validation";
+import { FlashcardItem, UserSettings } from "@/services/api-client";
+import { ValidationResult } from "@/services/validation";
 import { getModuleType } from "../input/helpers/module-type";
 
 export const getEnabledInputModes = (settings: UserSettings, moduleName?: string) => {
@@ -93,7 +93,7 @@ export const getFeedbackContainerColor = (
   } else if (frontendValidationResult) {
     return "bg-red-500/20 border-red-400 text-red-300";
   }
-  
+
   return isCorrect
     ? "bg-emerald-500/20 border-emerald-400 text-emerald-300"
     : "bg-red-500/20 border-red-400 text-red-300";

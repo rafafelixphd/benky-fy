@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { FloatingElements } from "@/components/common/layout/background";
+import { Button } from "@/shared/components/ui/button";
+import { FloatingElements } from "@/shared/components/common/layout/background";
 import { Home, BookOpen, ArrowLeft } from "lucide-react";
 
 export default function NotFoundPage() {

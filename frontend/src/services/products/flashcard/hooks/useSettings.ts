@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { SettingsController } from "../controllers/SettingsController";
-import { UserSettings } from "@/core/api-client";
+import { UserSettings } from "@/services/api-client";
 import { InputType } from "../types/AnswerTypes";
 
 interface UseSettingsState {
