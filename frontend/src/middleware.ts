@@ -14,13 +14,11 @@ const publicPaths = [
 ];
 
 export function middleware(request: NextRequest) {
-  console.log("[MW]", request.method, request.nextUrl.pathname, "env:", process.env.NODE_ENV);
-
   // Bypass if AUTH_BYPASS is true, OR if we are in dev and it is NOT explicitly false
   const enableBypass = process.env.AUTH_BYPASS === "true" || (process.env.NODE_ENV === "development" && process.env.AUTH_BYPASS !== "false");
 
   if (enableBypass) {
-    console.log("[MW] Development mode: Bypassing authentication");
+    console.log("[MW] WARNING: Development mode BYPASSING authentication");
     const isAuthRoute =
       request.nextUrl.pathname.startsWith("/api/auth/google") ||
       request.nextUrl.pathname === "/auth/login";
@@ -66,13 +64,13 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Existing public-path logic
   const isPublicPath = publicPaths.some(
     (path) =>
       request.nextUrl.pathname === path ||
       request.nextUrl.pathname.startsWith("/api/") ||
       request.nextUrl.pathname.startsWith(path + "/"),
   );
+
 
   if (isPublicPath) {
     return NextResponse.next();
