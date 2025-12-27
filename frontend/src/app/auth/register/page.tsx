@@ -52,7 +52,7 @@ export default function RegisterPage() {
 
     const handleSocialLogin = async (provider: string) => {
         if (provider === "google") {
-            window.location.href = "/api/auth/google";
+            window.location.href = "/auth/google";
         }
     };
 

@@ -64,7 +64,7 @@ export default function LoginPage() {
   const handleSocialLogin = async (provider: string) => {
     // Keep existing social login logic if functionality exists or acts as placeholder
     if (provider === "google") {
-      window.location.href = "/api/auth/google";
+      window.location.href = "/auth/google";
     }
   };
 

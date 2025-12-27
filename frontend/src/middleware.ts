@@ -8,8 +8,8 @@ const publicPaths = [
   "/",
   "/auth/login",
   "/auth/register",
-  "/api/auth/google",
-  "/api/auth/google/callback",
+  "/auth/google",
+  "/auth/google/callback",
   "/auth/logout",
 ];
 
@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
   if (enableBypass) {
     console.log("[MW] WARNING: Development mode BYPASSING authentication");
     const isAuthRoute =
-      request.nextUrl.pathname.startsWith("/api/auth/google") ||
+      request.nextUrl.pathname.startsWith("/auth/google") ||
       request.nextUrl.pathname === "/auth/login";
 
     const session = request.cookies.get("benkyfy_session");

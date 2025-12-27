@@ -5,7 +5,7 @@ import { getBaseUrl } from "@/services/api-utils";
 const client = new OAuth2Client(
   process.env.GOOGLE_OAUTH_CLIENT_ID,
   process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-  `${getBaseUrl()}/api/auth/google/callback`
+  `${getBaseUrl()}/auth/google/callback`
 );
 
 export async function getGoogleAuthUrl() {

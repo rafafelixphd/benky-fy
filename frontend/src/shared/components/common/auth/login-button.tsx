@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from "@/shared/components/ui/button";
-import { cn } from "@/services/utils";
+import { cn } from "@/core/utils";
 import { LoginButtonProps } from "./types";
 
 const providerConfig = {
@@ -53,7 +53,7 @@ export function LoginButton({
     if (onLogin) {
       onLogin();
     } else {
-      window.location.href = `/api/auth/${provider}`;
+      window.location.href = `/auth/${provider}`;
     }
   };
 
