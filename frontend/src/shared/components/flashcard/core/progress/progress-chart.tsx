@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 import { Clock } from "lucide-react";
 import { ProgressChartProps } from "../../types/progress";
 import { AccuracyChart } from "./accuracy-chart";

@@ -1,4 +1,4 @@
-import { FlashcardItem, UserSettings } from "@/services/api-client";
+import { FlashcardItem, UserSettings } from "@/api/private/flashcards/api-client";
 import { ValidationResult } from "@/services/validation";
 import { getModuleType } from "../input/helpers/module-type";
 

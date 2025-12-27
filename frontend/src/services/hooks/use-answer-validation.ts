@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { FlashcardItem, ValidationRequest } from "@/services/api-client";
+import { FlashcardItem, ValidationRequest } from "@/api/private/flashcards/api-client";
 import { useValidateInput } from "@/services/hooks";
 import { validateAnswer, validateWithSettings } from "@/services/validation";
 import { ValidationResult } from "@/services/validation/core/ValidationResult";

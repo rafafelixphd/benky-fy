@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 
 interface SingleInputFieldProps {
   type: string;

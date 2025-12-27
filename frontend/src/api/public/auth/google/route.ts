@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
-import { getBaseUrl } from "@/services/api-utils";
+import { getBaseUrl } from "@/services/utils/api-utils";
 
 const client = new OAuth2Client(
   process.env.GOOGLE_OAUTH_CLIENT_ID,

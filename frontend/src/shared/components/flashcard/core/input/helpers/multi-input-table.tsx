@@ -1,7 +1,7 @@
 'use client';
 
 import { MultiInputTableProps } from "@/shared/components/flashcard/types/input";
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 
 export function MultiInputTable({
   modes,

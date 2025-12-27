@@ -2,7 +2,7 @@
 
 import React from "react";
 import { FlashcardItem } from "../../types/FlashcardTypes";
-import { UserSettings } from "@/services/api-client";
+import { UserSettings } from "@/api/private/flashcards/api-client";
 import { FuriganaText, CharacterDisplay } from "@/shared/components/japanese/core/display/furigana";
 
 interface FlashcardContentProps {

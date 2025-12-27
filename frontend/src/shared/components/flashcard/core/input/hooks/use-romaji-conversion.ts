@@ -4,7 +4,7 @@ import {
   romajiToHiragana,
   romajiToKatakana,
   convertInputForField,
-} from "@/services/romaji-conversion";
+} from "@/services/utils/romaji-conversion";
 
 interface ConversionHistoryEntry {
   input: string;

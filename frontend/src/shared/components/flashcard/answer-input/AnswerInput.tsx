@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { UserSettings, FlashcardItem } from "@/services/api-client";
+import { UserSettings, FlashcardItem } from "@/api/private/flashcards/api-client";
 import { MultiInputTable } from "./components/MultiInputTable";
 import { SubmitButton } from "./components/SubmitButton";
 import { useInputValidation } from "./hooks/useInputValidation";
 import { useRomajiConversion } from "./hooks/useRomajiConversion";
 import { useInputFocus } from "./hooks/useInputFocus";
 import { getEnabledInputModes } from "./utils/inputModeUtils";
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 
 interface AnswerInputProps {
   onSubmit: (

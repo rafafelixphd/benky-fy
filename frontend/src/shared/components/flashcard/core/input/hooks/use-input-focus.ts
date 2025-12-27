@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect, useState } from "react";
-import { UserSettings } from "@/services/api-client";
+import { UserSettings } from "@/api/private/flashcards/api-client";
 import { getModuleType } from "../helpers/module-type";
 
 interface InputFocusState {

@@ -2,9 +2,9 @@
 
 import React from "react";
 import { ProgressData, ProgressMetrics } from "../../types/ProgressTypes";
-import { UserSettings } from "@/services/api-client";
+import { UserSettings } from "@/api/private/flashcards/api-client";
 import { ProgressBar } from "./ProgressBar";
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 
 interface ProgressSectionProps {
   currentItem: number;

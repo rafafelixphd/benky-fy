@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 
 interface FlashcardActionsProps {
   onNext?: () => void;

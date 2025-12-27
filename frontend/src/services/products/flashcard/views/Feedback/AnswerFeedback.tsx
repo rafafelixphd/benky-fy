@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react";
 import { FlashcardItem } from "../../types/FlashcardTypes";
-import { UserSettings } from "@/services/api-client";
+import { UserSettings } from "@/api/private/flashcards/api-client";
 import { ValidationResult, getFeedbackColor } from "@/services/validation";
 
 interface AnswerFeedbackProps {

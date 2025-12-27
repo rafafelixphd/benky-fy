@@ -1,4 +1,4 @@
-import { UserSettings } from "@/services/api-client";
+import { UserSettings } from "@/api/private/flashcards/api-client";
 
 /**
  * Input mode configuration interface

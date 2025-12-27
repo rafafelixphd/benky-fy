@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 import { CheckCircle, XCircle, SkipForward } from "lucide-react";
 import { AccuracyChartProps } from "../../types/progress";
 

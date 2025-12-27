@@ -1,6 +1,6 @@
 'use client';
 
-import { FlashcardItem, UserSettings } from "@/services/api-client";
+import { FlashcardItem, UserSettings } from "@/api/private/flashcards/api-client";
 import { FuriganaText, CharacterDisplay } from "@/shared/components/japanese/core/display/furigana";
 
 interface WordDisplayProps {

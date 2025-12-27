@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { ValidationResult } from "@/services/validation/core/ValidationResult";
 import { ModuleValidatorFactory } from "@/services/validation/factories/ModuleValidatorFactory";
 import { AnswerSet } from "@/services/validation/core/ActivityValidator";
-import { FlashcardItem, UserSettings } from "@/services/api-client";
+import { FlashcardItem, UserSettings } from "@/api/private/flashcards/api-client";
 
 interface ValidationState {
   validationResult: ValidationResult | null;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getBaseUrl } from "@/services/api-utils";
+import { getBaseUrl } from "@/services/utils/api-utils";
 import { validateGoogleSession } from "@/api/public/auth/google/callback/route";
 
 export async function GET(request: NextRequest) {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from "react";
-import { useSettingsStore } from "@/services/settings-store";
+import { useSettingsStore } from "@/services/products/flashcard/settings-store";
 import { useUpdateSettings } from "@/services/hooks";
 import { Button } from "@/shared/components/ui/button";
 import { X, Settings as SettingsIcon } from "lucide-react";

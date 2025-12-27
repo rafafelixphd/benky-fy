@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { UserSettings } from "./api-client";
+import { UserSettings } from "../../../api/private/flashcards/api-client";
 
 interface SettingsState {
   settings: Record<string, UserSettings>;

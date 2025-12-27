@@ -5,7 +5,7 @@ import { Menu } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useRandomWord, useTrackAnswer, AnswerResult } from "@/services/hooks";
 import { validateAnswer } from "@/services/validation";
-import { useSettingsStore } from "@/services/settings-store";
+import { useSettingsStore } from "@/services/products/flashcard/settings-store";
 import { FlashcardDisplay } from "@/shared/components/flashcard/core/display";
 import { AnswerInput } from "@/shared/components/flashcard/core/input";
 import { ProgressSection } from "@/shared/components/flashcard/core/progress";

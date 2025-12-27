@@ -2,10 +2,10 @@
 
 import React, { useEffect, useCallback } from "react";
 import { FlashcardItem } from "../../types/FlashcardTypes";
-import { UserSettings } from "@/services/api-client";
+import { UserSettings } from "@/api/private/flashcards/api-client";
 import { ValidationResult, getFeedbackColor } from "@/services/validation";
 import { X, CheckCircle, XCircle, AlertCircle } from "lucide-react";
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 
 interface FloatingFeedbackContainerProps {
   validationResult: ValidationResult;

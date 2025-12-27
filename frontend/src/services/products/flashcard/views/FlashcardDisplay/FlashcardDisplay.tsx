@@ -2,10 +2,10 @@
 
 import React, { useState } from "react";
 import { FlashcardItem } from "../../types/FlashcardTypes";
-import { UserSettings } from "@/services/api-client";
+import { UserSettings } from "@/api/private/flashcards/api-client";
 import { FlashcardContent } from "./FlashcardContent";
 import { FlashcardActions } from "./FlashcardActions";
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 
 interface FlashcardDisplayProps {
   flashcard: FlashcardItem;

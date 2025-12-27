@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 
 interface SubmitButtonProps {
   onSubmit: () => void;

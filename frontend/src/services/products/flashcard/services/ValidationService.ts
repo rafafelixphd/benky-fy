@@ -1,6 +1,6 @@
 import { ValidationResult } from "@/services/validation/core/ValidationResult";
 import { AnswerSet } from "@/services/validation/core/ActivityValidator";
-import { UserSettings } from "@/services/api-client";
+import { UserSettings } from "@/api/private/flashcards/api-client";
 import { ModuleValidatorFactory } from "@/services/validation/factories/ModuleValidatorFactory";
 import { AnswerModel } from "../models/AnswerModel";
 

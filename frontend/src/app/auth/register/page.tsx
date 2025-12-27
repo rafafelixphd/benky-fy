@@ -7,7 +7,7 @@ import { FloatingElements } from "@/shared/components/common/layout/background";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Loader2 } from "lucide-react";
-import { apiClient } from "@/services/api-client";
+import { apiClient } from "@/api/private/flashcards/api-client";
 
 export default function RegisterPage() {
     const router = useRouter();

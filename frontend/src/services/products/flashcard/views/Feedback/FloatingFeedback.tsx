@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { ValidationResult } from "@/services/validation";
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 
 interface FloatingFeedbackProps {
   validationResult: ValidationResult;

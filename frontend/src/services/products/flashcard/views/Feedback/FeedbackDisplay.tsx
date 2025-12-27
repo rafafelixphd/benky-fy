@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ValidationResult } from "@/services/validation";
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 import { AnswerFeedback } from "./AnswerFeedback";
 import { FloatingFeedback } from "./FloatingFeedback";
 

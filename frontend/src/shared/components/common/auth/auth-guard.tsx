@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAuth } from "@/services/hooks";
-import { apiClient } from "@/services/api-client";
+import { apiClient } from "@/api/private/flashcards/api-client";
 import { Button } from "@/shared/components/ui/button";
 import { Loader2 } from "lucide-react";
 

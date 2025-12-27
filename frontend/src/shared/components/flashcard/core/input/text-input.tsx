@@ -1,7 +1,7 @@
 'use client';
 
 import { forwardRef } from 'react';
-import { cn } from "@/services/utils";
+import { cn } from "@/services/utils/utils";
 import { InputFieldProps } from "@/shared/components/flashcard/types/input";
 
 export const TextInput = forwardRef<HTMLInputElement, InputFieldProps>(({

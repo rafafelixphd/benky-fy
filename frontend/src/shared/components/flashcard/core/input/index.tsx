@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import { AnswerFeedback } from "../feedback";
 import { useValidateInput } from "@/services/hooks";
 import { validateAnswer, validateWithSettings, ValidationResult } from "@/services/validation";
-import { convertInputForField } from "@/services/romaji-conversion";
+import { convertInputForField } from "@/services/utils/romaji-conversion";
 import { getModuleType } from "./helpers/module-type";
 import { MultiInputTable } from "./helpers/multi-input-table";
 import { TextInput } from "./text-input";
