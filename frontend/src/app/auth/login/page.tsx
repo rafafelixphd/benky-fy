@@ -50,7 +50,7 @@ export default function LoginPage() {
       const response = await apiClient.login({ email, password });
 
       if (response.success) {
-        router.push("/modules");
+        router.push("/dashboard");
       } else {
         setError(response.message || response.error || "Login failed");
       }

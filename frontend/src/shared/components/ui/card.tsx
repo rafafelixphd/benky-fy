@@ -5,7 +5,7 @@ import {
   cardStyles,
   layoutStyles,
   interactionStyles,
-} from "@/styles/components";
+} from "@/shared/styles/components";
 
 interface CardProps {
   children: ReactNode;

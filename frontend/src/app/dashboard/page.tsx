@@ -5,16 +5,11 @@ import { AuthGuard } from "@/shared/components/common/auth/auth-guard";
 import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
 import { useAuth } from "@/services/hooks";
 import { FloatingElements } from "@/shared/components/common/layout/background/floating-elements";
-import { RomajiInput } from "@/shared/components/japanese/core/input/romaji";
 import { Button } from "@/shared/components/ui/button";
 import {
   BookOpen,
   Brain,
   Target,
-  TrendingUp,
-  Clock,
-  Award,
-  Search,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,92 +18,18 @@ import { ProgressBar } from "@/shared/components/common/layout/progress/progress
 import { StatCard } from "@/shared/components/common/layout/stats/stat-card";
 import { ActivityCard } from "@/shared/components/common/layout/activity/activity-card";
 import { GoalProgress } from "@/shared/components/common/layout/progress/goal-progress";
-
-const dashboardData = {
-  todayStats: {
-    studyTime: "2 hours 30 minutes",
-    cardsReviewed: 45,
-    accuracy: 87,
-    streakDays: 12,
-  },
-  recentActivity: [
-    {
-      module: "Hiragana",
-      action: "Completed 20 cards",
-      time: "2 hours ago",
-      accuracy: 90,
-    },
-    {
-      module: "Numbers",
-      action: "Reviewed 15 cards",
-      time: "1 day ago",
-      accuracy: 85,
-    },
-    {
-      module: "Time",
-      action: "Started new session",
-      time: "2 days ago",
-      accuracy: 78,
-    },
-  ],
-  weeklyProgress: [
-    { day: "Mon", cards: 25, accuracy: 88 },
-    { day: "Tue", cards: 30, accuracy: 92 },
-    { day: "Wed", cards: 20, accuracy: 85 },
-    { day: "Thu", cards: 35, accuracy: 90 },
-    { day: "Fri", cards: 28, accuracy: 87 },
-    { day: "Sat", cards: 22, accuracy: 89 },
-    { day: "Sun", cards: 18, accuracy: 91 },
-  ],
-};
-
-const recentModules = [
-  {
-    id: "hiragana",
-    name: "Hiragana",
-    progress: 75,
-    lastStudied: "2 hours ago",
-  },
-  { id: "katakana", name: "Katakana", progress: 20, lastStudied: "3 days ago" },
-  {
-    id: "colors_basic",
-    name: "Colors",
-    progress: 60,
-    lastStudied: "1 day ago",
-  },
-];
-
-const stats = [
-  {
-    label: "Study Time Today",
-    value: dashboardData.todayStats.studyTime,
-    icon: Clock,
-    color: "text-purple-500",
-  },
-  {
-    label: "Cards Reviewed",
-    value: dashboardData.todayStats.cardsReviewed.toString(),
-    icon: BookOpen,
-    color: "text-blue-500",
-  },
-  {
-    label: "Accuracy Rate",
-    value: `${dashboardData.todayStats.accuracy}%`,
-    icon: Award,
-    color: "text-orange-500",
-  },
-  {
-    label: "Current Streak",
-    value: `${dashboardData.todayStats.streakDays} days`,
-    icon: TrendingUp,
-    color: "text-green-500",
-  },
-];
+import {
+  dashboardData,
+  recentModules,
+  getStatsConfig
+} from "@/services/pages/dashboard";
 
 export default function DashboardPage() {
   const { data: authData } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [useRomajiInput, setUseRomajiInput] = useState(false);
+
+  const stats = getStatsConfig(dashboardData.todayStats);
 
   return (
     <AuthGuard>
