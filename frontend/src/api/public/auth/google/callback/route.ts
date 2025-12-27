@@ -9,15 +9,15 @@ const client = new OAuth2Client(
   `${getBaseUrl()}/api/auth/google/callback`
 );
 
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const code = searchParams.get("code");
-
-  if (!code) {
-    return NextResponse.redirect(new URL("/auth/login", getBaseUrl()));
-  }
-
+export async function validateGoogleSession(request: NextRequest, codeParamName: string = "code", redirectUrl: string = "/dashboard") {
   try {
+    const searchParams = request.nextUrl.searchParams;
+    const code = searchParams.get(codeParamName);
+
+    if (!code) {
+      return NextResponse.redirect(new URL("/auth/login", getBaseUrl()));
+    }
+
     const { tokens } = await client.getToken(code);
     client.setCredentials(tokens);
 
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
     };
 
     // Create session cookie and redirect
-    const response = NextResponse.redirect(new URL("/home", getBaseUrl()));
+    const response = NextResponse.redirect(new URL(redirectUrl, getBaseUrl()));
 
     // Set secure HTTP-only cookie with user session
     // Forward the session cookie from Flask backend
@@ -107,4 +107,5 @@ export async function GET(request: NextRequest) {
     console.error("Google OAuth error:", error);
     return NextResponse.redirect(new URL("/auth/login", getBaseUrl()));
   }
+
 }

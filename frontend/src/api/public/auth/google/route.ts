@@ -8,7 +8,7 @@ const client = new OAuth2Client(
   `${getBaseUrl()}/api/auth/google/callback`
 );
 
-export async function GET() {
+export async function getGoogleAuthUrl() {
   const authUrl = client.generateAuthUrl({
     access_type: "offline",
     scope: [
@@ -17,6 +17,10 @@ export async function GET() {
     ],
     prompt: "consent",
   });
+  return authUrl;
+}
 
+export async function GET() {
+  const authUrl = await getGoogleAuthUrl();
   return NextResponse.redirect(authUrl);
 }
