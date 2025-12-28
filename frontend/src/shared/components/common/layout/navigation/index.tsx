@@ -25,7 +25,7 @@ const navigationItems: NavigationItem[] = [
   { href: "/", label: "Home", icon: Home },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/flashcards", label: "Flashcards", icon: Brain },
-  { href: "/modules", label: "Modules", icon: BookOpen },
+  { href: "/products", label: "Modules", icon: BookOpen },
   { href: "/stats", label: "Stats", icon: BarChart3 },
 ];
 

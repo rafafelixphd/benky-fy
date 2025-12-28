@@ -91,7 +91,7 @@ export default function DashboardPage() {
                 <h2 className="text-xl font-semibold text-primary-foreground">
                   Continue Learning
                 </h2>
-                <Link href="/modules">
+                <Link href="/home">
                   <Button
                     variant="outline"
                     className="border-primary-foreground text-primary hover:bg-background/90"                  >
@@ -192,7 +192,7 @@ export default function DashboardPage() {
                       Browse All Flashcards
                     </Button>
                   </Link>
-                  <Link href="/modules">
+                  <Link href="/products">
                     <Button
                       variant="outline"
                       className="w-full justify-start bg-background text-primary hover:bg-background/90"

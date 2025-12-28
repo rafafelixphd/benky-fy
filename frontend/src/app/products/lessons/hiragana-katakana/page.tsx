@@ -84,7 +84,7 @@ export default function HiraganaKatakanaPage() {
       {/* Header */}
       <div className="relative z-10 p-6 flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <Link href="/modules/lessons" className="flex items-center">
+          <Link href="/products/lessons" className="flex items-center">
             <Image
               src="/logo1.webp"
               alt="BenkoFY logo"

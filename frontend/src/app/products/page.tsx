@@ -173,7 +173,7 @@ export default function ModulesPage() {
                         href={
                           isAvailable
                             ? `/${module.id}`
-                            : `/modules/${module.id}`
+                            : `/products/${module.id}`
                         }
                       >
                         <span className="flex items-center justify-center">

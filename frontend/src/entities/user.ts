@@ -1,3 +1,4 @@
+// user.ts
 export interface UserData {
   name: string;
   email: string;
@@ -11,9 +12,3 @@ export interface UserData {
   favoriteModules: string[];
 }
 
-export interface AuthResponse {
-  authenticated: boolean;
-  user?: UserData;
-  session_keys: string[];
-  google_authorized: boolean;
-}

@@ -69,7 +69,7 @@ export default function LessonsPage() {
       {/* Header */}
       <div className="relative z-10 p-6 flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <Link href="/modules" className="flex items-center">
+          <Link href="/home" className="flex items-center">
             <Image
               src="/logo1.webp"
               alt="BenkoFY logo"
@@ -138,7 +138,7 @@ export default function LessonsPage() {
                       asChild
                       className="w-full bg-primary-purple hover:bg-primary-purple/90"
                     >
-                      <Link href={`/modules/lessons/${lesson.id}`}>
+                      <Link href={`/products/lessons/${lesson.id}`}>
                         <span className="flex items-center justify-center">
                           Start Lesson
                           <ArrowRight className="w-4 h-4 ml-2" />

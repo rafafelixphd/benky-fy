@@ -227,7 +227,7 @@ export default function ProfilePage() {
                     variant="outline"
                     className="w-full justify-start border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
                   >
-                    <Link href="/modules">
+                    <Link href="/home">
                       <Target className="w-4 h-4 mr-2" />
                       Browse Modules
                     </Link>

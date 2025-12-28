@@ -39,7 +39,7 @@ export default function RegisterPage() {
 
             if (response.success) {
                 // Redirect to modules
-                router.push("/modules");
+                router.push("/home");
             } else {
                 setError(response.message || response.error || "Registration failed");
             }

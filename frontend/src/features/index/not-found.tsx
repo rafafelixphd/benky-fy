@@ -51,7 +51,7 @@ export default function NotFoundPage() {
                         </Button>
 
                         <Button
-                            onClick={() => router.push("/modules")}
+                            onClick={() => router.push("/home")}
                             variant="secondary"
                             className="w-full px-6 py-3"
                         >

@@ -14,7 +14,7 @@ export default function HomePage() {
                     {/* Logo and Title */}
                     <div className="mb-8">
                         <div className="mb-6">
-                            <Link href="/modules">
+                            <Link href="/home">
                                 <Image
                                     src="/logo2.svg"
                                     alt="BenkyoFY logo"
@@ -71,7 +71,7 @@ export default function HomePage() {
 
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link href="/modules">
+                        <Link href="/home">
                             <Button
                                 size="lg"
                                 className="bg-background text-primary hover:bg-background/90"
