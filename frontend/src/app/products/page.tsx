@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
 import { useAuth } from "@/services/hooks/hooks";
 import { FloatingElements } from "@/shared/components/common/layout/background";
@@ -75,7 +75,14 @@ const learningModules: LearningModule[] = [
 ];
 
 export default function ModulesPage() {
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   const { data: authData } = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden">
       <FloatingElements />
@@ -103,7 +110,7 @@ export default function ModulesPage() {
           </div>
         </div>
 
-        {authData?.user ? (
+        {isMounted && authData?.user ? (
           <UserMenu user={authData.user} />
         ) : (
           <Link href="/auth/login">
