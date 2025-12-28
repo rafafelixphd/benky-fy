@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useWindowScroll } from "@/services/hooks/use-window-scroll";
-import { useAuth } from "@/services/hooks";
+import { useAuth } from "@/services/hooks/hooks";
 import {
   Home,
   LayoutDashboard,

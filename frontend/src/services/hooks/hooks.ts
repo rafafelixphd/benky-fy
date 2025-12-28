@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "../api/private/flashcards/api-client";
-import type { UserSettings } from "../api/private/flashcards/api-client";
+import { apiClient } from "@/api/private/flashcards/api-client";
+import type { UserSettings } from "@/entities/tmp";
 
 // Authentication hooks
 export const useAuth = () => {

@@ -1,5 +1,13 @@
 import { API_BASE_URL } from "../../../services/utils/api-utils";
 
+import {
+  ApiResponse,
+  AuthResponse,
+  ConjugationResponse,
+  FlashcardItem,
+  ValidationRequest,
+  ValidationResponse
+} from "@/entities/tmp"
 
 class ApiClient {
   private baseUrl: string;

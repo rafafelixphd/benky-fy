@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AuthGuard } from "@/shared/components/common/auth/auth-guard";
 import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
-import { useAuth } from "@/services/hooks";
+import { useAuth } from "@/services/hooks/hooks";
 import { FloatingElements } from "@/shared/components/common/layout/background/floating-elements";
 import { Button } from "@/shared/components/ui/button";
 import {

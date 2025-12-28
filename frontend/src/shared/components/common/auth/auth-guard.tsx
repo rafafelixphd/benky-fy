@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from "react";
-import { useAuth } from "@/services/hooks";
+import { useAuth } from "@/services/hooks/hooks";
 import { apiClient } from "@/api/private/flashcards/api-client";
 import { Button } from "@/shared/components/ui/button";
 import { Loader2 } from "lucide-react";

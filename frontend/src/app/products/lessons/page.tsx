@@ -1,7 +1,7 @@
 "use client";
 
 import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
-import { useAuth } from "@/services/hooks";
+import { useAuth } from "@/services/hooks/hooks";
 import { FloatingElements } from "@/shared/components/common/layout/background";
 import {
   BookOpen,

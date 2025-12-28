@@ -1,10 +1,10 @@
 "use client";
 
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/services/query-client";
+import { queryClient } from "@/services/utils/query-client";
 import { ThemeProvider } from "@/shared/components/common/theme";
 import { ErrorBoundaryWrapper } from "@/shared/components/common/error";
-import { UserProvider } from "@/services/user-context";
+import { UserProvider } from "@/services/hooks/user-context";
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (

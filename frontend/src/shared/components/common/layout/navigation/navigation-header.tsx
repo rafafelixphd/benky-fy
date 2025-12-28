@@ -17,7 +17,7 @@ import { MobileMenu } from "@/shared/components/ui/mobile-menu";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useWindowScroll } from "@/services/hooks/use-window-scroll";
-import { useAuth } from "@/services/hooks";
+import { useAuth } from "@/services/hooks/hooks";
 
 interface NavigationHeaderProps {
   currentPage?: string;

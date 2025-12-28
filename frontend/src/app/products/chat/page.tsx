@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
-import { useAuth } from "@/services/hooks";
+import { useAuth } from "@/services/hooks/hooks";
 import { FloatingElements } from "@/shared/components/common/layout/background";
 import { Send, Bot, User, Loader2 } from "lucide-react";
 import Link from "next/link";
