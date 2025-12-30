@@ -153,6 +153,7 @@ const ROMAJI_TO_HIRAGANA: Record<string, string> = {
   pya: "ぴゃ",
   pyu: "ぴゅ",
   pyo: "ぴょ",
+  '-': 'ー',
 };
 
 // Convert hiragana to katakana
@@ -261,6 +262,7 @@ const HIRAGANA_TO_KATAKANA: Record<string, string> = {
   ぴゃ: "ピャ",
   ぴゅ: "ピュ",
   ぴょ: "ピョ",
+  '-': 'ー',
 };
 
 /**
@@ -450,10 +452,10 @@ export function convertMixedInput(
   let i = 0;
 
   while (i < input.length) {
-    if (/[a-zA-Z]/.test(input[i])) {
+    if (/[a-zA-Z\-]/.test(input[i])) {
       // Find the end of the romaji sequence
       let j = i;
-      while (j < input.length && /[a-zA-Z]/.test(input[j])) {
+      while (j < input.length && /[a-zA-Z\-]/.test(input[j])) {
         j++;
       }
 

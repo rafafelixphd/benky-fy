@@ -8,6 +8,7 @@ import { FlashcardSettings, InputMode } from "@/entities/flashcards/settings";
 import { Check, X } from "lucide-react";
 import { RomajiInput } from "@/components/japanese/romaji";
 import { convertInputForField } from "@/lib/utils/romaji-conversion";
+import { FlashcardFeedback, FeedbackItem, FeedbackStatus } from "./FlashcardFeedback";
 
 interface FlashcardProps {
     onExit: () => void;
@@ -19,6 +20,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showAnswer, setShowAnswer] = useState(false);
+    const [gaveUp, setGaveUp] = useState(false);
 
     // Input state - mapped by InputMode
     const [userInputs, setUserInputs] = useState<Record<string, string>>({});
@@ -34,6 +36,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
         setLoading(true);
         setError(null);
         setShowAnswer(false);
+        setGaveUp(false);
         setUserInputs({});
         setInputFeedbacks({});
 
@@ -62,7 +65,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
         fetchWord();
     }, []);
 
-    const handleCheckAnswer = () => {
+    const handleCheckAnswer = (isGiveUp = false) => {
         if (!word) return;
 
         const newFeedbacks: Record<string, 'correct' | 'incorrect'> = {};
@@ -77,15 +80,21 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                 inputVal = conversion.converted;
             }
 
-            let validAnswers: string[] = [];
+            let handlerValidateAnswer: string[] = [];
 
             // Get valid answers for THIS specific mode
-            if (mode === 'english') validAnswers = word.reading.english || [];
-            else if (mode === 'romaji') validAnswers = word.reading.romaji || [];
-            else if (mode === 'kana') validAnswers = word.reading.kana || [];
-            else if (mode === 'kanji') validAnswers = word.reading.kanji || [];
+            // Get valid answers for THIS specific mode
+            if (mode === 'english') {
+                handlerValidateAnswer = word.reading.english || [];
+            } else if (mode === 'romaji') {
+                handlerValidateAnswer = [word.reading.romaji?.join("") || ""];
+            } else if (mode === 'kana') {
+                handlerValidateAnswer = [word.reading.kana?.join("") || ""];
+            } else if (mode === 'kanji') {
+                handlerValidateAnswer = [word.reading.kanji?.join("") || ""];
+            }
 
-            const isCorrect = validAnswers.some(ans => ans.toLowerCase() === inputVal);
+            const isCorrect = handlerValidateAnswer.some(ans => ans.toLowerCase() === inputVal);
 
             if (isCorrect) {
                 newFeedbacks[mode] = 'correct';
@@ -97,7 +106,8 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
 
         setInputFeedbacks(newFeedbacks);
 
-        if (allCorrect) {
+        if (allCorrect || isGiveUp) {
+            if (isGiveUp) setGaveUp(true);
             setShowAnswer(true);
         }
     };
@@ -262,24 +272,58 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                         {/* Answer Section */}
                         {showAnswer && (
                             <div className="pt-8 border-t border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
-                                <div className="grid grid-cols-2 gap-4 text-left max-w-xs mx-auto mb-6">
-                                    <div>
-                                        <p className="text-xs text-white/40">English</p>
-                                        <p className="text-lg text-white">{word.reading.english?.join(", ")}</p>
+                                {isViewOnly ? (
+                                    <div className="grid grid-cols-2 gap-4 text-left max-w-xs mx-auto mb-6">
+                                        <div>
+                                            <p className="text-xs text-white/40">English</p>
+                                            <p className="text-lg text-white">{word.reading.english?.join(", ")}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-white/40">Kanji</p>
+                                            <p className="text-lg text-white">{word.reading.kanji?.join("") || "-"}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-white/40">Kana</p>
+                                            <p className="text-lg text-white">{word.reading.kana?.join("")}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-white/40">Romaji</p>
+                                            <p className="text-lg text-white">{word.reading.romaji?.join("") || "-"}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-xs text-white/40">Kanji</p>
-                                        <p className="text-lg text-white">{word.reading.kanji?.join("") || "-"}</p>
+                                ) : (
+                                    <div className="mb-6">
+                                        <FlashcardFeedback
+                                            items={activeModes.map(mode => {
+                                                let inputVal = (userInputs[mode] || "").trim().toLowerCase();
+                                                // Convert logic repeated from validation for consistency (stored value is usually converted but let's be safe)
+                                                // Actually userInputs for Kana IS converted in onChange.
+                                                // Just need to determine status.
+
+                                                let validAnswers: string[] = [];
+                                                if (mode === 'english') {
+                                                    validAnswers = word.reading.english || [];
+                                                } else if (mode === 'romaji') {
+                                                    validAnswers = [word.reading.romaji?.join("") || ""];
+                                                } else if (mode === 'kana') {
+                                                    validAnswers = [word.reading.kana?.join("") || ""];
+                                                } else if (mode === 'kanji') {
+                                                    validAnswers = [word.reading.kanji?.join("") || ""];
+                                                }
+
+                                                const isCorrect = validAnswers.some(ans => ans.toLowerCase() === inputVal);
+                                                const status: FeedbackStatus = isCorrect ? 'correct' : 'incorrect';
+
+                                                return {
+                                                    mode,
+                                                    userInput: userInputs[mode] || "", // Display what user typed (already converted for Kana)
+                                                    correctValues: validAnswers,
+                                                    status
+                                                };
+                                            })}
+                                        />
                                     </div>
-                                    <div>
-                                        <p className="text-xs text-white/40">Kana</p>
-                                        <p className="text-lg text-white">{word.reading.kana?.join("")}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-white/40">Romaji</p>
-                                        <p className="text-lg text-white">{word.reading.romaji?.join("") || "-"}</p>
-                                    </div>
-                                </div>
+                                )}
 
                                 <div className="flex flex-wrap justify-center gap-2">
                                     {word.part_of_speech?.map((pos, i) => (
@@ -314,13 +358,23 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                             Show Answer
                         </Button>
                     ) : (
-                        <Button
-                            size="lg"
-                            onClick={handleCheckAnswer}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[150px]"
-                        >
-                            Check Answer
-                        </Button>
+                        <div className="flex gap-4">
+                            <Button
+                                size="lg"
+                                variant="secondary"
+                                onClick={() => handleCheckAnswer(true)}
+                                className="bg-white/10 hover:bg-white/20 text-white border-white/10"
+                            >
+                                Give Up
+                            </Button>
+                            <Button
+                                size="lg"
+                                onClick={() => handleCheckAnswer(false)}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[150px]"
+                            >
+                                Check Answer
+                            </Button>
+                        </div>
                     )
                 ) : (
                     <Button
