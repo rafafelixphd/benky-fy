@@ -46,6 +46,8 @@ export interface FlashcardSettings {
     /** Content domains/tags */
     tag: ContentTag[];
 
+    maxCards: number;
+
     /** Display configuration for the flashcards */
     display: DisplaySettings;
 }
@@ -54,6 +56,7 @@ export const DEFAULT_FLASHCARD_SETTINGS: FlashcardSettings = {
     level: ['N5'],
     partOfSpeech: ['noun', 'verb', 'adjectives'],
     tag: ['everyday'],
+    maxCards: 50,
     display: {
         output: {
             kanji: 50,

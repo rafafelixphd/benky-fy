@@ -33,10 +33,7 @@ export default function CustomFlashcardPage() {
       // But backend needs 'jlpt' (string) and 'categories' (list)
       // FlashcardSettings has 'level' (list) and 'tag' (list)
       // We map the first level/tag to backend format for now
-      await wordsApiClient.initSession({
-        jlpt: currentSettings.level[0],
-        categories: currentSettings.tag
-      });
+      await wordsApiClient.initSession(currentSettings);
       setSettings(currentSettings);
       setShowSettings(false);
 

@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "../../../lib/utils/api-utils";
-import { FlashcardSettings, Word } from "@/entities/word";
-import { ApiResponse } from "@/entities/flashcard"; // Reusing ApiResponse generic
+import { Word } from "@/entities/word";
+import { ApiResponse } from "@/entities/api/auth"; // Reusing ApiResponse generic
+import { FlashcardSettings } from "@/entities/flashcards/settings"; // Correct type
 
 class WordsApiClient {
     private baseUrl: string;
@@ -65,6 +66,10 @@ class WordsApiClient {
 
     async getRandomWord(): Promise<ApiResponse<Word>> {
         return this.request<Word>("/v2/words/random");
+    }
+
+    async getNextWord(): Promise<ApiResponse<Word>> {
+        return this.request<Word>("/v2/words/next");
     }
 }
 

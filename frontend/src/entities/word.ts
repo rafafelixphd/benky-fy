@@ -22,8 +22,3 @@ export interface Word {
     created_at?: string;
     updated_at?: string;
 }
-
-export interface FlashcardSettings {
-    jlpt?: string;
-    categories?: string[];
-}

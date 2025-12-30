@@ -16,7 +16,7 @@ export function Flashcard({ onExit }: { onExit: () => void }) {
         setError(null);
         setShowAnswer(false);
         try {
-            const response = await wordsApiClient.getRandomWord();
+            const response = await wordsApiClient.getNextWord();
             if (response.success && response.data) {
                 setWord(response.data);
             } else {
