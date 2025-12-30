@@ -161,3 +161,15 @@ class WordResource(Resource):
 
         db.session.commit()
         return word.to_dict()
+
+
+@ns.route("/random")
+class RandomWord(Resource):
+    @ns.doc("get_random_word")
+    @ns.marshal_with(word_model)
+    def get(self):
+        """Fetch a random word."""
+        from sqlalchemy.sql.expression import func
+
+        word = Word.query.order_by(func.random()).first_or_404()
+        return word.to_dict()
