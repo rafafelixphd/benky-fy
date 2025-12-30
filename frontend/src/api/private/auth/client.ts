@@ -73,6 +73,7 @@ class ApiClient {
     }
 
     async login(credentials: { email?: string; password?: string, provider?: string }): Promise<ApiResponse<AuthResponse>> {
+        console.log("[CREDENTIALS]: ", credentials)
         return this.request<AuthResponse>("/v2/auth/login", {
             method: "POST",
             body: JSON.stringify(credentials)

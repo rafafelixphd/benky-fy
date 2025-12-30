@@ -49,6 +49,7 @@ export default function LoginPage() {
     try {
       const response = await apiClient.login({ email, password });
 
+      console.log("Login response:", response);
       if (response.success) {
         router.push("/dashboard");
       } else {
