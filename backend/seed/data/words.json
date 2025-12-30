@@ -1,0 +1,576 @@
+[
+    {
+        "id": 1,
+        "reading": {
+            "kanji": [
+                "猫"
+            ],
+            "furigana": [
+                "ねこ"
+            ],
+            "kana": [
+                "ね",
+                "こ"
+            ],
+            "romaji": [
+                "ne",
+                "ko"
+            ],
+            "katakana": [],
+            "english": [
+                "cat"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 2
+        },
+        "part_of_speech": [
+            "noun"
+        ],
+        "category": [
+            "Animals",
+            "Daily"
+        ]
+    },
+    {
+        "id": 2,
+        "reading": {
+            "kanji": [
+                "日",
+                "本"
+            ],
+            "furigana": [
+                "に",
+                "ほん"
+            ],
+            "kana": [
+                "に",
+                "ほん"
+            ],
+            "romaji": [
+                "ni",
+                "hon"
+            ],
+            "katakana": [],
+            "english": [
+                "Japan"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 2
+        },
+        "part_of_speech": [
+            "noun"
+        ],
+        "category": [
+            "Places",
+            "Countries"
+        ]
+    },
+    {
+        "id": 3,
+        "reading": {
+            "kanji": [
+                "食",
+                "べ",
+                "る"
+            ],
+            "furigana": [
+                "た",
+                false,
+                false
+            ],
+            "kana": [
+                "た",
+                "べ",
+                "る"
+            ],
+            "romaji": [
+                "ta",
+                "be",
+                "ru"
+            ],
+            "katakana": [],
+            "english": [
+                "to eat",
+                "eat"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 6
+        },
+        "part_of_speech": [
+            "verb",
+            "ichidan",
+            "transitive"
+        ],
+        "category": [
+            "Food",
+            "Actions"
+        ]
+    },
+    {
+        "id": 4,
+        "reading": {
+            "kanji": [
+                "学",
+                "生"
+            ],
+            "furigana": [
+                "がく",
+                "せい"
+            ],
+            "kana": [
+                "がく",
+                "せい"
+            ],
+            "romaji": [
+                "gaku",
+                "sei"
+            ],
+            "katakana": [],
+            "english": [
+                "student"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 5
+        },
+        "part_of_speech": [
+            "noun"
+        ],
+        "category": [
+            "People",
+            "School"
+        ]
+    },
+    {
+        "id": 5,
+        "reading": {
+            "kanji": [
+                "先",
+                "生"
+            ],
+            "furigana": [
+                "せん",
+                "せい"
+            ],
+            "kana": [
+                "せん",
+                "せい"
+            ],
+            "romaji": [
+                "sen",
+                "sei"
+            ],
+            "katakana": [],
+            "english": [
+                "teacher",
+                "master"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 5
+        },
+        "part_of_speech": [
+            "noun"
+        ],
+        "category": [
+            "People",
+            "School",
+            "Professions"
+        ]
+    },
+    {
+        "id": 6,
+        "reading": {
+            "kanji": [
+                "行",
+                "く"
+            ],
+            "furigana": [
+                "い",
+                false
+            ],
+            "kana": [
+                "い",
+                "く"
+            ],
+            "romaji": [
+                "i",
+                "ku"
+            ],
+            "katakana": [],
+            "english": [
+                "to go"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 5
+        },
+        "part_of_speech": [
+            "verb",
+            "godan",
+            "intransitive"
+        ],
+        "category": [
+            "Movement",
+            "Travel"
+        ]
+    },
+    {
+        "id": 7,
+        "reading": {
+            "kanji": [
+                "見",
+                "る"
+            ],
+            "furigana": [
+                "み",
+                false
+            ],
+            "kana": [
+                "み",
+                "る"
+            ],
+            "romaji": [
+                "mi",
+                "ru"
+            ],
+            "katakana": [],
+            "english": [
+                "to see",
+                "to look",
+                "to watch"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 4
+        },
+        "part_of_speech": [
+            "verb",
+            "ichidan",
+            "transitive"
+        ],
+        "category": [
+            "Action",
+            "Senses"
+        ]
+    },
+    {
+        "id": 8,
+        "reading": {
+            "kanji": [
+                "勉",
+                "強"
+            ],
+            "furigana": [
+                "べん",
+                "きょう"
+            ],
+            "kana": [
+                "べん",
+                "きょう"
+            ],
+            "romaji": [
+                "ben",
+                "kyou"
+            ],
+            "katakana": [],
+            "english": [
+                "study"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 10
+        },
+        "part_of_speech": [
+            "noun",
+            "suru verb"
+        ],
+        "category": [
+            "School",
+            "Action"
+        ]
+    },
+    {
+        "id": 9,
+        "reading": {
+            "kanji": [
+                "新",
+                "し",
+                "い"
+            ],
+            "furigana": [
+                "あたら",
+                false,
+                false
+            ],
+            "kana": [
+                "あたら",
+                "し",
+                "い"
+            ],
+            "romaji": [
+                "ata",
+                "ra",
+                "shii"
+            ],
+            "katakana": [],
+            "english": [
+                "new"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 6
+        },
+        "part_of_speech": [
+            "adjective",
+            "i-adjective"
+        ],
+        "category": [
+            "Description",
+            "Condition"
+        ]
+    },
+    {
+        "id": 10,
+        "reading": {
+            "kanji": [
+                "天",
+                "気"
+            ],
+            "furigana": [
+                "てん",
+                "き"
+            ],
+            "kana": [
+                "てん",
+                "き"
+            ],
+            "romaji": [
+                "ten",
+                "ki"
+            ],
+            "katakana": [],
+            "english": [
+                "weather"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 5
+        },
+        "part_of_speech": [
+            "noun"
+        ],
+        "category": [
+            "Nature",
+            "Daily"
+        ]
+    },
+    {
+        "id": 11,
+        "reading": {
+            "kanji": [
+                "高",
+                "い"
+            ],
+            "furigana": [
+                "たか",
+                false
+            ],
+            "kana": [
+                "たか",
+                "い"
+            ],
+            "romaji": [
+                "taka",
+                "i"
+            ],
+            "katakana": [],
+            "english": [
+                "tall",
+                "high",
+                "expensive"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 4
+        },
+        "part_of_speech": [
+            "adjective",
+            "i-adjective"
+        ],
+        "category": [
+            "Description",
+            "Size",
+            "Money"
+        ]
+    },
+    {
+        "id": 12,
+        "reading": {
+            "kanji": [],
+            "furigana": [],
+            "kana": [
+                "コ",
+                "ー",
+                "ヒ",
+                "ー"
+            ],
+            "romaji": [
+                "ko",
+                "o",
+                "hi",
+                "i"
+            ],
+            "katakana": [
+                "コ",
+                "ー",
+                "ヒ",
+                "ー"
+            ],
+            "english": [
+                "coffee"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 0
+        },
+        "part_of_speech": [
+            "noun"
+        ],
+        "category": [
+            "Food",
+            "Drink"
+        ]
+    },
+    {
+        "id": 13,
+        "reading": {
+            "kanji": [
+                "東",
+                "京"
+            ],
+            "furigana": [
+                "とう",
+                "きょう"
+            ],
+            "kana": [
+                "とう",
+                "きょう"
+            ],
+            "romaji": [
+                "tou",
+                "kyou"
+            ],
+            "katakana": [],
+            "english": [
+                "Tokyo"
+            ]
+        },
+        "level": {
+            "jlpt": "N_4",
+            "wanikani": 6
+        },
+        "part_of_speech": [
+            "noun",
+            "place"
+        ],
+        "category": [
+            "Places",
+            "Cities"
+        ]
+    },
+    {
+        "id": 14,
+        "reading": {
+            "kanji": [
+                "面",
+                "白",
+                "い"
+            ],
+            "furigana": [
+                "おも",
+                "しろ",
+                false
+            ],
+            "kana": [
+                "おも",
+                "しろ",
+                "い"
+            ],
+            "romaji": [
+                "omo",
+                "shiro",
+                "i"
+            ],
+            "katakana": [],
+            "english": [
+                "interesting",
+                "funny"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 6
+        },
+        "part_of_speech": [
+            "adjective",
+            "i-adjective"
+        ],
+        "category": [
+            "Description",
+            "Emotion"
+        ]
+    },
+    {
+        "id": 15,
+        "reading": {
+            "kanji": [
+                "週",
+                "末"
+            ],
+            "furigana": [
+                "しゅう",
+                "まつ"
+            ],
+            "kana": [
+                "しゅう",
+                "まつ"
+            ],
+            "romaji": [
+                "shuu",
+                "matsu"
+            ],
+            "katakana": [],
+            "english": [
+                "weekend"
+            ]
+        },
+        "level": {
+            "jlpt": "N_5",
+            "wanikani": 7
+        },
+        "part_of_speech": [
+            "noun",
+            "temporal"
+        ],
+        "category": [
+            "Time",
+            "Calendar"
+        ]
+    }
+]

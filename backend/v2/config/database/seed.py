@@ -5,6 +5,7 @@ from pathlib import Path
 
 from ...logger import get_logger
 from ...models import User, UserSession
+from .words_seed import seed_words
 
 logger = get_logger()
 
@@ -114,4 +115,7 @@ def init_seed_database(app, db):
                 continue
 
             seed_table(table_name, model, file, db)
+
+        # 2. Seed Words from JSON
+        seed_words(app, db)
     logger.info("Complete database...")
