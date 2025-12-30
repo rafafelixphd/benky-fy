@@ -20,20 +20,13 @@ export type ContentTag =
     | 'everyday'
     | 'small-talk';
 
-export type DisplayMode = 'en' | 'kana' | 'furigana' | 'kanji' | 'katakana';
+export type CardDisplayMode = 'english' | 'kana' | 'kanji';
+
+export type InputMode = 'english' | 'romaji' | 'kanji' | 'kana';
 
 export interface DisplaySettings {
-    /**
-     * Display weights for output generation.
-     * Maps the display mode to its percentage probability (0-100).
-     */
-    output: Partial<Record<DisplayMode, number>>;
-
-    /**
-     * Allowed input modes for the user.
-     * Maps the input mode to its percentage probability (0-100).
-     */
-    input: Partial<Record<DisplayMode, number>>;
+    cardDisplay: CardDisplayMode;
+    inputMode: 'view-only' | InputMode[];
 }
 
 export interface FlashcardSettings {
@@ -58,14 +51,8 @@ export const DEFAULT_FLASHCARD_SETTINGS: FlashcardSettings = {
     tag: ['everyday'],
     maxCards: 50,
     display: {
-        output: {
-            kanji: 50,
-            kana: 50,
-        },
-        input: {
-            en: 50,
-            kana: 50,
-        },
+        cardDisplay: 'kanji',
+        inputMode: 'view-only',
     },
 };
 

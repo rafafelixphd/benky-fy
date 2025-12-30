@@ -29,10 +29,12 @@ export default function CustomFlashcardPage() {
   const handleStartSession = async (currentSettings: FlashcardSettings) => {
     setIsLoadingCards(true);
     try {
+      // Save settings to localStorage for the practice session to use
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('flashcard-settings', JSON.stringify(currentSettings));
+      }
+
       // Only map if backend needs specific transformation, currently passing as is if compatible
-      // But backend needs 'jlpt' (string) and 'categories' (list)
-      // FlashcardSettings has 'level' (list) and 'tag' (list)
-      // We map the first level/tag to backend format for now
       await wordsApiClient.initSession(currentSettings);
       setSettings(currentSettings);
       setShowSettings(false);

@@ -27,7 +27,7 @@ export interface StrokeCanvasProps {
 
 export interface RomajiInputProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   disabled?: boolean;
   className?: string;
@@ -36,4 +36,4 @@ export interface RomajiInputProps {
   onKeyPress?: (e: React.KeyboardEvent) => void;
 }
 
-export interface RomajiInputWithOptionsProps extends Omit<RomajiInputProps, "outputType" | "showPreview"> {}
+export interface RomajiInputWithOptionsProps extends Omit<RomajiInputProps, "outputType" | "showPreview"> { }

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from "react";
-import { HiraganaInput } from "./hiragana/hiragana-input";
-import { KatakanaInput } from "./katakana/katakana-input";
+import { HiraganaInput } from "../hiragana/hiragana-input";
+import { KatakanaInput } from "../katakana/katakana-input";
 import { RomajiInputProps, RomajiInputWithOptionsProps } from "@/components/japanese/types/input";
 
 export function RomajiInput({

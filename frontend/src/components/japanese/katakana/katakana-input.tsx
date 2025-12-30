@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from "react";
-import { useRomajiConversion } from "../utils/conversion";
+import { useRef } from "react";
+import { useRomajiConversion } from "@/lib/hooks/use-romaji-conversion";
 import { RomajiInputProps } from "@/components/japanese/types/input";
 
 export function KatakanaInput({
@@ -13,27 +13,11 @@ export function KatakanaInput({
   showPreview = true,
   onKeyPress,
 }: Omit<RomajiInputProps, "outputType">) {
-  const [preview, setPreview] = useState("");
-  const [isConverting, setIsConverting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const conversionHelper = useRomajiConversion(value, "katakana");
+  const conversionResult = useRomajiConversion(value, "katakana");
 
-  useEffect(() => {
-    if (!value.trim() || !showPreview) {
-      setPreview("");
-      return;
-    }
-
-    setIsConverting(true);
-    const convert = async () => {
-      if (conversionHelper.debouncedConvert) {
-        const result = await conversionHelper.debouncedConvert();
-        setPreview(result.converted);
-        setIsConverting(false);
-      }
-    };
-    convert();
-  }, [value, showPreview, conversionHelper]);
+  const preview = (showPreview && value.trim()) ? conversionResult.converted : "";
+  const isInvalid = (showPreview && value.trim() && !preview);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (onKeyPress) {
@@ -52,7 +36,7 @@ export function KatakanaInput({
         ref={inputRef}
         type="text"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={onChange}
         onKeyPress={handleKeyPress}
         onFocus={handleFocus}
         placeholder={placeholder}
@@ -64,9 +48,7 @@ export function KatakanaInput({
       {showPreview && preview && (
         <div className="absolute top-1/2 right-4 transform -translate-y-1/2 pointer-events-none">
           <div className="flex items-center gap-2">
-            {isConverting && (
-              <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-foreground rounded-full animate-spin" />
-            )}
+            {/* Removed loading spinner since conversion is sync */}
             <span className="text-muted-foreground text-sm font-medium">
               {preview}
             </span>
@@ -75,7 +57,7 @@ export function KatakanaInput({
       )}
 
       {/* Invalid Input Indicator */}
-      {showPreview && value && !preview && !isConverting && (
+      {isInvalid && (
         <div className="absolute top-1/2 right-4 transform -translate-y-1/2 pointer-events-none">
           <span className="text-muted-foreground text-xs">Invalid romaji</span>
         </div>

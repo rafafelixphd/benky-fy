@@ -2,20 +2,26 @@
 
 import { useState } from 'react';
 import { SettingsSection } from './settings-section';
-import { DisplayMode } from '@/entities/flashcards/settings';
+import { InputMode } from '@/entities/flashcards/settings';
 
 export interface InputConfigProps {
-  weights: Partial<Record<DisplayMode, number>>;
-  onChange: (weights: Partial<Record<DisplayMode, number>>) => void;
+  inputMode: 'view-only' | InputMode[];
+  onChange: (mode: 'view-only' | InputMode[]) => void;
 }
 
 // Reusing DisplayMode types but ensuring we cover sensible inputs
-const ALL_INPUTS: { value: DisplayMode; label: string; description: string; color: string }[] = [
+const ALL_INPUTS: { value: InputMode; label: string; description: string; color: string }[] = [
   {
-    value: 'en',
+    value: 'english',
     label: 'English',
     description: 'Type English translation',
     color: 'bg-yellow-400'
+  },
+  {
+    value: 'romaji',
+    label: 'Romaji',
+    description: 'Type Romaji (e.g. "neko")',
+    color: 'bg-purple-400'
   },
   {
     value: 'kana',
@@ -29,132 +35,100 @@ const ALL_INPUTS: { value: DisplayMode; label: string; description: string; colo
     description: 'Type Kanji directly',
     color: 'bg-red-400'
   },
-  // 'katakana', 'furigana' might behave same as 'kana' or be specific. Including for completeness if backend supports.
-  {
-    value: 'katakana',
-    label: 'Katakana',
-    description: 'Type Katakana',
-    color: 'bg-green-400'
-  },
 ];
 
 export function InputConfig({
-  weights,
+  inputMode,
   onChange,
 }: InputConfigProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const enabledInputs = ALL_INPUTS.filter(m => weights[m.value] !== undefined);
-  const totalWeight = Object.values(weights).reduce((sum, w) => sum + (w || 0), 0);
+  const isViewOnly = inputMode === 'view-only';
 
-  const normalizeWeights = (currentWeights: Partial<Record<DisplayMode, number>>) => {
-    const keys = Object.keys(currentWeights) as DisplayMode[];
-    const currentTotal = keys.reduce((sum, key) => sum + (currentWeights[key] || 0), 0);
-
-    if (currentTotal === 0 || keys.length === 0) return currentWeights;
-
-    const normalized: Partial<Record<DisplayMode, number>> = {};
-    keys.forEach(key => {
-      normalized[key] = Math.round(((currentWeights[key] || 0) / currentTotal) * 100);
-    });
-    return normalized;
-  };
-
-  const handleToggle = (mode: DisplayMode, enabled: boolean) => {
-    const newWeights = { ...weights };
-    if (enabled) {
-      newWeights[mode] = 50;
+  const handleModeChange = (mode: 'view-only' | 'interactive') => {
+    if (mode === 'view-only') {
+      onChange('view-only');
     } else {
-      delete newWeights[mode];
+      // Default to English if switching to interactive and nothing selected
+      onChange(['english']);
     }
-    onChange(normalizeWeights(newWeights));
   };
 
-  const handleWeightChange = (mode: DisplayMode, newWeight: number) => {
-    const newWeights = { ...weights, [mode]: newWeight };
-    onChange(newWeights);
+  const handleInputToggle = (mode: InputMode, checked: boolean) => {
+    if (inputMode === 'view-only') return; // Should not happen given UI state
+
+    let newModes = [...inputMode];
+    if (checked) {
+      if (!newModes.includes(mode)) newModes.push(mode);
+    } else {
+      newModes = newModes.filter(m => m !== mode);
+    }
+
+    // Prevent deselecting all? Or allow it implies "View Only"?
+    // Use case says: Multi choice. If all deselected, effectively view only? 
+    // Let's allow empty array but typically at least one is needed for "Interactive".
+    // If empty -> maybe warn or just allow.
+    onChange(newModes);
   };
 
   return (
     <SettingsSection
-      title="Input Configuration"
+      title="User Input Interface"
       isExpanded={isExpanded}
       onToggle={() => setIsExpanded(!isExpanded)}
       indicatorColor="bg-emerald-500"
     >
-      <div className="space-y-4">
-        {/* Input Checkboxes */}
-        <div className="space-y-3">
-          {ALL_INPUTS.map(({ value, label, description }) => (
-            <label key={value} className="flex items-center space-x-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
+      <div className="space-y-6">
+        {/* Main Mode Selection */}
+        <div className="flex gap-4">
+          <label className={`flex-1 p-4 rounded-lg border-2 cursor-pointer transition-all ${isViewOnly ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200 hover:border-gray-300'}`}>
+            <div className="flex items-center gap-2 mb-2">
               <input
-                type="checkbox"
-                checked={weights[value] !== undefined}
-                onChange={(e) => handleToggle(value, e.target.checked)}
-                className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2"
+                type="radio"
+                name="input-type"
+                checked={isViewOnly}
+                onChange={() => handleModeChange('view-only')}
+                className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
               />
-              <div className="flex-1">
-                <span className="text-sm font-medium text-gray-700">{label}</span>
-                <div className="text-xs text-gray-500 mt-1">{description}</div>
-              </div>
-            </label>
-          ))}
+              <span className="font-semibold text-gray-900">View Only</span>
+            </div>
+            <p className="text-sm text-gray-500 pl-6">No typing required. Just reveal the answer.</p>
+          </label>
+
+          <label className={`flex-1 p-4 rounded-lg border-2 cursor-pointer transition-all ${!isViewOnly ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200 hover:border-gray-300'}`}>
+            <div className="flex items-center gap-2 mb-2">
+              <input
+                type="radio"
+                name="input-type"
+                checked={!isViewOnly}
+                onChange={() => handleModeChange('interactive')}
+                className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+              />
+              <span className="font-semibold text-gray-900">Interactive</span>
+            </div>
+            <p className="text-sm text-gray-500 pl-6">Type the answer in the selected scripts.</p>
+          </label>
         </div>
 
-        {/* Weight Sliders */}
-        {enabledInputs.length > 1 && (
-          <div className="space-y-3 border-t pt-3">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium text-gray-700">Input Probability</h4>
-              <span className={`text-xs ${totalWeight !== 100 ? 'text-amber-600' : 'text-gray-500'}`}>
-                Total: {totalWeight}%
-              </span>
-            </div>
-
-            {enabledInputs.map(({ value, label }) => (
-              <div key={value} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm text-gray-600">{label}</label>
-                  <span className="text-sm font-medium text-gray-700">
-                    {weights[value]}%
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={weights[value] || 0}
-                  onChange={(e) => handleWeightChange(value, Number(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Visual Bar */}
-        {enabledInputs.length > 0 && (
-          <div className="mt-4">
-            <div className="flex h-6 bg-gray-200 rounded-lg overflow-hidden">
-              {enabledInputs.map(({ value, color, label }) => {
-                const weight = weights[value] || 0;
-                if (weight <= 0) return null;
-                const percentage = (weight / totalWeight) * 100; // Visual percentage
-                return (
-                  <div
-                    key={value}
-                    className={`${color} transition-all duration-300 flex items-center justify-center`}
-                    style={{ width: `${percentage}%` }}
-                    title={`${label}: ${weight}%`}
-                  >
-                    {percentage > 10 && (
-                      <span className="text-xs font-medium text-white shadow-sm">
-                        {weight}%
-                      </span>
-                    )}
+        {/* Interactive Options */}
+        {!isViewOnly && (
+          <div className="pl-1 animate-in fade-in slide-in-from-top-2 duration-300">
+            <h4 className="text-sm font-medium text-gray-700 mb-3">Allowed Input Scripts</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {ALL_INPUTS.map(({ value, label, description }) => (
+                <label key={value} className="flex items-center space-x-3 cursor-pointer p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={(inputMode as InputMode[]).includes(value)}
+                    onChange={(e) => handleInputToggle(value, e.target.checked)}
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-gray-700 block">{label}</span>
+                    <span className="text-xs text-gray-500">{description}</span>
                   </div>
-                );
-              })}
+                </label>
+              ))}
             </div>
           </div>
         )}
