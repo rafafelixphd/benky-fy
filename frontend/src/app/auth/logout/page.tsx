@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { logoutAction } from "@/services/auth/actions";
+import { logoutAction } from "@/lib/auth/actions";
 import { Loader2 } from "lucide-react";
 
 export default function LogoutPage() {

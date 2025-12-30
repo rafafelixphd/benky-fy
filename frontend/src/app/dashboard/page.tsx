@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { AuthGuard } from "@/shared/components/common/auth/auth-guard";
-import { UserMenu } from "@/shared/components/common/layout/navigation/user-menu";
-import { useAuth } from "@/services/hooks/hooks";
-import { FloatingElements } from "@/shared/components/common/layout/background/floating-elements";
-import { Button } from "@/shared/components/ui/button";
+import { AuthGuard } from "@/components/common/auth/auth-guard";
+import { UserMenu } from "@/components/common/layout/navigation/user-menu";
+import { useAuth } from "@/lib/hooks/hooks";
+import { FloatingElements } from "@/components/common/layout/background";
+import { Button } from "@/components/ui/button";
 import {
   BookOpen,
   Brain,
@@ -13,16 +13,18 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { Card } from "@/shared/components/ui/card";
-import { ProgressBar } from "@/shared/components/common/layout/progress/progress-bar";
-import { StatCard } from "@/shared/components/common/layout/stats/stat-card";
-import { ActivityCard } from "@/shared/components/common/layout/activity/activity-card";
-import { GoalProgress } from "@/shared/components/common/layout/progress/goal-progress";
+import { Card } from "@/components/ui/card";
+import { ProgressBar } from "@/components/common/layout/progress/progress-bar";
+import { StatCard } from "@/components/common/layout/stats/stat-card";
+import { ActivityCard } from "@/components/common/layout/activity/activity-card";
+import { GoalProgress } from "@/components/common/layout/progress/goal-progress";
+
+// TODO: Replicate this with database later.
 import {
   dashboardData,
   recentModules,
   getStatsConfig
-} from "@/services/pages/dashboard";
+} from "@/entities/dashboard";
 
 export default function DashboardPage() {
   const { data: authData } = useAuth();

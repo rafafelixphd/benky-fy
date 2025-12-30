@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../../../services/utils/api-utils";
+import { API_BASE_URL } from "../../../lib/utils/api-utils";
 
 import {
   ApiResponse,
@@ -7,7 +7,7 @@ import {
   FlashcardItem,
   ValidationRequest,
   ValidationResponse
-} from "@/entities/tmp"
+} from "@/entities/flashcard"
 
 class ApiClient {
   private baseUrl: string;

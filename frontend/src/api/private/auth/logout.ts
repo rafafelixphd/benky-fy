@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "@/services/utils/api-utils";
+import { API_BASE_URL } from "@/lib/utils/api-utils";
 import { cookies } from "next/headers";
 
 export const logout = async () => {

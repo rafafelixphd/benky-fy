@@ -1,10 +1,10 @@
-import "../shared/styles/globals.css";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import AppLayout from "@/features/index/layout";
+import "./globals.css";
+import { Providers } from "./providers";
+import { FloatingThemeToggle } from "@/components/common/theme";
 
 const inter = Inter({ subsets: ["latin"] });
-
 
 export const metadata: Metadata = {
   title: "Benky-Fy - Japanese Learning Platform",
@@ -26,7 +26,6 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,7 +34,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
-        <AppLayout>{children}</AppLayout>
+        <Providers>
+          {children}
+          <FloatingThemeToggle />
+        </Providers>
       </body>
     </html>
   );
