@@ -38,108 +38,6 @@ export default function CustomFlashcardPage() {
 
     setIsLoadingCards(true);
     setIsSessionActive(true);
-
-    try {
-      // Get enabled modules
-      const enabledModules = settings.modules.filter(module => module.enabled);
-
-      if (enabledModules.length === 0) {
-        alert("Please select at least one module to start a session.");
-        setIsSessionActive(false);
-        setIsLoadingCards(false);
-        return;
-      }
-
-      // Load flashcards from each enabled module
-      const allFlashcards: any[] = [];
-
-      for (const module of enabledModules) {
-        try {
-          const response = await fetch(`/api/v2/words/${module.id}`);
-          if (response.ok) {
-            const data = await response.json();
-            const moduleCards = data.words || [];
-
-            // Add module info to each card
-            const cardsWithModule = moduleCards.map((card: any) => ({
-              ...card,
-              moduleId: module.id,
-              moduleName: module.name,
-              moduleWeight: module.weight,
-            }));
-
-            allFlashcards.push(...cardsWithModule);
-          }
-        } catch (error) {
-          console.error(`Failed to load flashcards from ${module.name}:`, error);
-        }
-      }
-
-      if (allFlashcards.length === 0) {
-        alert("No flashcards found in the selected modules.");
-        setIsSessionActive(false);
-        setIsLoadingCards(false);
-        return;
-      }
-
-      // Shuffle flashcards
-      const shuffledCards = allFlashcards.sort(() => Math.random() - 0.5);
-
-      setSessionFlashcards(shuffledCards);
-      setCurrentCardIndex(0);
-
-    } catch (error) {
-      console.error("Failed to start session:", error);
-      alert("Failed to start session. Please try again.");
-      setIsSessionActive(false);
-    } finally {
-      setIsLoadingCards(false);
-    }
-  };
-
-  const getEnabledWordTypes = () => {
-    if (!settings) return [];
-    return Object.entries(settings.wordTypes)
-      .filter(([_, enabled]) => enabled)
-      .map(([type, _]) => type);
-  };
-
-  const getEnabledDisplayModes = () => {
-    if (!settings) return [];
-    return Object.entries(settings.displayModes)
-      .filter(([_, enabled]) => enabled)
-      .map(([mode, _]) => mode);
-  };
-
-  const getEnabledInputModes = () => {
-    if (!settings) return [];
-    return Object.entries(settings.inputModes)
-      .filter(([_, enabled]) => enabled)
-      .map(([mode, _]) => mode);
-  };
-
-  const getCurrentCard = () => {
-    if (sessionFlashcards.length === 0 || currentCardIndex >= sessionFlashcards.length) {
-      return null;
-    }
-    return sessionFlashcards[currentCardIndex];
-  };
-
-  const nextCard = () => {
-    if (currentCardIndex < sessionFlashcards.length - 1) {
-      setCurrentCardIndex(currentCardIndex + 1);
-    } else {
-      // Session complete
-      setIsSessionActive(false);
-      setSessionFlashcards([]);
-      setCurrentCardIndex(0);
-    }
-  };
-
-  const endSession = () => {
-    setIsSessionActive(false);
-    setSessionFlashcards([]);
-    setCurrentCardIndex(0);
   };
 
   return (
@@ -166,70 +64,14 @@ export default function CustomFlashcardPage() {
                         Configuration Status
                       </h2>
                       <p className="text-primary-foreground/80 text-sm">
-                        {settings ? "Ready to start" : "Configure your custom flashcards"}
+                        {settings ? "Ready to start" : "Configure your flashcards"}
                       </p>
                     </div>
                   </div>
 
                 </div>
 
-                {settings ? (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-white/10 rounded-lg p-4">
-                      <h4 className="font-medium text-white mb-2">Word Types</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {getEnabledWordTypes().map((type) => (
-                          <span
-                            key={type}
-                            className="px-2 py-1 bg-blue-500/20 text-blue-200 text-xs rounded"
-                          >
-                            {type}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="bg-white/10 rounded-lg p-4">
-                      <h4 className="font-medium text-white mb-2">Display Modes</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {getEnabledDisplayModes().map((mode) => (
-                          <span
-                            key={mode}
-                            className="px-2 py-1 bg-green-500/20 text-green-200 text-xs rounded"
-                          >
-                            {mode}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="bg-white/10 rounded-lg p-4">
-                      <h4 className="font-medium text-white mb-2">Input Modes</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {getEnabledInputModes().map((mode) => (
-                          <span
-                            key={mode}
-                            className="px-2 py-1 bg-purple-500/20 text-purple-200 text-xs rounded"
-                          >
-                            {mode}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <BookOpen className="w-12 h-12 text-white/40 mx-auto mb-4" />
-                    <p className="text-white/60 mb-4">
-                      Configure your custom flashcard settings to get started
-                    </p>
-                    <Button
-                      onClick={() => setShowSettings(true)}
-                      className="bg-white/20 hover:bg-white/30 text-white border-white/30"
-                    >
-                      <Settings className="w-4 h-4 mr-2" />
-                      Configure Settings
-                    </Button>
-                  </div>
-                )}
+
               </div>
             </Card>
 

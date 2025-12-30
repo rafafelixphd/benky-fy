@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useWindowScroll } from "@/services/hooks/use-window-scroll";
-import { useAuth } from "@/services/hooks/hooks";
+import { useWindowScroll } from "@/lib/hooks/use-window-scroll";
+import { useAuth } from "@/lib/hooks/hooks";
 import {
   Home,
   LayoutDashboard,

@@ -1,9 +1,15 @@
 # views/words.py
+import random
+
 from flask import request
 from flask_restx import Namespace, Resource, fields
 
 from ..config.database import db
+from ..logger import get_logger
 from ..models import Word
+
+logger = get_logger(namespace="words")
+
 
 ns = Namespace("words", description="Words operations")
 
@@ -163,13 +169,58 @@ class WordResource(Resource):
         return word.to_dict()
 
 
+@ns.route("/settings")
+class WordSettings(Resource):
+    @ns.doc("init_session")
+    def post(self):
+        """Initialize a flashcard session with settings."""
+        data = request.json
+        # user_id = 1  # TODO: getting from auth context if available, otherwise defaulting for demo
+
+        # Create or update active session
+        # session = FlashcardSession.query.filter_by(user_id=user_id, is_active=True).first()
+        # if not session:
+        # session = FlashcardSession(user_id=user_id, settings=data)
+        # db.session.add(session)
+        # else:
+        # session.settings = data
+        # session.created_at = datetime.utcnow() # Reset time?
+
+        logger.info(f"{data=}")
+        # db.session.commit()
+        return {"message": "Session initialized"}, 200
+
+
 @ns.route("/random")
 class RandomWord(Resource):
     @ns.doc("get_random_word")
     @ns.marshal_with(word_model)
     def get(self):
-        """Fetch a random word."""
-        from sqlalchemy.sql.expression import func
+        """Fetch a random word based on active session settings."""
+        # from sqlalchemy.sql.expression import func
 
-        word = Word.query.order_by(func.random()).first_or_404()
+        # from ..models import FlashcardSession
+        # user_id = 1  # TODO: use auth
+        # Get active session settings
+        # session = FlashcardSession.query.filter_by(user_id=user_id, is_active=True).first()
+
+        # query = Word.query
+
+        # if session and session.settings:
+        # settings = session.settings
+
+        # Filter by JLPT
+        # if "jlpt" in settings and settings["jlpt"]:
+        # Handle "N5" vs "n5" normalization if needed, or exact match
+        # query = query.filter(Word.level["jlpt"].astext == settings["jlpt"])
+
+        # Filter by Category
+        # if "categories" in settings and settings["categories"]:
+        # settings["categories"] expected to be a list ["Animals", "Food"]
+        # Postgres && operator for array overlap: array['a', 'b'] && column_array
+        # SQLAlchemy: Column.overlap(list)
+        # query = query.filter(Word.category.overlap(settings["categories"]))
+        # else:
+        # query = Word.query
+        word = Word.query.get_or_404(random.randint(1, Word.query.count()))
         return word.to_dict()
