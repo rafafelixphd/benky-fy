@@ -203,8 +203,9 @@ class NextWord(Resource):
                 if "categories" in flashcard_settings and flashcard_settings["categories"]:
                     query = query.filter(Word.category.overlap(flashcard_settings["categories"]))
 
+            max_cards = flashcard_settings.get("maxCards", 50)
             # Fetch up to 50 random words
-            words = query.order_by(func.random()).limit(50).all()
+            words = query.order_by(func.random()).limit(max_cards).all()
 
             if not words:
                 ns.abort(404, "No words found matching criteria")
