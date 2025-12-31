@@ -10,6 +10,7 @@ class Word(db.Model):
     __tablename__ = "words"
 
     id = db.Column(db.Integer, primary_key=True)
+    surface = db.Column(db.Text, nullable=False, default="")
 
     # JSONB columns for nested data
     reading = db.Column(JSONB, nullable=False, default={})
@@ -30,6 +31,7 @@ class Word(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
+            "surface": self.surface,
             "reading": self.reading,
             "level": self.level,
             "part_of_speech": self.part_of_speech,

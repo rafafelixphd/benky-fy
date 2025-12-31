@@ -15,16 +15,22 @@ logger = get_logger(namespace="words")
 ns = Namespace("words", description="Words operations")
 
 # Output Model
+# 'reading': {
+#     'kanji': '電気',
+#     'kanji_split': ['電', '気'],
+#     'kana': 'でんき',
+#     'kana_split': ['でん', 'き'],
+#     'kanji_split_type': ['kanji', 'kanji']
+#     'english': ['electricity', 'electric light'],
+# },
 reading_model = ns.model(
     "Reading",
     {
-        "kanji": fields.List(fields.String, description="Kanji forms"),
-        "furigana": fields.List(
-            fields.Raw, description="Furigana readings (String or False)"
-        ),  # Raw to support mixed types
-        "kana": fields.List(fields.String, description="Kana readings"),
-        "romaji": fields.List(fields.String, description="Romaji readings"),
-        "katakana": fields.List(fields.String, description="Katakana readings"),
+        "kanji": fields.String(description="Kanji forms"),
+        "kanji_split": fields.List(fields.String, description="Kanji splits"),
+        "kana": fields.String(description="Kana forms"),
+        "kana_split": fields.List(fields.String, description="Kana splits"),
+        "kanji_split_type": fields.List(fields.String, description="Kanji split types"),
         "english": fields.List(fields.String, description="English meanings"),
     },
 )
@@ -33,8 +39,8 @@ level_model = ns.model(
     "Level",
     {
         "jlpt": fields.String(description="JLPT Level (e.g., N5)"),
-        "wanikani": fields.Integer(description="Wanikani Level"),
-        "custom": fields.String(description="Custom Level tag"),
+        # "wanikani": fields.Integer(description="Wanikani Level"),
+        "custom": fields.Integer(description="Custom Level tag"),
     },
 )
 
@@ -42,6 +48,7 @@ word_model = ns.model(
     "Word",
     {
         "id": fields.Integer(description="Word ID"),
+        "surface": fields.String(description="Surface form"),
         "reading": fields.Nested(reading_model),
         "level": fields.Nested(level_model),
         "part_of_speech": fields.List(fields.String),
@@ -140,7 +147,15 @@ class WordResource(Resource):
     def get(self, id):
         """Fetch a word given its identifier."""
         word = Word.query.get_or_404(id)
+        import json
+
+        logger.info("==" * 30)
+        logger.info("==" * 30)
+        logger.info(f"{json.dumps(word.to_dict(), indent=4)}")
+        logger.info("==" * 30)
+        logger.info("==" * 30)
         return word.to_dict()
+        # return "rafa"
 
     @ns.doc("update_word")
     @ns.expect(word_input_model)

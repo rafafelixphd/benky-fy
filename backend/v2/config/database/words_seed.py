@@ -45,6 +45,7 @@ def seed_words(app, db):
                 # Create Word object
                 word = Word(
                     id=item.get("id"),
+                    surface=item.get("surface"),
                     reading=item.get("reading", {}),
                     level=item.get("level", {}),
                     part_of_speech=item.get("part_of_speech", []),

@@ -3,8 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS words (
     id SERIAL PRIMARY KEY,
-    
-    -- Nested JSON Structures
+    surface TEXT NOT NULL,
     reading JSONB NOT NULL DEFAULT '{}'::jsonb,
     level JSONB NOT NULL DEFAULT '{}'::jsonb,
     
