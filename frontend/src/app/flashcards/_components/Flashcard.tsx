@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { wordsApiClient } from "@/api/private/words/api-client";
+import { wordsApiClient, SessionStats } from "@/api/private/words/api-client";
 import { Word } from "@/entities/word";
 import { FlashcardSettings, InputMode } from "@/entities/flashcards/settings";
 import { Check, X } from "lucide-react";
@@ -23,6 +23,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
     const [showAnswer, setShowAnswer] = useState(false);
     const [gaveUp, setGaveUp] = useState(false);
     const [sessionComplete, setSessionComplete] = useState(false);
+    const [stats, setStats] = useState<SessionStats | null>(null);
 
     // Input state - mapped by InputMode
     const [userInputs, setUserInputs] = useState<Record<string, string>>({});
@@ -65,7 +66,12 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                    // Since we don't have a summary screen design yet, let's call onExit() which goes back to settings?
                    // Or show a message "Session Complete!" and a button to exit.
                    // I'll set a local state "sessionComplete" and render that.
+                   // I'll set a local state "sessionComplete" and render that.
                    setSessionComplete(true);
+                   // Fetch stats
+                   wordsApiClient.getSessionStats().then(res => {
+                       if (res.success && res.data) setStats(res.data);
+                   });
                 } else {
                    setError(response.error || "Failed to fetch word");
                 }
@@ -109,7 +115,6 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
             let handlerValidateAnswer: string[] = [];
 
             // Get valid answers for THIS specific mode
-            // Get valid answers for THIS specific mode
             if (mode === 'english') {
                 handlerValidateAnswer = word.reading.english || [];
             } else if (mode === 'romaji') {
@@ -135,11 +140,45 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
         if (allCorrect || isGiveUp) {
             if (isGiveUp) setGaveUp(true);
             setShowAnswer(true);
+
+            // Submit Feedback
+            // Construct results map
+            const resultsPayload: Record<string, 'correct' | 'incorrect' | 'gave_up'> = {};
+            activeModes.forEach(mode => {
+                const status = newFeedbacks[mode];
+                if (status === 'correct') {
+                    resultsPayload[mode] = 'correct';
+                } else {
+                    resultsPayload[mode] = isGiveUp ? 'gave_up' : 'incorrect';
+                }
+            });
+
+            if (word) {
+                wordsApiClient.submitFeedback({
+                    word_id: word.id,
+                    display_mode: settings.display.cardDisplay,
+                    results: resultsPayload
+                });
+            }
         } else {
             const nextAttempts = attempts + 1;
             setAttempts(nextAttempts);
             if (nextAttempts >= MAX_ATTEMPTS) {
                 setShowAnswer(true);
+                 if (word) {
+                     // Max attempts reached, so everything not correct is incorrect
+                     const resultsPayload: Record<string, 'correct' | 'incorrect' | 'gave_up'> = {};
+                     activeModes.forEach(mode => {
+                         const status = newFeedbacks[mode];
+                         resultsPayload[mode] = status === 'correct' ? 'correct' : 'incorrect';
+                     });
+
+                    wordsApiClient.submitFeedback({
+                        word_id: word.id,
+                        display_mode: settings.display.cardDisplay,
+                        results: resultsPayload
+                    });
+                }
             }
         }
     };
@@ -216,7 +255,33 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                         <Check className="w-8 h-8 text-green-400" />
                     </div>
                     <h2 className="text-2xl font-bold text-white mb-2">Session Complete!</h2>
-                    <p className="text-white/60 mb-8">You have reviewed all the cards in this session.</p>
+                    <p className="text-white/60 mb-6">You have reviewed all the cards in this session.</p>
+                    
+                    {stats && (
+                        <div className="grid grid-cols-2 gap-4 w-full max-w-sm mb-8 animate-in slide-in-from-bottom-2">
+                             <div className="bg-white/10 rounded-lg p-3">
+                                <div className="text-2xl font-bold text-white">{stats.total_cards}</div>
+                                <div className="text-xs text-white/60 uppercase">Total Cards</div>
+                             </div>
+                             <div className="bg-green-500/20 rounded-lg p-3">
+                                <div className="text-2xl font-bold text-green-400">{stats.correct}</div>
+                                <div className="text-xs text-green-400/80 uppercase">Correct</div>
+                             </div>
+                             <div className="bg-red-500/20 rounded-lg p-3">
+                                <div className="text-2xl font-bold text-red-400">{stats.incorrect}</div>
+                                <div className="text-xs text-red-400/80 uppercase">Incorrect</div>
+                             </div>
+                             <div className="bg-blue-500/20 rounded-lg p-3">
+                                <div className="text-2xl font-bold text-blue-400">{stats.half}</div>
+                                <div className="text-xs text-blue-400/80 uppercase">Partial</div>
+                             </div>
+                             <div className="bg-yellow-500/20 rounded-lg p-3">
+                                <div className="text-2xl font-bold text-yellow-400">{stats.gave_up}</div>
+                                <div className="text-xs text-yellow-400/80 uppercase">Gave Up</div>
+                             </div>
+                        </div>
+                    )}
+
                     <Button onClick={onExit} size="lg" className="bg-white/20 hover:bg-white/30 text-white min-w-[200px]">
                         Return to Menu
                     </Button>
