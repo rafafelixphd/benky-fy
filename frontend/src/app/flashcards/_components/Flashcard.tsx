@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { wordsApiClient, SessionStats } from "@/api/private/words/api-client";
 import { Word } from "@/entities/word";
 import { FlashcardSettings, InputMode } from "@/entities/flashcards/settings";
-import { Check, X } from "lucide-react";
+import { Check, X, Edit, ExternalLink } from "lucide-react";
 import { RomajiInput } from "@/components/japanese/romaji";
 import { convertInputForField } from "@/lib/utils/romaji-conversion";
 import { FlashcardFeedback, FeedbackItem, FeedbackStatus } from "./FlashcardFeedback";
@@ -319,8 +319,17 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                         <div className="text-center space-y-8 w-full">
                             {/* Word Display */}
                             <div>
-                                <p className="text-sm text-white/60 mb-2 uppercase tracking-wider">
+                                <p className="text-sm text-white/60 mb-2 uppercase tracking-wider flex items-center justify-center gap-2">
                                     {word.level?.jlpt || "Word"}
+                                    <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        className="h-6 w-6 text-white/40 hover:text-white hover:bg-white/10"
+                                        onClick={() => window.open(`/vocabulary/edit/${word.id}`, '_blank')}
+                                        title="Edit Word"
+                                    >
+                                        <Edit className="w-3 h-3" />
+                                    </Button>
                                 </p>
                                 <div className="text-6xl font-bold text-white mb-4">
                                     {getPrimaryDisplay()}

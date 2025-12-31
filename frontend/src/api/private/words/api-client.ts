@@ -99,6 +99,23 @@ class WordsApiClient {
     async getSessionStats(): Promise<ApiResponse<SessionStats>> {
         return this.request<SessionStats>("/v2/words/session/stats");
     }
+
+    async getWord(id: string): Promise<ApiResponse<Word>> {
+        return this.request<Word>(`/v2/words/${id}`);
+    }
+
+    async saveWord(word: Partial<Word>): Promise<ApiResponse<Word>> {
+        if (word.id) {
+            return this.request<Word>(`/v2/words/${word.id}`, {
+                method: "PUT",
+                body: JSON.stringify(word),
+            });
+        }
+        return this.request<Word>("/v2/words/edit", {
+            method: "POST",
+            body: JSON.stringify(word),
+        });
+    }
 }
 
 export const wordsApiClient = new WordsApiClient();

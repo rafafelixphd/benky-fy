@@ -94,6 +94,33 @@ class WordResource(Resource):
         return word.to_dict()
 
 
+@ns.route("/edit")
+class CreateWord(Resource):
+    @ns.doc("create_word")
+    @ns.expect(word_input_model)
+    @ns.marshal_with(word_model)
+    def post(self):
+        """Create a new word."""
+        data = request.json
+
+        # Basic validation for required fields beyond what expect provides
+        if "reading" not in data:
+            ns.abort(400, "Reading data is required")
+
+        new_word = Word(
+            surface=data.get("surface", ""),
+            reading=data.get("reading", {}),
+            level=data.get("level", {}),
+            part_of_speech=data.get("part_of_speech", []),
+            category=data.get("category", []),
+        )
+
+        db.session.add(new_word)
+        db.session.commit()
+
+        return new_word.to_dict(), 201
+
+
 @ns.route("/settings")
 class WordSettings(Resource):
     @ns.doc("init_session")
