@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X, Settings as SettingsIcon } from "lucide-react";
+import { X, Settings as SettingsIcon, Brain, Shuffle } from "lucide-react";
 import { ContentSelector } from './content-selector';
 import { PartOfSpeechSelector } from './part-of-speech-selector';
 import { InputConfig } from './input-config';
@@ -69,6 +69,74 @@ export function FlashcardSettingsModal({
 
                 {/* Content */}
                 <div className="p-6 space-y-8">
+                    {/* Study Mode Section */}
+                    <div className="space-y-4">
+                        <label className="text-sm font-medium text-gray-700">Study Mode</label>
+                        <div className="grid grid-cols-2 gap-4">
+                            <button
+                                onClick={() => setSettings(s => ({ ...s, mode: 'random' }))}
+                                className={`
+                                    flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all
+                                    ${settings.mode === 'random' || !settings.mode
+                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600'}
+                                `}
+                            >
+                                <div className={`p-3 rounded-full ${settings.mode === 'random' || !settings.mode ? 'bg-indigo-100' : 'bg-gray-100'}`}>
+                                    <Shuffle className="w-6 h-6" />
+                                </div>
+                                <div className="text-center">
+                                    <div className="font-semibold">Random Shuffle</div>
+                                    <div className="text-xs opacity-80 mt-1">Mix of all cards matching criteria</div>
+                                </div>
+                            </button>
+
+                            <button
+                                onClick={() => setSettings(s => ({ ...s, mode: 'anki', learningRatio: s.learningRatio ?? 0.2 }))}
+                                className={`
+                                    flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all
+                                    ${settings.mode === 'anki'
+                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600'}
+                                `}
+                            >
+                                <div className={`p-3 rounded-full ${settings.mode === 'anki' ? 'bg-indigo-100' : 'bg-gray-100'}`}>
+                                    <Brain className="w-6 h-6" />
+                                </div>
+                                <div className="text-center">
+                                    <div className="font-semibold">Smart Review (Anki)</div>
+                                    <div className="text-xs opacity-80 mt-1">Spaced repetition based on accuracy</div>
+                                </div>
+                            </button>
+                        </div>
+
+                        {/* Learning Ratio Slider (only for Anki) */}
+                        {settings.mode === 'anki' && (
+                            <div className="pt-2 px-1 animate-in slide-in-from-top-2 duration-200">
+                                <div className="flex justify-between text-sm mb-2">
+                                    <span className="text-gray-600">New Words Ratio</span>
+                                    <span className="font-medium text-indigo-600">{Math.round((settings.learningRatio ?? 0.2) * 100)}%</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="1"
+                                    step="0.1"
+                                    value={settings.learningRatio ?? 0.2}
+                                    onChange={(e) => setSettings(s => ({ ...s, learningRatio: parseFloat(e.target.value) }))}
+                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                                />
+                                <div className="flex justify-between text-xs text-gray-400 mt-1">
+                                    <span>Mostly Review</span>
+                                    <span>Balanced</span>
+                                    <span>Mostly New</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="h-px bg-gray-100" />
+
                     <ContentSelector
                         selectedLevel={settings.level}
                         selectedTags={settings.tag}

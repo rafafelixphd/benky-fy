@@ -4,6 +4,7 @@ from flask import session as flask_session
 from flask_restx import Namespace, Resource, fields
 
 from ..config.database import db
+from ..controllers.words.anki import AnkiDeck
 from ..controllers.words.flashcards import FlashCardsDeck
 from ..controllers.words.progress import ProgressController
 from ..logger import get_logger
@@ -116,7 +117,14 @@ class NextWord(Resource):
     @ns.marshal_with(word_model)
     def get(self):
         settings = flask_session.get("flashcard_settings", {})
-        deck = FlashCardsDeck(settings)
+
+        # Use AnkiDeck if explicitly requested or if parameters suggest it
+        if settings.get("mode") == "anki" or settings.get("learningRatio") is not None:
+            user_id = flask_session.get("user_id")
+            deck = AnkiDeck(settings, user_id=user_id)
+        else:
+            deck = FlashCardsDeck(settings)
+
         word = deck.draw_next(flask_session)
         if not word:
             ns.abort(404, "No words found matching criteria")
@@ -159,7 +167,7 @@ class SessionStats(Resource):
         Get stats for the current session (or latest active if none in context).
         """
         session_id = flask_session.get("session_id")
-        user_id = 1  # Same placeholder
+        user_id = 8  # Same placeholder
 
         try:
             # Controller handles session_id lookup if None

@@ -14,7 +14,6 @@ def seed_user_progress(app, db):
 
     with app.app_context():
         for user_id in range(1, 7):
-            user_id = 1
             # Check if we already have stats to avoid overwriting valuable data if any
             # But user asked for dummy data so we might want to clear or append.
             # Let's assume we append/overwrite for a specific set of words to ensure data exists.
@@ -83,3 +82,63 @@ def seed_user_progress(app, db):
                 f"Seeded UserWordMap with {len(mastered_candidates)} "
                 f"mastered and {len(learning_candidates)} learning words."
             )
+
+
+def seed_user_8_anki_test(app, db):
+    """
+    Seeds user 8 with 10 specific words for Anki verification.
+    7 seen words (varied accuracy/recency), 3 unseen words will be picked by logic.
+    """
+    from datetime import datetime, timedelta
+
+    logger.info("Seeding User 8 for Anki verification...")
+
+    with app.app_context():
+        # 1. Cleanup User 8
+        UserWordMap.query.filter_by(user_id=8).delete()
+
+        # 2. Get 10 words (IDs 1-10 ideally, or first 10 available)
+        words = Word.query.order_by(Word.id).limit(10).all()
+        if len(words) < 10:
+            logger.warning("Not enough words database to seed full test set.")
+
+        # We need to Create 7 "Seen" words.
+        # Let's create a mix to test the heuristic.
+        # Heuristic: Score = 0.5 * (1 - Accuracy) + 0.5 * (1 - e^(-0.1 * Days))
+        # High Score (Priority) = Low Accuracy OR Long Time
+
+        test_cases = [
+            # (Index in 'words', correct, attempts, days_since)
+            (0, 0, 5, 10.0),  # Word 1: 0% Acc, 10 days -> High Priority
+            (1, 1, 5, 10.0),  # Word 2: 20% Acc, 10 days
+            (2, 5, 5, 10.0),  # Word 3: 100% Acc, 10 days -> Medium Priority (due to time)
+            (3, 0, 5, 1.0),  # Word 4: 0% Acc, 1 day -> High Priority (due to acc)
+            (4, 1, 5, 1.0),  # Word 5: 20% Acc, 1 day
+            (5, 5, 5, 1.0),  # Word 6: 100% Acc, 1 day -> Low Priority
+            (6, 2, 4, 5.0),  # Word 7: 50% Acc, 5 days
+        ]
+
+        new_maps = []
+        for idx, correct, attempts, days in test_cases:
+            if idx >= len(words):
+                continue
+
+            w = words[idx]
+            stats = {
+                "total": attempts,
+                "requested_input": {"kana": attempts},
+                "requested_stats": {"kana": correct},
+                "display": {"kanji": 1},
+            }
+
+            updated_at = datetime.utcnow() - timedelta(days=days)
+
+            new_maps.append(
+                UserWordMap(user_id=8, word_id=w.id, stats=stats, created_at=updated_at, updated_at=updated_at)
+            )
+
+        if new_maps:
+            db.session.add_all(new_maps)
+
+        db.session.commit()
+        logger.info(f"Seeded {len(new_maps)} records for User 8. (Words {', '.join(str(w.word_id) for w in new_maps)})")

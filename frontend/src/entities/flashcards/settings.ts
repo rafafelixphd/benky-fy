@@ -1,7 +1,7 @@
 export type JLPTLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | 'EXPERT';
 
 export type Level = {
-    jlpt: JLPTLevel;
+    jlpt: JLPTLevel | null;
     custom: number;
 };
 
@@ -46,12 +46,20 @@ export interface FlashcardSettings {
 
     maxCards: number;
 
+    /** Session Mode: 'random' or 'anki' */
+    mode?: 'random' | 'anki';
+
+    /** Ratio of new words (0.0 to 1.0) for Anki mode */
+    learningRatio?: number;
+
     /** Display configuration for the flashcards */
     display: DisplaySettings;
 }
 
 export const DEFAULT_FLASHCARD_SETTINGS: FlashcardSettings = {
     level: {jlpt: null, custom: 1},
+    mode: "anki",
+    learningRatio: 0.2,
     partOfSpeech: [],
     tag: [],
     maxCards: 3,

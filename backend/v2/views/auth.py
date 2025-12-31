@@ -15,7 +15,7 @@ ns = Namespace("auth", description="Auth operations")
 def get_context_and_controller():
     logger.debug(f"Headers: {request.headers}")
     logger.debug(f"Cookies: {request.cookies}")
-    logger.info(f"Session: {session}")
+    logger.debug(f"Session: {session}")
     ctx = SessionContext(session)
     controller = UserController(ctx)
     return ctx, controller
