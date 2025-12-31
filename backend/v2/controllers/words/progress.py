@@ -147,7 +147,126 @@ class ProgressController:
         return {
             "total_cards": total_cards,
             "correct": correct,
-            "incorrect": incorrect,
-            "half": half,
-            "gave_up": gave_up,
         }
+
+    def get_dashboard_stats(self, user_id):
+        """
+        Retrieves dashboard statistics for the user.
+        """
+        try:
+            # Fetch all user word maps
+            user_word_maps = UserWordMap.query.filter_by(user_id=user_id).all()
+
+            total_words_known = 0  # Total unique words interacted with
+            mastered_words = 0  # accuracy > 50% & attempts > 5
+            on_the_way_words = 0  # interacted > 0 but not mastered
+
+            total_attempts = 0
+            attempts_positive = 0
+            attempts_negative = 0
+
+            # For sorting
+            word_accuracies = []  # tuple (word_id, accuracy, total_attempts)
+            word_views = []  # tuple (word_id, total_views)
+
+            for w in user_word_maps:
+                stats = w.stats or {}
+
+                # Check interaction
+                total = stats.get("total", 0)
+                if total == 0:
+                    continue
+
+                total_words_known += 1
+
+                # Attempts
+                req_input = stats.get("requested_input", {})
+                req_stats = stats.get("requested_stats", {})  # Correct count
+
+                w_attempts = sum(req_input.values())
+                w_correct = sum(req_stats.values())
+
+                total_attempts += w_attempts
+                attempts_positive += w_correct
+                attempts_negative += w_attempts - w_correct
+
+                # Accuracy calc
+                accuracy = 0.0
+                if w_attempts > 0:
+                    accuracy = w_correct / w_attempts
+
+                # Mastered vs On the way
+                if w_attempts > 5 and accuracy >= 0.5:
+                    mastered_words += 1
+                else:
+                    on_the_way_words += 1
+
+                # Collect for sorting
+                if w_attempts >= 3:  # Min attempt threshold for "hardest" to be meaningful
+                    word_accuracies.append({"word_id": w.word_id, "accuracy": accuracy, "attempts": w_attempts})
+
+                word_views.append({"word_id": w.word_id, "views": total})
+
+            # Sort for Top 10s
+            # Hardest: Lowest accuracy first
+            word_accuracies.sort(key=lambda x: x["accuracy"])
+            top_hardest_ids = [x["word_id"] for x in word_accuracies[:10]]
+
+            # Most Viewed: Highest views first
+            word_views.sort(key=lambda x: x["views"], reverse=True)
+            top_viewed_ids = [x["word_id"] for x in word_views[:10]]
+
+            # Fetch Word details
+            from ...models import Word
+
+            def get_word_details(ids):
+                if not ids:
+                    return []
+                words = Word.query.filter(Word.id.in_(ids)).all()
+                # Maintain order
+                word_map = {w.id: w for w in words}
+                result = []
+                for wid in ids:
+                    if wid in word_map:
+                        w_obj = word_map[wid]
+                        # Find the stat for this word
+                        stat_entry = next((x for x in user_word_maps if x.word_id == wid), None)
+                        accuracy = 0
+                        total_views = 0
+                        if stat_entry and stat_entry.stats:
+                            req_in = stat_entry.stats.get("requested_input", {})
+                            req_st = stat_entry.stats.get("requested_stats", {})
+                            attempts = sum(req_in.values())
+                            correct = sum(req_st.values())
+                            total_views = stat_entry.stats.get("total", 0)
+                            if attempts > 0:
+                                accuracy = correct / attempts
+
+                        result.append(
+                            {
+                                "id": w_obj.id,
+                                "surface": w_obj.surface,
+                                "reading": w_obj.reading,
+                                "accuracy": float(f"{accuracy:.2f}"),  # Format for display
+                                "views": total_views,
+                            }
+                        )
+                return result
+
+            top_hardest = get_word_details(top_hardest_ids)
+            top_viewed = get_word_details(top_viewed_ids)
+
+            return {
+                "total_words_known": total_words_known,
+                "mastered_words": mastered_words,
+                "on_the_way_words": on_the_way_words,
+                "total_attempts": total_attempts,
+                "attempts_positive": attempts_positive,
+                "attempts_negative": attempts_negative,
+                "top_hardest_words": top_hardest,
+                "top_viewed_words": top_viewed,
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to get dashboard stats: {e}")
+            raise e
