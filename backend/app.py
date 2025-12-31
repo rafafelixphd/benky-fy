@@ -27,7 +27,7 @@ def create_app():
         setup_cors(app)
 
         init_routes(app)
-        db = init_database(app)
+        db = init_database(app, create_tables=True)
         init_seed_database(app, db)
     return app
 

@@ -3,6 +3,20 @@ import { Word } from "@/entities/word";
 import { ApiResponse } from "@/entities/api/auth"; // Reusing ApiResponse generic
 import { FlashcardSettings } from "@/entities/flashcards/settings"; // Correct type
 
+export interface FeedbackData {
+    word_id: number;
+    display_mode?: string;
+    results: Record<string, 'correct' | 'incorrect' | 'gave_up'>;
+}
+
+export interface SessionStats {
+    total_cards: number;
+    correct: number;
+    incorrect: number;
+    half: number;
+    gave_up: number;
+}
+
 class WordsApiClient {
     private baseUrl: string;
 
@@ -73,6 +87,17 @@ class WordsApiClient {
 
     async getNextWord(): Promise<ApiResponse<Word>> {
         return this.request<Word>("/v2/words/next");
+    }
+
+    async submitFeedback(data: FeedbackData): Promise<ApiResponse<{ success: boolean }>> {
+        return this.request<{ success: boolean }>("/v2/words/feedback", {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+    }
+
+    async getSessionStats(): Promise<ApiResponse<SessionStats>> {
+        return this.request<SessionStats>("/v2/words/session/stats");
     }
 }
 

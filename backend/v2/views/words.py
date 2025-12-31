@@ -5,11 +5,13 @@ from flask_restx import Namespace, Resource, fields
 
 from ..config.database import db
 from ..controllers.words.flashcards import FlashCardsDeck
+from ..controllers.words.progress import ProgressController
 from ..logger import get_logger
 from ..models import Word
 
 logger = get_logger(namespace="words")
 ns = Namespace("words", description="Words operations")
+progress_controller = ProgressController()
 
 reading_model = ns.model(
     "Reading",
@@ -95,11 +97,17 @@ class WordResource(Resource):
 class WordSettings(Resource):
     @ns.doc("init_session")
     def post(self):
+        import uuid
+
         session_settings = request.json
+        session_id = str(uuid.uuid4())
+
         flask_session["flashcard_settings"] = session_settings
+        flask_session["session_id"] = session_id
         flask_session.pop("word_queue", None)
-        logger.debug(f"Updated session settings: {session_settings}")
-        return {"message": "Session initialized", "settings": session_settings}, 200
+
+        logger.debug(f"Updated session settings: {session_settings}, Session ID: {session_id}")
+        return {"message": "Session initialized", "settings": session_settings, "session_id": session_id}, 200
 
 
 @ns.route("/next")
@@ -113,3 +121,50 @@ class NextWord(Resource):
         if not word:
             ns.abort(404, "No words found matching criteria")
         return word.to_dict()
+
+
+@ns.route("/feedback")
+class WordFeedback(Resource):
+    @ns.doc("register_feedback")
+    def post(self):
+        """
+        Register feedback for a word.
+        Expected payload: { "word_id": 123, "result": "correct", ... }
+        """
+        data = request.json
+        # TODO: Get actual user ID from authcontext. Defaulting to 1 for MVP/Demo based on single user context.
+        user_id = 1
+
+        session_id = flask_session.get("session_id")
+        if not session_id:
+            return {"error": "No active session"}, 400
+
+        word_id = data.get("word_id")
+        if not word_id:
+            return {"error": "Missing word_id"}, 400
+
+        try:
+            progress_controller.register_feedback(user_id, word_id, session_id, data)
+            return {"success": True}, 200
+        except Exception as e:
+            logger.error(f"Error in feedback: {e}")
+            return {"success": False, "error": str(e)}, 500
+
+
+@ns.route("/session/stats")
+class SessionStats(Resource):
+    @ns.doc("get_session_stats")
+    def get(self):
+        """
+        Get stats for the current session (or latest active if none in context).
+        """
+        session_id = flask_session.get("session_id")
+        user_id = 1  # Same placeholder
+
+        try:
+            # Controller handles session_id lookup if None
+            stats = progress_controller.get_session_stats(user_id, session_id)
+            return {"success": True, "data": stats}, 200
+        except Exception as e:
+            logger.error(f"Error fetching stats: {e}")
+            return {"success": False, "error": str(e)}, 500
