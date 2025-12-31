@@ -7,7 +7,7 @@ import { FloatingElements } from "@/components/common/layout/background";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import { apiClient } from "@/core/api-client";
+import { apiClient } from "@/api/private/auth/client";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -39,7 +39,7 @@ export default function RegisterPage() {
 
             if (response.success) {
                 // Redirect to modules
-                router.push("/modules");
+                router.push("/home");
             } else {
                 setError(response.message || response.error || "Registration failed");
             }
@@ -52,7 +52,7 @@ export default function RegisterPage() {
 
     const handleSocialLogin = async (provider: string) => {
         if (provider === "google") {
-            window.location.href = "/api/auth/google";
+            window.location.href = "/auth/google";
         }
     };
 

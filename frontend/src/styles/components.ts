@@ -1,8 +1,4 @@
-/**
- * Shared component styles using Tailwind CSS
- * These classes are used across multiple components to maintain consistency
- */
-
+// 
 export const textStyles = {
   // Text colors and opacity variants
   primary: "text-white",

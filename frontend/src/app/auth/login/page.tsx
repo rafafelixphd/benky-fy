@@ -7,7 +7,7 @@ import { FloatingElements } from "@/components/common/layout/background";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import { apiClient } from "@/core/api-client";
+import { apiClient } from "@/api/private/auth/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -49,8 +49,9 @@ export default function LoginPage() {
     try {
       const response = await apiClient.login({ email, password });
 
+      console.log("Login response:", response);
       if (response.success) {
-        router.push("/modules");
+        router.push("/dashboard");
       } else {
         setError(response.message || response.error || "Login failed");
       }
@@ -64,7 +65,7 @@ export default function LoginPage() {
   const handleSocialLogin = async (provider: string) => {
     // Keep existing social login logic if functionality exists or acts as placeholder
     if (provider === "google") {
-      window.location.href = "/api/auth/google";
+      window.location.href = "/auth/google";
     }
   };
 

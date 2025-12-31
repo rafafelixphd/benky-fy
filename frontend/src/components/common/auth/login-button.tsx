@@ -53,7 +53,7 @@ export function LoginButton({
     if (onLogin) {
       onLogin();
     } else {
-      window.location.href = `/api/auth/${provider}`;
+      window.location.href = `/auth/${provider}`;
     }
   };
 

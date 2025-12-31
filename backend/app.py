@@ -23,12 +23,12 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.add_url_rule("/", "index", lambda: "{'benkyfy': 'ok'}")
+    with app.app_context():
+        setup_cors(app)
 
-    setup_cors(app)
-
-    init_routes(app)
-    db = init_database(app)
-    init_seed_database(app, db)
+        init_routes(app)
+        db = init_database(app)
+        init_seed_database(app, db)
     return app
 
 

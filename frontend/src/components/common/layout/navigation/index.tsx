@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useWindowScroll } from "@/core/hooks/use-window-scroll";
-import { useAuth } from "@/core/hooks";
+import { useWindowScroll } from "@/lib/hooks/use-window-scroll";
+import { useAuth } from "@/lib/hooks/hooks";
 import {
   Home,
   LayoutDashboard,
@@ -25,7 +25,7 @@ const navigationItems: NavigationItem[] = [
   { href: "/", label: "Home", icon: Home },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/flashcards", label: "Flashcards", icon: Brain },
-  { href: "/modules", label: "Modules", icon: BookOpen },
+  { href: "/products", label: "Modules", icon: BookOpen },
   { href: "/stats", label: "Stats", icon: BarChart3 },
 ];
 
@@ -58,13 +58,11 @@ export function NavigationHeader({
     <>
       {/* Desktop Header */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 transform md:translate-y-0 ${
-          isHeaderVisible ? "translate-y-0" : "-translate-y-full"
-        } ${
-          isScrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 transform md:translate-y-0 ${isHeaderVisible ? "translate-y-0" : "-translate-y-full"
+          } ${isScrolled
             ? "bg-background/95 backdrop-blur-md shadow-lg"
             : "bg-background/80 backdrop-blur-sm"
-        }`}
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -107,17 +105,17 @@ export function NavigationHeader({
                     })),
                     ...(showUserMenu && authData?.user
                       ? [
-                          {
-                            icon: User,
-                            label: "Profile",
-                            onClick: () => router.push("/profile"),
-                          },
-                          {
-                            icon: Settings,
-                            label: "Settings",
-                            onClick: () => router.push("/settings"),
-                          },
-                        ]
+                        {
+                          icon: User,
+                          label: "Profile",
+                          onClick: () => router.push("/profile"),
+                        },
+                        {
+                          icon: Settings,
+                          label: "Settings",
+                          onClick: () => router.push("/settings"),
+                        },
+                      ]
                       : []),
                   ]}
                   className="relative z-50"

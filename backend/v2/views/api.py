@@ -7,6 +7,7 @@ from backend.v2 import __version__
 
 from .auth import ns as auth_ns
 from .test_auth import ns as test_auth_ns
+from .words import ns as words_ns
 
 # API blueprint
 router = Blueprint("v2_api", __name__)
@@ -30,3 +31,4 @@ Documentation is available under `/v2/<namespace>/docs/`.
 
 api.add_namespace(auth_ns)
 api.add_namespace(test_auth_ns)
+api.add_namespace(words_ns)
