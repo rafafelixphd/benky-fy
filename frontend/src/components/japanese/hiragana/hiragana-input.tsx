@@ -12,6 +12,7 @@ export function HiraganaInput({
   className = "",
   showPreview = true,
   onKeyPress,
+  onKeyDown,
 }: Omit<RomajiInputProps, "outputType">) {
   const inputRef = useRef<HTMLInputElement>(null);
   const conversionResult = useRomajiConversion(value, "hiragana");
@@ -36,8 +37,10 @@ export function HiraganaInput({
         ref={inputRef}
         type="text"
         value={value}
+
         onChange={onChange}
         onKeyPress={handleKeyPress}
+        onKeyDown={onKeyDown}
         onFocus={handleFocus}
         placeholder={placeholder}
         disabled={disabled}

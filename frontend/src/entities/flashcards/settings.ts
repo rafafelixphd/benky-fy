@@ -49,10 +49,10 @@ export const DEFAULT_FLASHCARD_SETTINGS: FlashcardSettings = {
     level: ['N5'],
     partOfSpeech: ['noun', 'verb', 'adjectives'],
     tag: ['everyday'],
-    maxCards: 50,
+    maxCards: 3,
     display: {
         cardDisplay: 'kanji',
-        inputMode: 'view-only',
+        inputMode: ['english', 'kana'],
     },
 };
 

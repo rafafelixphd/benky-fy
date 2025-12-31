@@ -34,6 +34,7 @@ export interface RomajiInputProps {
   outputType?: "hiragana" | "katakana" | "auto";
   showPreview?: boolean;
   onKeyPress?: (e: React.KeyboardEvent) => void;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
 }
 
 export interface RomajiInputWithOptionsProps extends Omit<RomajiInputProps, "outputType" | "showPreview"> { }

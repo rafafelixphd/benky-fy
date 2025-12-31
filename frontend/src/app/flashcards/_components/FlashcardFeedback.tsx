@@ -62,7 +62,7 @@ export function FlashcardFeedback({ items, className = "" }: FlashcardFeedbackPr
                         <div>
                             <p className="text-xs text-white/40 mb-1">Your Answer</p>
                             <p className="text-lg text-white font-medium">
-                                {item.userInput || <span className="text-white/20 italic">Empty</span>}
+                                {item.userInput || <span className="text-white/50 italic tracking-wide">Empty</span>}
                             </p>
                         </div>
                         <div>

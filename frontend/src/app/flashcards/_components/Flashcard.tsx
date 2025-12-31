@@ -25,6 +25,9 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
     // Input state - mapped by InputMode
     const [userInputs, setUserInputs] = useState<Record<string, string>>({});
     const [inputFeedbacks, setInputFeedbacks] = useState<Record<string, 'correct' | 'incorrect'>>({});
+    const [attempts, setAttempts] = useState(0);
+
+    const MAX_ATTEMPTS = 2;
 
     // Refs for focus management
     const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -36,7 +39,9 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
         setLoading(true);
         setError(null);
         setShowAnswer(false);
+
         setGaveUp(false);
+        setAttempts(0);
         setUserInputs({});
         setInputFeedbacks({});
 
@@ -64,6 +69,16 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
     useEffect(() => {
         fetchWord();
     }, []);
+
+    const handleKeyDown = (e: React.KeyboardEvent, mode: string) => {
+        if (e.key === 'Enter') {
+            if (showAnswer) {
+                fetchWord();
+            } else {
+                handleCheckAnswer(false);
+            }
+        }
+    };
 
     const handleCheckAnswer = (isGiveUp = false) => {
         if (!word) return;
@@ -109,18 +124,31 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
         if (allCorrect || isGiveUp) {
             if (isGiveUp) setGaveUp(true);
             setShowAnswer(true);
-        }
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent, mode: string) => {
-        if (e.key === 'Enter') {
-            if (showAnswer) {
-                fetchWord();
-            } else {
-                handleCheckAnswer();
+        } else {
+            const nextAttempts = attempts + 1;
+            setAttempts(nextAttempts);
+            if (nextAttempts >= MAX_ATTEMPTS) {
+                setShowAnswer(true);
             }
         }
     };
+
+    useEffect(() => {
+        const handleGlobalKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                if (showAnswer) {
+                    fetchWord();
+                } else {
+                    handleCheckAnswer(false);
+                }
+            }
+        };
+        window.addEventListener('keydown', handleGlobalKeyDown);
+        return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+    }, [handleCheckAnswer]);
+
+
 
     const getPrimaryDisplay = () => {
         if (!word) return "?";
@@ -210,7 +238,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                                                                         });
                                                                     }
                                                                 }}
-                                                                onKeyPress={(e) => handleKeyDown(e, mode)}
+                                                                onKeyDown={(e) => handleKeyDown(e, mode)}
                                                                 placeholder="Type romaji..."
                                                                 outputType={shouldUseKatakana ? "katakana" : "hiragana"}
                                                                 className={`
