@@ -9,6 +9,7 @@ import { Check, X } from "lucide-react";
 import { RomajiInput } from "@/components/japanese/romaji";
 import { convertInputForField } from "@/lib/utils/romaji-conversion";
 import { FlashcardFeedback, FeedbackItem, FeedbackStatus } from "./FlashcardFeedback";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip";
 
 interface FlashcardProps {
     onExit: () => void;
@@ -159,7 +160,40 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                 return word.reading.kana || "?";
             case 'kanji':
             default:
+                // Check if we have split data for interactive kanji
+                const { kanji_split, kanji_split_type, kana_split } = word.reading;
                 const kanjiText = word.reading.kanji;
+
+                if (kanjiText && kanji_split && kanji_split_type && kana_split &&
+                    kanji_split.length === kanji_split_type.length &&
+                    kanji_split.length === kana_split.length) {
+
+                    return (
+                        <span className="flex items-center justify-center flex-wrap gap-0.5">
+                            {kanji_split.map((char, index) => {
+                                const type = kanji_split_type[index];
+                                const reading = kana_split[index];
+
+                                if (type === 'kanji') {
+                                    return (
+                                        <Tooltip key={index}>
+                                            <TooltipTrigger asChild>
+                                                <span className="cursor-help hover:text-indigo-300 transition-colors border-b-2 border-transparent hover:border-indigo-300 border-dotted">
+                                                    {char}
+                                                </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="bg-indigo-900 border-indigo-500/50 text-white font-bold text-lg">
+                                                {reading}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    );
+                                }
+                                return <span key={index}>{char}</span>;
+                            })}
+                        </span>
+                    );
+                }
+
                 return kanjiText ? kanjiText : (word.reading.kana || "?");
         }
     };
@@ -186,234 +220,236 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
     }
 
     return (
-        <div className="w-full max-w-xl mx-auto">
-            <Card className="bg-background/20 backdrop-blur-md border-white/20 overflow-hidden relative min-h-[400px] flex flex-col justify-center items-center p-8">
-                {word && (
-                    <div className="text-center space-y-8 w-full">
-                        {/* Word Display */}
-                        <div>
-                            <p className="text-sm text-white/60 mb-2 uppercase tracking-wider">
-                                {word.level?.jlpt || "Word"}
-                            </p>
-                            <h1 className="text-6xl font-bold text-white mb-4">
-                                {getPrimaryDisplay()}
-                            </h1>
-
-                            {/* Secondary Display (always show Kana if Kanji is main? Or obey settings strictly? 
-                                Use case says 'Card display'. Usually means FRONT of card.
-                                Back of card (Answer) should show everything or specific?
-                                Let's assume Back shows full info.)
-                            */}
-                        </div>
-
-                        {/* Input Area or View Only Control */}
-                        {!isViewOnly && !showAnswer && (
-                            <div className="w-full max-w-sm mx-auto animate-in fade-in slide-in-from-bottom-4 space-y-4">
-                                {activeModes.map((mode) => (
-                                    <div key={mode} className="relative">
-                                        <label className="text-xs text-white/50 block text-left mb-1 ml-1 capitalize">
-                                            {mode}
-                                        </label>
-                                        <div className="relative">
-                                            {mode === 'kana' ? (
-                                                (() => {
-                                                    const shouldUseKatakana = word?.reading?.katakana && word.reading.katakana.length > 0;
-                                                    return (
-                                                        <div className="relative">
-                                                            <RomajiInput
-                                                                value={userInputs[mode] || ""}
-                                                                onChange={(e) => {
-                                                                    const rawVal = e.target.value;
-                                                                    // Convert immediately to mimic IME behavior
-                                                                    const targetType = shouldUseKatakana ? "katakana" : "hiragana";
-                                                                    const conversion = convertInputForField(rawVal, targetType);
-
-                                                                    setUserInputs(prev => ({ ...prev, [mode]: conversion.converted }));
-
-                                                                    if (inputFeedbacks[mode]) {
-                                                                        setInputFeedbacks(prev => {
-                                                                            const newFeedbacks = { ...prev };
-                                                                            delete newFeedbacks[mode];
-                                                                            return newFeedbacks;
-                                                                        });
-                                                                    }
-                                                                }}
-                                                                onKeyDown={(e) => handleKeyDown(e, mode)}
-                                                                placeholder="Type romaji..."
-                                                                outputType={shouldUseKatakana ? "katakana" : "hiragana"}
-                                                                className={`
-                                                                    w-full text-center text-lg h-12 bg-white/10 border-white/20 text-white placeholder:text-white/30
-                                                                    focus:ring-2 focus:ring-offset-0 transition-all
-                                                                    ${inputFeedbacks[mode] === 'correct' ? 'border-green-500 focus:ring-green-500' : ''}
-                                                                    ${inputFeedbacks[mode] === 'incorrect' ? 'border-red-500 focus:ring-red-500' : 'focus:ring-indigo-500'}
-                                                                `}
-                                                                showPreview={false}
-                                                            />
-                                                        </div>
-                                                    );
-                                                })()
-                                            ) : (
-                                                <Input
-                                                    ref={el => { inputRefs.current[mode] = el }}
-                                                    value={userInputs[mode] || ""}
-                                                    onChange={(e) => {
-                                                        setUserInputs(prev => ({ ...prev, [mode]: e.target.value }));
-                                                        // Clear error on type for this field
-                                                        if (inputFeedbacks[mode]) {
-                                                            setInputFeedbacks(prev => {
-                                                                const newFeedbacks = { ...prev };
-                                                                delete newFeedbacks[mode];
-                                                                return newFeedbacks;
-                                                            });
-                                                        }
-                                                    }}
-                                                    onKeyDown={(e) => handleKeyDown(e, mode)}
-                                                    placeholder={`Type ${mode}...`}
-                                                    className={`
-                                                        bg-white/10 border-white/20 text-white placeholder:text-white/30 text-center text-lg h-12
-                                                        focus:ring-2 focus:ring-offset-0 transition-all
-                                                        ${inputFeedbacks[mode] === 'correct' ? 'border-green-500 focus:ring-green-500' : ''}
-                                                        ${inputFeedbacks[mode] === 'incorrect' ? 'border-red-500 focus:ring-red-500' : 'focus:ring-indigo-500'}
-                                                    `}
-                                                />
-                                            )}
-                                            {inputFeedbacks[mode] === 'incorrect' && (
-                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400 animate-in zoom-in pointer-events-none">
-                                                    <X className="w-5 h-5" />
-                                                </div>
-                                            )}
-                                            {inputFeedbacks[mode] === 'correct' && (
-                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-green-400 animate-in zoom-in pointer-events-none">
-                                                    <Check className="w-5 h-5" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-
-                                <p className="text-xs text-white/40 mt-2">
-                                    Press Enter to check
+        <TooltipProvider>
+            <div className="w-full max-w-xl mx-auto">
+                <Card className="bg-background/20 backdrop-blur-md border-white/20 overflow-hidden relative min-h-[400px] flex flex-col justify-center items-center p-8">
+                    {word && (
+                        <div className="text-center space-y-8 w-full">
+                            {/* Word Display */}
+                            <div>
+                                <p className="text-sm text-white/60 mb-2 uppercase tracking-wider">
+                                    {word.level?.jlpt || "Word"}
                                 </p>
-                            </div>
-                        )}
-
-                        {/* Answer Section */}
-                        {showAnswer && (
-                            <div className="pt-8 border-t border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
-                                {isViewOnly ? (
-                                    <div className="grid grid-cols-2 gap-4 text-left max-w-xs mx-auto mb-6">
-                                        <div>
-                                            <p className="text-xs text-white/40">English</p>
-                                            <p className="text-lg text-white">{word.reading.english?.join(", ")}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-white/40">Kanji</p>
-                                            <p className="text-lg text-white">{word.reading.kanji || "-"}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-white/40">Kana</p>
-                                            <p className="text-lg text-white">{word.reading.kana}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-white/40">Romaji</p>
-                                            <p className="text-lg text-white">{word.reading.romaji?.join("") || "-"}</p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="mb-6">
-                                        <FlashcardFeedback
-                                            items={activeModes.map(mode => {
-                                                let inputVal = (userInputs[mode] || "").trim().toLowerCase();
-                                                // Convert logic repeated from validation for consistency (stored value is usually converted but let's be safe)
-                                                // Actually userInputs for Kana IS converted in onChange.
-                                                // Just need to determine status.
-
-                                                let validAnswers: string[] = [];
-                                                if (mode === 'english') {
-                                                    validAnswers = word.reading.english || [];
-                                                } else if (mode === 'romaji') {
-                                                    validAnswers = word.reading.romaji || [];
-                                                } else if (mode === 'kana') {
-                                                    validAnswers = word.reading.kana ? [word.reading.kana] : [];
-                                                } else if (mode === 'kanji') {
-                                                    validAnswers = word.reading.kanji ? [word.reading.kanji] : [];
-                                                }
-
-                                                const isCorrect = validAnswers.some(ans => ans.toLowerCase() === inputVal);
-                                                const status: FeedbackStatus = isCorrect ? 'correct' : 'incorrect';
-
-                                                return {
-                                                    mode,
-                                                    userInput: userInputs[mode] || "", // Display what user typed (already converted for Kana)
-                                                    correctValues: validAnswers,
-                                                    status
-                                                };
-                                            })}
-                                        />
-                                    </div>
-                                )}
-
-                                <div className="flex flex-wrap justify-center gap-2">
-                                    {word.part_of_speech?.map((pos, i) => (
-                                        <span key={i} className="px-2 py-1 rounded-full bg-white/10 text-xs text-white/70">
-                                            {pos}
-                                        </span>
-                                    ))}
+                                <div className="text-6xl font-bold text-white mb-4">
+                                    {getPrimaryDisplay()}
                                 </div>
+
+                                {/* Secondary Display (always show Kana if Kanji is main? Or obey settings strictly? 
+                                    Use case says 'Card display'. Usually means FRONT of card.
+                                    Back of card (Answer) should show everything or specific?
+                                    Let's assume Back shows full info.)
+                                */}
                             </div>
-                        )}
-                    </div>
-                )}
-            </Card>
 
-            {/* Controls */}
-            <div className="mt-8 flex justify-center gap-4">
-                <Button
-                    variant="ghost"
-                    onClick={onExit}
-                    className="text-white/60 hover:text-white hover:bg-white/10"
-                >
-                    End Session
-                </Button>
+                            {/* Input Area or View Only Control */}
+                            {!isViewOnly && !showAnswer && (
+                                <div className="w-full max-w-sm mx-auto animate-in fade-in slide-in-from-bottom-4 space-y-4">
+                                    {activeModes.map((mode) => (
+                                        <div key={mode} className="relative">
+                                            <label className="text-xs text-white/50 block text-left mb-1 ml-1 capitalize">
+                                                {mode}
+                                            </label>
+                                            <div className="relative">
+                                                {mode === 'kana' ? (
+                                                    (() => {
+                                                        const shouldUseKatakana = word?.reading?.katakana && word.reading.katakana.length > 0;
+                                                        return (
+                                                            <div className="relative">
+                                                                <RomajiInput
+                                                                    value={userInputs[mode] || ""}
+                                                                    onChange={(e) => {
+                                                                        const rawVal = e.target.value;
+                                                                        // Convert immediately to mimic IME behavior
+                                                                        const targetType = shouldUseKatakana ? "katakana" : "hiragana";
+                                                                        const conversion = convertInputForField(rawVal, targetType);
 
-                {!showAnswer ? (
-                    isViewOnly ? (
+                                                                        setUserInputs(prev => ({ ...prev, [mode]: conversion.converted }));
+
+                                                                        if (inputFeedbacks[mode]) {
+                                                                            setInputFeedbacks(prev => {
+                                                                                const newFeedbacks = { ...prev };
+                                                                                delete newFeedbacks[mode];
+                                                                                return newFeedbacks;
+                                                                            });
+                                                                        }
+                                                                    }}
+                                                                    onKeyDown={(e) => handleKeyDown(e, mode)}
+                                                                    placeholder="Type romaji..."
+                                                                    outputType={shouldUseKatakana ? "katakana" : "hiragana"}
+                                                                    className={`
+                                                                        w-full text-center text-lg h-12 bg-white/10 border-white/20 text-white placeholder:text-white/30
+                                                                        focus:ring-2 focus:ring-offset-0 transition-all
+                                                                        ${inputFeedbacks[mode] === 'correct' ? 'border-green-500 focus:ring-green-500' : ''}
+                                                                        ${inputFeedbacks[mode] === 'incorrect' ? 'border-red-500 focus:ring-red-500' : 'focus:ring-indigo-500'}
+                                                                    `}
+                                                                    showPreview={false}
+                                                                />
+                                                            </div>
+                                                        );
+                                                    })()
+                                                ) : (
+                                                    <Input
+                                                        ref={el => { inputRefs.current[mode] = el }}
+                                                        value={userInputs[mode] || ""}
+                                                        onChange={(e) => {
+                                                            setUserInputs(prev => ({ ...prev, [mode]: e.target.value }));
+                                                            // Clear error on type for this field
+                                                            if (inputFeedbacks[mode]) {
+                                                                setInputFeedbacks(prev => {
+                                                                    const newFeedbacks = { ...prev };
+                                                                    delete newFeedbacks[mode];
+                                                                    return newFeedbacks;
+                                                                });
+                                                            }
+                                                        }}
+                                                        onKeyDown={(e) => handleKeyDown(e, mode)}
+                                                        placeholder={`Type ${mode}...`}
+                                                        className={`
+                                                            bg-white/10 border-white/20 text-white placeholder:text-white/30 text-center text-lg h-12
+                                                            focus:ring-2 focus:ring-offset-0 transition-all
+                                                            ${inputFeedbacks[mode] === 'correct' ? 'border-green-500 focus:ring-green-500' : ''}
+                                                            ${inputFeedbacks[mode] === 'incorrect' ? 'border-red-500 focus:ring-red-500' : 'focus:ring-indigo-500'}
+                                                        `}
+                                                    />
+                                                )}
+                                                {inputFeedbacks[mode] === 'incorrect' && (
+                                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400 animate-in zoom-in pointer-events-none">
+                                                        <X className="w-5 h-5" />
+                                                    </div>
+                                                )}
+                                                {inputFeedbacks[mode] === 'correct' && (
+                                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-green-400 animate-in zoom-in pointer-events-none">
+                                                        <Check className="w-5 h-5" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    <p className="text-xs text-white/40 mt-2">
+                                        Press Enter to check
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Answer Section */}
+                            {showAnswer && (
+                                <div className="pt-8 border-t border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
+                                    {isViewOnly ? (
+                                        <div className="grid grid-cols-2 gap-4 text-left max-w-xs mx-auto mb-6">
+                                            <div>
+                                                <p className="text-xs text-white/40">English</p>
+                                                <p className="text-lg text-white">{word.reading.english?.join(", ")}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-white/40">Kanji</p>
+                                                <p className="text-lg text-white">{word.reading.kanji || "-"}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-white/40">Kana</p>
+                                                <p className="text-lg text-white">{word.reading.kana}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-white/40">Romaji</p>
+                                                <p className="text-lg text-white">{word.reading.romaji?.join("") || "-"}</p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="mb-6">
+                                            <FlashcardFeedback
+                                                items={activeModes.map(mode => {
+                                                    let inputVal = (userInputs[mode] || "").trim().toLowerCase();
+                                                    // Convert logic repeated from validation for consistency (stored value is usually converted but let's be safe)
+                                                    // Actually userInputs for Kana IS converted in onChange.
+                                                    // Just need to determine status.
+
+                                                    let validAnswers: string[] = [];
+                                                    if (mode === 'english') {
+                                                        validAnswers = word.reading.english || [];
+                                                    } else if (mode === 'romaji') {
+                                                        validAnswers = word.reading.romaji || [];
+                                                    } else if (mode === 'kana') {
+                                                        validAnswers = word.reading.kana ? [word.reading.kana] : [];
+                                                    } else if (mode === 'kanji') {
+                                                        validAnswers = word.reading.kanji ? [word.reading.kanji] : [];
+                                                    }
+
+                                                    const isCorrect = validAnswers.some(ans => ans.toLowerCase() === inputVal);
+                                                    const status: FeedbackStatus = isCorrect ? 'correct' : 'incorrect';
+
+                                                    return {
+                                                        mode,
+                                                        userInput: userInputs[mode] || "", // Display what user typed (already converted for Kana)
+                                                        correctValues: validAnswers,
+                                                        status
+                                                    };
+                                                })}
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="flex flex-wrap justify-center gap-2">
+                                        {word.part_of_speech?.map((pos, i) => (
+                                            <span key={i} className="px-2 py-1 rounded-full bg-white/10 text-xs text-white/70">
+                                                {pos}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </Card>
+
+                {/* Controls */}
+                <div className="mt-8 flex justify-center gap-4">
+                    <Button
+                        variant="ghost"
+                        onClick={onExit}
+                        className="text-white/60 hover:text-white hover:bg-white/10"
+                    >
+                        End Session
+                    </Button>
+
+                    {!showAnswer ? (
+                        isViewOnly ? (
+                            <Button
+                                size="lg"
+                                onClick={() => setShowAnswer(true)}
+                                className="bg-white/20 hover:bg-white/30 text-white min-w-[150px]"
+                            >
+                                Show Answer
+                            </Button>
+                        ) : (
+                            <div className="flex gap-4">
+                                <Button
+                                    size="lg"
+                                    variant="secondary"
+                                    onClick={() => handleCheckAnswer(true)}
+                                    className="bg-white/10 hover:bg-white/20 text-white border-white/10"
+                                >
+                                    Give Up
+                                </Button>
+                                <Button
+                                    size="lg"
+                                    onClick={() => handleCheckAnswer(false)}
+                                    className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[150px]"
+                                >
+                                    Check Answer
+                                </Button>
+                            </div>
+                        )
+                    ) : (
                         <Button
                             size="lg"
-                            onClick={() => setShowAnswer(true)}
-                            className="bg-white/20 hover:bg-white/30 text-white min-w-[150px]"
+                            onClick={fetchWord}
+                            className="bg-green-500 hover:bg-green-600 text-white min-w-[150px]"
                         >
-                            Show Answer
+                            Next Word
                         </Button>
-                    ) : (
-                        <div className="flex gap-4">
-                            <Button
-                                size="lg"
-                                variant="secondary"
-                                onClick={() => handleCheckAnswer(true)}
-                                className="bg-white/10 hover:bg-white/20 text-white border-white/10"
-                            >
-                                Give Up
-                            </Button>
-                            <Button
-                                size="lg"
-                                onClick={() => handleCheckAnswer(false)}
-                                className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[150px]"
-                            >
-                                Check Answer
-                            </Button>
-                        </div>
-                    )
-                ) : (
-                    <Button
-                        size="lg"
-                        onClick={fetchWord}
-                        className="bg-green-500 hover:bg-green-600 text-white min-w-[150px]"
-                    >
-                        Next Word
-                    </Button>
-                )}
+                    )}
+                </div>
             </div>
-        </div>
+        </TooltipProvider>
     );
 }
