@@ -14,15 +14,6 @@ from ..models import Word
 logger = get_logger(namespace="words")
 ns = Namespace("words", description="Words operations")
 
-# Output Model
-# 'reading': {
-#     'kanji': '電気',
-#     'kanji_split': ['電', '気'],
-#     'kana': 'でんき',
-#     'kana_split': ['でん', 'き'],
-#     'kanji_split_type': ['kanji', 'kanji']
-#     'english': ['electricity', 'electric light'],
-# },
 reading_model = ns.model(
     "Reading",
     {
@@ -70,30 +61,30 @@ word_input_model = ns.model(
 )
 
 
-@ns.route("/")
+@ns.route("/update")
 class WordList(Resource):
-    @ns.doc("list_words")
-    @ns.marshal_list_with(word_model)
-    def get(self):
-        """List all words with optional filtering."""
-        query = Word.query
+    # @ns.doc("list_words")
+    # @ns.marshal_list_with(word_model)
+    # def get(self):
+    #     """List all words with optional filtering."""
+    #     query = Word.query
 
-        # Filter by JLPT Level (nested JSONB)
-        jlpt = request.args.get("jlpt")
-        if jlpt:
-            query = query.filter(Word.level["jlpt"].astext == jlpt)
+    #     # Filter by JLPT Level (nested JSONB)
+    #     jlpt = request.args.get("jlpt")
+    #     if jlpt:
+    #         query = query.filter(Word.level["jlpt"].astext == jlpt)
 
-        # Filter by Part of Speech (Array overlap)
-        pos = request.args.get("part_of_speech")
-        if pos:
-            query = query.filter(Word.part_of_speech.contains([pos]))
+    #     # Filter by Part of Speech (Array overlap)
+    #     pos = request.args.get("part_of_speech")
+    #     if pos:
+    #         query = query.filter(Word.part_of_speech.contains([pos]))
 
-        # Filter by Category (Array overlap)
-        category = request.args.get("category")
-        if category:
-            query = query.filter(Word.category.contains([category]))
+    #     # Filter by Category (Array overlap)
+    #     category = request.args.get("category")
+    #     if category:
+    #         query = query.filter(Word.category.contains([category]))
 
-        return [w.to_dict() for w in query.all()]
+    #     return [w.to_dict() for w in query.all()]
 
     @ns.doc("create_word")
     @ns.expect(word_input_model)

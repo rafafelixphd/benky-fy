@@ -1,16 +1,19 @@
 export interface WordReading {
-    kanji: string[];
-    furigana: (string | boolean)[];
-    kana: string[];
-    romaji: string[];
-    katakana: string[];
+    kanji: string;
+    kanji_split: string[];
+    kanji_split_type?: string[];
+    kana: string;
+    kana_split: string[];
     english: string[];
+    romaji?: string[];
+    furigana?: (string | boolean)[];
+    katakana?: string[];
 }
 
 export interface WordLevel {
     jlpt?: string;
     wanikani?: number;
-    custom?: string;
+    custom?: number | string;
 }
 
 export interface Word {
@@ -21,4 +24,5 @@ export interface Word {
     category: string[];
     created_at?: string;
     updated_at?: string;
+    surface?: string;
 }

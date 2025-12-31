@@ -87,11 +87,11 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
             if (mode === 'english') {
                 handlerValidateAnswer = word.reading.english || [];
             } else if (mode === 'romaji') {
-                handlerValidateAnswer = [word.reading.romaji?.join("") || ""];
+                handlerValidateAnswer = word.reading.romaji || [];
             } else if (mode === 'kana') {
-                handlerValidateAnswer = [word.reading.kana?.join("") || ""];
+                handlerValidateAnswer = word.reading.kana ? [word.reading.kana] : [];
             } else if (mode === 'kanji') {
-                handlerValidateAnswer = [word.reading.kanji?.join("") || ""];
+                handlerValidateAnswer = word.reading.kanji ? [word.reading.kanji] : [];
             }
 
             const isCorrect = handlerValidateAnswer.some(ans => ans.toLowerCase() === inputVal);
@@ -128,11 +128,11 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
             case 'english':
                 return word.reading.english?.join(", ") || "?";
             case 'kana':
-                return word.reading.kana?.join("") || "?";
+                return word.reading.kana || "?";
             case 'kanji':
             default:
-                const kanjiText = word.reading.kanji?.join("");
-                return kanjiText ? kanjiText : (word.reading.kana?.join("") || "?");
+                const kanjiText = word.reading.kanji;
+                return kanjiText ? kanjiText : (word.reading.kana || "?");
         }
     };
 
@@ -280,11 +280,11 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                                         </div>
                                         <div>
                                             <p className="text-xs text-white/40">Kanji</p>
-                                            <p className="text-lg text-white">{word.reading.kanji?.join("") || "-"}</p>
+                                            <p className="text-lg text-white">{word.reading.kanji || "-"}</p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-white/40">Kana</p>
-                                            <p className="text-lg text-white">{word.reading.kana?.join("")}</p>
+                                            <p className="text-lg text-white">{word.reading.kana}</p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-white/40">Romaji</p>
@@ -304,11 +304,11 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                                                 if (mode === 'english') {
                                                     validAnswers = word.reading.english || [];
                                                 } else if (mode === 'romaji') {
-                                                    validAnswers = [word.reading.romaji?.join("") || ""];
+                                                    validAnswers = word.reading.romaji || [];
                                                 } else if (mode === 'kana') {
-                                                    validAnswers = [word.reading.kana?.join("") || ""];
+                                                    validAnswers = word.reading.kana ? [word.reading.kana] : [];
                                                 } else if (mode === 'kanji') {
-                                                    validAnswers = [word.reading.kanji?.join("") || ""];
+                                                    validAnswers = word.reading.kanji ? [word.reading.kanji] : [];
                                                 }
 
                                                 const isCorrect = validAnswers.some(ans => ans.toLowerCase() === inputVal);
