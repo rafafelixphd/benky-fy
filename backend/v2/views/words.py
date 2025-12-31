@@ -1,13 +1,10 @@
 # views/words.py
-import random
-from queue import Queue
-
 from flask import request
 from flask import session as flask_session
 from flask_restx import Namespace, Resource, fields
-from sqlalchemy.sql.expression import func
 
 from ..config.database import db
+from ..controllers.words.flashcards import FlashCardsDeck
 from ..logger import get_logger
 from ..models import Word
 
@@ -61,74 +58,6 @@ word_input_model = ns.model(
 )
 
 
-@ns.route("/update")
-class WordList(Resource):
-    # @ns.doc("list_words")
-    # @ns.marshal_list_with(word_model)
-    # def get(self):
-    #     """List all words with optional filtering."""
-    #     query = Word.query
-
-    #     # Filter by JLPT Level (nested JSONB)
-    #     jlpt = request.args.get("jlpt")
-    #     if jlpt:
-    #         query = query.filter(Word.level["jlpt"].astext == jlpt)
-
-    #     # Filter by Part of Speech (Array overlap)
-    #     pos = request.args.get("part_of_speech")
-    #     if pos:
-    #         query = query.filter(Word.part_of_speech.contains([pos]))
-
-    #     # Filter by Category (Array overlap)
-    #     category = request.args.get("category")
-    #     if category:
-    #         query = query.filter(Word.category.contains([category]))
-
-    #     return [w.to_dict() for w in query.all()]
-
-    @ns.doc("create_word")
-    @ns.expect(word_input_model)
-    @ns.marshal_with(word_model, code=201)
-    @ns.response(409, "Word already exists")
-    def post(self):
-        """Create a new word."""
-        data = request.json
-        # 1. Check ID conflict if provided
-        if "id" in data:
-            if Word.query.get(data["id"]):
-                ns.abort(409, f"Word with ID {data['id']} already exists.")
-
-        # 2. Duplicate Detection
-        # Check: Same Kanji AND overlapping English
-        reading = data.get("reading", {})
-        input_kanji = reading.get("kanji", [])
-        input_english = set(x.lower() for x in reading.get("english", []))
-
-        if input_kanji and input_english:
-            # Find potential matches by Kanji (Postgres @> operator)
-            # This checks if an existing word's kanji list contains ALL input kanji
-            # (Or strict equality if lists are identical, simplified approach here)
-            candidates = Word.query.filter(Word.reading.contains({"kanji": input_kanji})).all()
-
-            for candidate in candidates:
-                candidate_english = set(x.lower() for x in candidate.reading.get("english", []))
-                if not input_english.isdisjoint(candidate_english):
-                    # Overlap found
-                    ns.abort(409, f"Duplicate word detected (ID {candidate.id}): Matches Kanji and English meaning.")
-
-        word = Word(
-            id=data.get("id"),  # Optional
-            reading=data.get("reading", {}),
-            level=data.get("level", {}),
-            part_of_speech=data.get("part_of_speech", []),
-            category=data.get("category", []),
-        )
-
-        db.session.add(word)
-        db.session.commit()
-        return word.to_dict(), 201
-
-
 @ns.route("/<int:id>")
 @ns.response(404, "Word not found")
 @ns.param("id", "The word identifier")
@@ -138,13 +67,6 @@ class WordResource(Resource):
     def get(self, id):
         """Fetch a word given its identifier."""
         word = Word.query.get_or_404(id)
-        import json
-
-        logger.info("==" * 30)
-        logger.info("==" * 30)
-        logger.info(f"{json.dumps(word.to_dict(), indent=4)}")
-        logger.info("==" * 30)
-        logger.info("==" * 30)
         return word.to_dict()
         # return "rafa"
 
@@ -158,16 +80,10 @@ class WordResource(Resource):
 
         if "reading" in data:
             word.reading = data["reading"]
-            # Important: flag modified for JSONB to track changes if updating nested dict in-place
-            # But full assignment usually triggers it.
-            # flag_modified(word, "reading")
-
         if "level" in data:
             word.level = data["level"]
-
         if "part_of_speech" in data:
             word.part_of_speech = data["part_of_speech"]
-
         if "category" in data:
             word.category = data["category"]
 
@@ -179,78 +95,21 @@ class WordResource(Resource):
 class WordSettings(Resource):
     @ns.doc("init_session")
     def post(self):
-        """Initialize a flashcard session with settings."""
         session_settings = request.json
-
-        # Store settings in Flask session
         flask_session["flashcard_settings"] = session_settings
-        logger.info(f"Updated session settings: {session_settings}")
-
+        flask_session.pop("word_queue", None)
+        logger.debug(f"Updated session settings: {session_settings}")
         return {"message": "Session initialized", "settings": session_settings}, 200
 
 
 @ns.route("/next")
 class NextWord(Resource):
-    word_queue = Queue()
-
     @ns.doc("get_next_word")
     @ns.marshal_with(word_model)
     def get(self):
-        if self.word_queue.empty():
-            flashcard_settings = flask_session.get("flashcard_settings", {})
-            query = Word.query
-
-            if flashcard_settings:
-                # Filter by JLPT
-                if "jlpt" in flashcard_settings and flashcard_settings["jlpt"]:
-                    query = query.filter(Word.level["jlpt"].astext == flashcard_settings["jlpt"])
-
-                # Filter by Category
-                if "categories" in flashcard_settings and flashcard_settings["categories"]:
-                    query = query.filter(Word.category.overlap(flashcard_settings["categories"]))
-
-            max_cards = flashcard_settings.get("maxCards", 50)
-            # Fetch up to 50 random words
-            words = query.order_by(func.random()).limit(max_cards).all()
-
-            if not words:
-                ns.abort(404, "No words found matching criteria")
-
-            for word in words:
-                self.word_queue.put(word)
-
-        return self.word_queue.get()
-
-
-@ns.route("/random")
-class RandomWord(Resource):
-    @ns.doc("get_random_word")
-    @ns.marshal_with(word_model)
-    def get(self):
-        """Fetch a random word based on active session settings."""
-        query = Word.query
         settings = flask_session.get("flashcard_settings", {})
-
-        # Filter by JLPT
-        if "jlpt" in settings and settings["jlpt"]:
-            query = query.filter(Word.level["jlpt"].astext == settings["jlpt"])
-
-        # Filter by Category
-        if "categories" in settings and settings["categories"]:
-            # Postgres && operator for array overlap
-            query = query.filter(Word.category.overlap(settings["categories"]))
-
-        # Helper to get random row efficiently
-        # Note: This simple count approach is okay for small datasets but not race-condition free
-        # or efficient for large deletions. For a demo, it's fine.
-        count = query.count()
-        if count == 0:
-            ns.abort(404, "No words found matching criteria")
-
-        random_offset = random.randint(0, count - 1)
-        word = query.offset(random_offset).first()
-
+        deck = FlashCardsDeck(settings)
+        word = deck.draw_next(flask_session)
         if not word:
-            ns.abort(404, "Word not found")
-
+            ns.abort(404, "No words found matching criteria")
         return word.to_dict()
