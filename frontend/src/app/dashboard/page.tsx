@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AuthGuard } from "@/components/common/auth/auth-guard";
 import { UserMenu } from "@/components/common/layout/navigation/user-menu";
 import { useAuth } from "@/lib/hooks/hooks";
@@ -10,28 +10,72 @@ import {
   BookOpen,
   Brain,
   Target,
+  Trophy,
+  Activity,
+  Zap,
+  Eye,
+  AlertTriangle
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/common/layout/progress/progress-bar";
 import { StatCard } from "@/components/common/layout/stats/stat-card";
-import { ActivityCard } from "@/components/common/layout/activity/activity-card";
 import { GoalProgress } from "@/components/common/layout/progress/goal-progress";
-
-// TODO: Replicate this with database later.
-import {
-  dashboardData,
-  recentModules,
-  getStatsConfig
-} from "@/entities/dashboard";
+import { dashboardApiClient, DashboardStats } from "@/api/private/dashboard/client";
+import { getStatsConfig, recentModules } from "@/entities/dashboard";
 
 export default function DashboardPage() {
   const { data: authData } = useAuth();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [useRomajiInput, setUseRomajiInput] = useState(false);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const stats = getStatsConfig(dashboardData.todayStats);
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await dashboardApiClient.getStats();
+        if (response.success && response.data) {
+          setStats(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard stats", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (authData?.user) {
+        fetchStats();
+    }
+  }, [authData]);
+
+  // Transform API stats to display config
+  const displayStats = stats ? [
+    {
+      label: "Total Words",
+      value: stats.total_words_known.toString(),
+      icon: BookOpen,
+      color: "bg-blue-500",
+    },
+    {
+      label: "Mastered",
+      value: stats.mastered_words.toString(),
+      icon: Trophy,
+      color: "bg-yellow-500",
+    },
+    {
+      label: "Learning",
+      value: stats.on_the_way_words.toString(),
+      icon: Brain,
+      color: "bg-purple-500",
+    },
+    {
+      label: "Accuracy",
+      value: stats.total_attempts > 0 ? Math.round((stats.attempts_positive / stats.total_attempts) * 100) + "%" : "0%",
+      icon: Target,
+      color: "bg-green-500",
+    },
+  ] : [];
 
   return (
     <AuthGuard>
@@ -76,161 +120,96 @@ export default function DashboardPage() {
           <div className="max-w-6xl mx-auto">
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {stats.map((stat) => (
-                <StatCard
-                  key={stat.label}
-                  label={stat.label}
-                  value={stat.value}
-                  icon={stat.icon}
-                  color={stat.color}
-                />
-              ))}
-            </div>
-
-            {/* Recent Modules */}
-            <Card className="mb-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-primary-foreground">
-                  Continue Learning
-                </h2>
-                <Link href="/home">
-                  <Button
-                    variant="outline"
-                    className="border-primary-foreground text-primary hover:bg-background/90"                  >
-                    View All Modules
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {recentModules.map((module) => (
-                  <Link
-                    key={module.id}
-                    href={`/flashcards/${module.id}`}
-                    className="group"
-                  >
-                    <Card className="bg-background/5 hover:bg-background/10 transition-all duration-300">
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-medium text-primary-foreground">
-                          {module.name}
-                        </h3>
-                        <span className="text-sm text-primary-foreground/60">
-                          {module.progress}%
-                        </span>
-                      </div>
-
-                      <ProgressBar progress={module.progress} />
-
-                      <div className="text-xs text-primary-foreground/60">
-                        Last studied: {module.lastStudied}
-                      </div>
+              {loading ? (
+                 // Simple skeletons
+                 Array(4).fill(0).map((_, i) => (
+                    <Card key={i} className="h-32 animate-pulse bg-white/5 p-6">
+                        <div className="h-full w-full bg-white/10 rounded"></div>
                     </Card>
-                  </Link>
-                ))}
-              </div>
-            </Card>
-
-            {/* Enhanced Dashboard Sections */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Recent Activity */}
-              <ActivityCard
-                title="Recent Activity"
-                activities={dashboardData.recentActivity}
-              />
-
-              {/* Weekly Progress */}
-              <Card>
-                <h3 className="text-xl font-semibold text-primary-foreground mb-4">
-                  Weekly Progress
-                </h3>
-                <div className="space-y-3">
-                  {dashboardData.weeklyProgress.map((day, index) => (
-                    <div
-                      key={index}
-                      className="flex justify-between items-center"
-                    >
-                      <span className="font-semibold text-primary-foreground">
-                        {day.day}
-                      </span>
-                      <div className="flex items-center space-x-4">
-                        <span className="text-sm text-primary-foreground/80">
-                          {day.cards} cards
-                        </span>
-                        <span className="text-sm font-semibold text-green-400">
-                          {day.accuracy}%
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
+                 ))
+              ) : (
+                  displayStats.map((stat) => (
+                    <StatCard
+                      key={stat.label}
+                      label={stat.label}
+                      value={stat.value}
+                      icon={stat.icon}
+                      color={stat.color}
+                    />
+                  ))
+              )}
             </div>
+            
+            {!loading && stats && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    {/* Activity Overview */}
+                    <Card className="p-6 bg-black/20 backdrop-blur-md border-white/10 text-white">
+                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                            <Activity className="w-5 h-5 text-blue-400" />
+                            Activity Overview
+                        </h3>
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                                <span className="text-white/70">Total Attempts</span>
+                                <span className="text-xl font-bold">{stats.total_attempts}</span>
+                            </div>
+                            <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                                <span className="text-white/70">Correct Answers</span>
+                                <span className="text-xl font-bold text-green-400">{stats.attempts_positive}</span>
+                            </div>
+                             <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                                <span className="text-white/70">Needs Practice</span>
+                                <span className="text-xl font-bold text-red-400">{stats.attempts_negative}</span>
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* Top lists container */}
+                    <div className="space-y-6">
+                        {/* Hardest Words */}
+                        <Card className="p-6 bg-black/20 backdrop-blur-md border-white/10 text-white">
+                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <AlertTriangle className="w-5 h-5 text-yellow-400" />
+                                Top Hardest Words
+                            </h3>
+                             <div className="grid grid-cols-2 gap-2">
+                                {stats.top_hardest_words.map(w => (
+                                    <div key={w.id} className="bg-white/5 p-2 rounded flex justify-between items-center">
+                                        <div>
+                                            <div className="font-bold">{w.surface}</div>
+                                             {w.reading?.kana && <div className="text-xs text-white/60">{w.reading.kana}</div>}
+                                        </div>
+                                         <div className="text-red-400 font-bold text-sm">{(w.accuracy * 100).toFixed(0)}%</div>
+                                    </div>
+                                ))}
+                                {stats.top_hardest_words.length === 0 && <div className="text-white/50 text-sm">No data yet. Keep studying!</div>}
+                             </div>
+                        </Card>
+                         {/* Most Viewed Words */}
+                        <Card className="p-6 bg-black/20 backdrop-blur-md border-white/10 text-white">
+                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <Eye className="w-5 h-5 text-purple-400" />
+                                Most Viewed Words
+                            </h3>
+                             <div className="grid grid-cols-2 gap-2">
+                                {stats.top_viewed_words.map(w => (
+                                    <div key={w.id} className="bg-white/5 p-2 rounded flex justify-between items-center">
+                                        <div>
+                                            <div className="font-bold">{w.surface}</div>
+                                            {w.reading?.kana && <div className="text-xs text-white/60">{w.reading.kana}</div>}
+                                        </div>
+                                         <div className="text-blue-400 font-bold text-sm">{w.views}</div>
+                                    </div>
+                                ))}
+                                {stats.top_viewed_words.length === 0 && <div className="text-white/50 text-sm">No data yet.</div>}
+                             </div>
+                        </Card>
+                    </div>
+                </div>
+            )}
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-              <Card>
-                <h3 className="text-lg font-semibold text-primary-foreground mb-4">
-                  Quick Start
-                </h3>
-                <div className="space-y-3">
-                  <Link href="/flashcards/hiragana">
-                    <Button className="w-full justify-start bg-background text-primary hover:bg-background/90">
-                      <BookOpen className="w-4 h-4 mr-2" />
-                      Practice Hiragana
-                    </Button>
-                  </Link>
-                  <Link href="/flashcards/colors_basic">
-                    <Button className="w-full justify-start bg-background text-primary hover:bg-background/90">
-                      <Target className="w-4 h-4 mr-2" />
-                      Practice Colors
-                    </Button>
-                  </Link>
-                  <Link href="/flashcards">
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start bg-background text-primary hover:bg-background/90"
-                    >
-                      <Brain className="w-4 h-4 mr-2" />
-                      Browse All Flashcards
-                    </Button>
-                  </Link>
-                  <Link href="/products">
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start bg-background text-primary hover:bg-background/90"
-                    >
-                      <Target className="w-4 h-4 mr-2" />
-                      Learning Modules
-                    </Button>
-                  </Link>
-                </div>
-              </Card>
-
-              <Card>
-                <h3 className="text-lg font-semibold text-primary-foreground mb-4">
-                  Today&apos;s Goals
-                </h3>
-                <div className="space-y-3">
-                  <GoalProgress
-                    label="Study 20 cards"
-                    current={12}
-                    total={20}
-                    showProgress
-                  />
-
-                  <GoalProgress
-                    label="Maintain streak"
-                    isDone
-                  />
-
-                  <GoalProgress
-                    label="Practice for 15 min"
-                    current={8}
-                    total={15}
-                    showProgress
-                  />
-                </div>
-              </Card>
             </div>
           </div>
         </div>

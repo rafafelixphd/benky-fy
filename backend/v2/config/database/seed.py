@@ -5,6 +5,7 @@ from pathlib import Path
 
 from ...logger import get_logger
 from ...models import User, UserSession
+from .dashboard_seed import seed_user_progress
 from .words_seed import seed_words
 
 logger = get_logger()
@@ -118,4 +119,6 @@ def init_seed_database(app, db):
 
         # 2. Seed Words from JSON
         seed_words(app, db)
+        seed_user_progress(app, db)
+
     logger.info("Complete database...")
