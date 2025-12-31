@@ -5,3 +5,5 @@ id,google_id,email,name,picture,password_hash,auth_provider,created_at,updated_a
 4,,diana@example.com,Diana Prince,,pbkdf2:sha256:1000000$O6OqlcKMijeeWUj3$a5dc262a31efb76901f24afac82b712955c6d14d119bc4527ef68ea18e835879,email,2025-02-05T16:10:45,2025-02-05T16:10:45
 5,,josh@example.com,Josh Smith,,pbkdf2:sha256:1000000$O6OqlcKMijeeWUj3$a5dc262a31efb76901f24afac82b712955c6d14d119bc4527ef68ea18e835879,email,2025-02-05T16:10:45,2025-02-05T16:10:45
 6,,test@example.com,Test Smith,,pbkdf2:sha256:1000000$O6OqlcKMijeeWUj3$a5dc262a31efb76901f24afac82b712955c6d14d119bc4527ef68ea18e835879,email,2025-02-05T16:10:45,2025-02-05T16:10:45
+7,,test1@example.com,Test Smith,,pbkdf2:sha256:1000000$O6OqlcKMijeeWUj3$a5dc262a31efb76901f24afac82b712955c6d14d119bc4527ef68ea18e835879,email,2025-02-05T16:10:45,2025-02-05T16:10:45
+8,,anki@example.com,Anki,,pbkdf2:sha256:1000000$O6OqlcKMijeeWUj3$a5dc262a31efb76901f24afac82b712955c6d14d119bc4527ef68ea18e835879,email,2025-02-05T16:10:45,2025-02-05T16:10:45

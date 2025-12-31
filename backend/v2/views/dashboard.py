@@ -1,3 +1,4 @@
+from flask import session
 from flask_restx import Namespace, Resource
 
 from ..controllers.words.progress import ProgressController
@@ -15,8 +16,9 @@ class DashboardStats(Resource):
         """
         Get aggregated dashboard statistics for the user.
         """
-        # TODO: Get actual user ID from auth/session
-        user_id = 1
+        user_id = session.get("user_id")
+        if not user_id:
+            return {"success": False, "error": "Unauthorized"}, 401
 
         try:
             stats = progress_controller.get_dashboard_stats(user_id)
