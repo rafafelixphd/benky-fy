@@ -70,14 +70,14 @@ export function FlashcardSettingsModal({
                 {/* Content */}
                 <div className="p-6 space-y-8">
                     <ContentSelector
-                        selectedLevels={settings.level}
+                        selectedLevel={settings.level}
                         selectedTags={settings.tag}
-                        onLevelsChange={(level) => setSettings(s => ({ ...s, level }))}
+                        onLevelChange={(level) => setSettings(s => ({ ...s, level }))}
                         onTagsChange={(tag) => setSettings(s => ({ ...s, tag }))}
                     />
 
                     <PartOfSpeechSelector
-                        selected={settings.partOfSpeech}
+                        selected={settings.partOfSpeech || []}
                         onChange={(partOfSpeech) => setSettings(s => ({ ...s, partOfSpeech }))}
                     />
 

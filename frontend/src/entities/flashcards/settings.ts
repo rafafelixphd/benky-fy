@@ -1,5 +1,10 @@
 export type JLPTLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | 'EXPERT';
 
+export type Level = {
+    jlpt: JLPTLevel;
+    custom: number;
+};
+
 export type PartOfSpeech =
     | 'noun'
     | 'verb'
@@ -31,13 +36,13 @@ export interface DisplaySettings {
 
 export interface FlashcardSettings {
     /** Files from which levels to draw words */
-    level: JLPTLevel[];
+    level?: Level;
 
     /** Selected parts of speech */
-    partOfSpeech: PartOfSpeech[];
+    partOfSpeech?: PartOfSpeech[];
 
     /** Content domains/tags */
-    tag: ContentTag[];
+    tag?: ContentTag[];
 
     maxCards: number;
 
@@ -46,9 +51,9 @@ export interface FlashcardSettings {
 }
 
 export const DEFAULT_FLASHCARD_SETTINGS: FlashcardSettings = {
-    level: ['N5'],
-    partOfSpeech: ['noun', 'verb', 'adjectives'],
-    tag: ['everyday'],
+    level: {jlpt: null, custom: 1},
+    partOfSpeech: [],
+    tag: [],
     maxCards: 3,
     display: {
         cardDisplay: 'kanji',

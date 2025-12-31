@@ -22,6 +22,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
     const [error, setError] = useState<string | null>(null);
     const [showAnswer, setShowAnswer] = useState(false);
     const [gaveUp, setGaveUp] = useState(false);
+    const [sessionComplete, setSessionComplete] = useState(false);
 
     // Input state - mapped by InputMode
     const [userInputs, setUserInputs] = useState<Record<string, string>>({});
@@ -58,7 +59,16 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                     }, 100);
                 }
             } else {
-                setError(response.error || "Failed to fetch word");
+                if (response.error === "not_found") {
+                   // Session exhausted
+                   // We should exit or show summary.
+                   // Since we don't have a summary screen design yet, let's call onExit() which goes back to settings?
+                   // Or show a message "Session Complete!" and a button to exit.
+                   // I'll set a local state "sessionComplete" and render that.
+                   setSessionComplete(true);
+                } else {
+                   setError(response.error || "Failed to fetch word");
+                }
             }
         } catch (err) {
             setError("An unexpected error occurred");
@@ -197,6 +207,23 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                 return kanjiText ? kanjiText : (word.reading.kana || "?");
         }
     };
+
+    if (sessionComplete) {
+        return (
+            <Card className="w-full max-w-xl mx-auto p-12 text-center bg-background/20 backdrop-blur-md border-white/20 animate-in fade-in zoom-in-95 duration-500">
+                <div className="flex flex-col items-center">
+                    <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-6">
+                        <Check className="w-8 h-8 text-green-400" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2">Session Complete!</h2>
+                    <p className="text-white/60 mb-8">You have reviewed all the cards in this session.</p>
+                    <Button onClick={onExit} size="lg" className="bg-white/20 hover:bg-white/30 text-white min-w-[200px]">
+                        Return to Menu
+                    </Button>
+                </div>
+            </Card>
+        );
+    }
 
     if (loading && !word) {
         return (

@@ -36,6 +36,9 @@ class WordsApiClient {
             }
 
             if (!response.ok) {
+                if (response.status === 404) {
+                    return { success: false, error: "not_found" };
+                }
                 console.error(`[words-api] HTTP ${response.status} ${response.statusText}`);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
