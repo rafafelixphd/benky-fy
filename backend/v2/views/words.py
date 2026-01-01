@@ -60,6 +60,8 @@ word_input_model = ns.model(
     },
 )
 
+# TODO: /search # replicate @ns.param("q", "Search query")
+
 
 @ns.route("/list")
 class WordListResource(Resource):
@@ -70,25 +72,17 @@ class WordListResource(Resource):
     @ns.param("q", "Search query")
     def get(self):
         """List words within a specific ID range or matching a query."""
-        from sqlalchemy import or_
+        from ...controllers.words.search import search_words
 
         start_id = request.args.get("start_id", type=int)
         end_id = request.args.get("end_id", type=int)
         q = request.args.get("q", type=str)
 
-        query = Word.query
-
         if q:
-            # Case-insensitive search across multiple fields
-            search_term = f"%{q}%"
-            query = query.filter(
-                or_(
-                    Word.surface.ilike(search_term),
-                    Word.reading["kana"].astext.ilike(search_term),
-                    Word.reading["kanji"].astext.ilike(search_term),
-                    Word.reading["english"].astext.ilike(search_term),
-                )
-            )
+            words = search_words(q)
+            return [word.to_dict() for word in words]
+
+        query = Word.query
 
         if start_id is not None:
             query = query.filter(Word.id >= start_id)

@@ -6,7 +6,13 @@ FROM python:3.11-slim AS builder
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    curl \
+    gnupg \
+    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+    && . $HOME/.cargo/env \
     && rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Create virtual environment
 RUN python -m venv /opt/venv
@@ -16,6 +22,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
+
+RUN python -m spacy download ja_core_news_sm
 
 # Stage 2: Production image
 FROM python:3.11-slim AS production
