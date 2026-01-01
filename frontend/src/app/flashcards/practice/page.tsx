@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AuthGuard } from "@/components/common/auth";
 import { FloatingElements } from "@/components/common/layout/background";
-import { ProductsHeader } from "@/components/layout/header";
+import { NavigationHeader } from "@/components/common/layout/navigation/navigation-header";
 import { Flashcard } from "../_components/Flashcard";
 import { FlashcardSettings } from "@/entities/flashcards/settings";
 
@@ -34,7 +34,12 @@ export default function PracticePage() {
             <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden">
                 <FloatingElements />
 
-                <ProductsHeader title={"Practice Session"} subtitle={"Focused learning"} />
+                <NavigationHeader />
+
+                <div className="relative z-10 pt-24 px-6 text-center">
+                    <h1 className="text-3xl font-bold text-white mb-2">Practice Session</h1>
+                    <p className="text-white/80">Focused learning</p>
+                </div>
 
                 <div className="relative z-10 px-6 pb-6 mt-8">
                     <div className="animate-in fade-in zoom-in-95 duration-500">

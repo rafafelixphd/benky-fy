@@ -14,7 +14,7 @@ export default function LandingPage() {
           {/* Logo and Title */}
           <div className="mb-8">
             <div className="mb-6">
-              <Link href="/modules">
+              <Link href="/home">
                 <Image
                   src="/logo2.webp"
                   alt="BenkyoFY logo"
@@ -71,7 +71,7 @@ export default function LandingPage() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/modules">
+            <Link href="/products">
               <Button
                 size="lg"
                 className="bg-background text-primary hover:bg-background/90"

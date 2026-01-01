@@ -12,7 +12,7 @@ export default function NotFoundPage() {
     if (window.history.length > 1) {
       router.back();
     } else {
-      router.push("/dashboard");
+      router.push("/products");
     }
   };
 
@@ -51,7 +51,7 @@ export default function NotFoundPage() {
             </Button>
 
             <Button
-              onClick={() => router.push("/modules")}
+              onClick={() => router.push("/products")}
               variant="secondary"
               className="w-full px-6 py-3"
             >

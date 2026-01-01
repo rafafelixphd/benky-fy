@@ -51,7 +51,7 @@ export default function LoginPage() {
 
       console.log("Login response:", response);
       if (response.success) {
-        router.push("/dashboard");
+        router.push("/home");
       } else {
         setError(response.message || response.error || "Login failed");
       }

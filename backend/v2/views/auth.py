@@ -78,3 +78,14 @@ class UpsertUser(Resource):
         body = request.get_json() or {}
         payload, status = controller.upsert_user(**body)
         return payload, status
+
+
+@ns.route("/update")
+class UpdateProfile(Resource):
+    def post(self):
+        ctx, controller = get_context_and_controller()
+        # This requires auth in controller, but good to be explicit if using decorators later
+
+        body = request.get_json() or {}
+        payload, status = controller.update_profile(**body)
+        return payload, status

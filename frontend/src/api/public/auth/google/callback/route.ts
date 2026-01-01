@@ -9,7 +9,7 @@ const client = new OAuth2Client(
   `${getBaseUrl()}/auth/google/callback`
 );
 
-export async function validateGoogleSession(request: NextRequest, codeParamName: string = "code", redirectUrl: string = "/dashboard") {
+export async function validateGoogleSession(request: NextRequest, codeParamName: string = "code", redirectUrl: string = "/home") {
   try {
     const searchParams = request.nextUrl.searchParams;
     const code = searchParams.get(codeParamName);

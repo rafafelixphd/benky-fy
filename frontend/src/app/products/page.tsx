@@ -1,6 +1,6 @@
 "use client";
 
-import { ProductsHeader } from "@/components/layout/header";
+import { NavigationHeader } from "@/components/common/layout/navigation/navigation-header";
 import { FloatingElements } from "@/components/common/layout/background";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -14,11 +14,12 @@ export default function ModulesPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden">
       <FloatingElements />
 
-      <ProductsHeader
-        title="Learning Modules"
-        subtitle="Choose your learning path"
-        showLoginButton={true}
-      />
+      <NavigationHeader />
+
+      <div className="relative z-10 pt-24 px-6 pb-6 text-center">
+        <h1 className="text-4xl font-bold text-white mb-2">Learning Modules</h1>
+        <p className="text-white/80 text-lg">Choose your learning path</p>
+      </div>
 
       {/* Modules Grid */}
       <div className="relative z-10 px-6 pb-6">

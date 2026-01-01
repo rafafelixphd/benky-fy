@@ -87,6 +87,13 @@ class ApiClient {
         });
     }
 
+    async updateUser(data: { name?: string; password?: string; picture?: string }): Promise<ApiResponse<AuthResponse>> {
+        return this.request<AuthResponse>("/v2/auth/update", {
+            method: "POST",
+            body: JSON.stringify(data)
+        });
+    }
+
     async logout(): Promise<void> {
         try {
             await this.request("/v2/auth/logout", { method: "POST" });

@@ -271,3 +271,43 @@ class UserController:
 
         logger.info("[USERS] Logout success")
         return {"message": "Logout successful"}, 200
+
+    def update_profile(
+        self, name: Optional[str] = None, password: Optional[str] = None, picture: Optional[str] = None, **kwargs
+    ):
+        if not self.ctx.user_id:
+            logger.warning("[USERS] Update profile: Not authenticated")
+            return {"error": "Not authenticated"}, 401
+
+        user = User.query.get(self.ctx.user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+
+        logger.info(f"[USERS] Updating profile for {user.email}")
+
+        if name:
+            user.name = name
+
+        if picture:
+            user.picture = picture
+
+        if password:
+            if user.auth_provider == "google":
+                logger.info("[USERS] Skipping password update for Google user")
+            else:
+                if len(password) < 8:
+                    return {"error": "Password must be at least 8 characters"}, 400
+                user.set_password(password)
+
+        try:
+            db.session.commit()
+
+            # Update session data
+            session["user_name"] = user.name
+            session["user_picture"] = user.picture
+
+            return {"user": user.to_dict(), "message": "Profile updated successfully"}, 200
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"[USERS] Profile update error: {e}", exc_info=True)
+            return {"error": "Database error"}, 500

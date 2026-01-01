@@ -4,6 +4,7 @@ export interface AuthUser {
     name: string;
     email: string;
     picture?: string;
+    provider?: string;
 }
 
 export interface AuthResponse {
