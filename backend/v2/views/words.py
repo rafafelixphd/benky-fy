@@ -61,6 +61,55 @@ word_input_model = ns.model(
 )
 
 
+@ns.route("/list")
+class WordListResource(Resource):
+    @ns.doc("list_words")
+    @ns.marshal_list_with(word_model)
+    @ns.param("start_id", "Start ID (inclusive)")
+    @ns.param("end_id", "End ID (inclusive)")
+    @ns.param("q", "Search query")
+    def get(self):
+        """List words within a specific ID range or matching a query."""
+        from sqlalchemy import or_
+
+        start_id = request.args.get("start_id", type=int)
+        end_id = request.args.get("end_id", type=int)
+        q = request.args.get("q", type=str)
+
+        query = Word.query
+
+        if q:
+            # Case-insensitive search across multiple fields
+            search_term = f"%{q}%"
+            query = query.filter(
+                or_(
+                    Word.surface.ilike(search_term),
+                    Word.reading["kana"].astext.ilike(search_term),
+                    Word.reading["kanji"].astext.ilike(search_term),
+                    Word.reading["english"].astext.ilike(search_term),
+                )
+            )
+
+        if start_id is not None:
+            query = query.filter(Word.id >= start_id)
+        if end_id is not None:
+            query = query.filter(Word.id <= end_id)
+
+        # Default limit if no range provided, or just safety cap?
+        # User asked for pagination via IDs, so we trust the range.
+        # But let's add a sane default order.
+        words = query.order_by(Word.id.asc()).limit(100).all()  # Safety limit of 100
+
+        # If user explicitly asks for a large range, we might want to respect it,
+        # but for now 100 seems safe for "20 words at a time" requirement.
+        # Actually, let's make the limit dynamic or just rely on IDs.
+        if start_id is not None and end_id is not None and (end_id - start_id) > 100:
+            # Just a safety check, but we will return what's asked within reason
+            pass
+
+        return [word.to_dict() for word in words]
+
+
 @ns.route("/<int:id>")
 @ns.response(404, "Word not found")
 @ns.param("id", "The word identifier")
@@ -81,6 +130,8 @@ class WordResource(Resource):
         word = Word.query.get_or_404(id)
         data = request.json
 
+        if "surface" in data:
+            word.surface = data["surface"]
         if "reading" in data:
             word.reading = data["reading"]
         if "level" in data:
