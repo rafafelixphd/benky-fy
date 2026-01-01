@@ -2,10 +2,10 @@
 
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { AuthGuard } from "@/components/common/auth";
 import { FloatingElements } from "@/components/common/layout/background";
-import { ProductsHeader } from "@/components/layout/header";
+import { NavigationHeader } from "@/components/common/layout/navigation/navigation-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,6 +57,7 @@ export default function VocabularyEditPage({ params }: { params: Promise<{ id: s
             category: []
         }
     });
+
 
     // Field Array for English meanings
     const { 
@@ -111,7 +112,7 @@ export default function VocabularyEditPage({ params }: { params: Promise<{ id: s
                     surface: w.surface,
                     level: {
                         jlpt: w.level?.jlpt || "N5",
-                        custom: w.level?.custom
+                        custom: typeof w.level?.custom === 'string' ? parseInt(w.level.custom) : w.level?.custom
                     },
                     reading: {
                         kanji: w.reading.kanji || "",
@@ -203,10 +204,11 @@ export default function VocabularyEditPage({ params }: { params: Promise<{ id: s
         <AuthGuard>
              <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden flex flex-col">
                 <FloatingElements />
-                <ProductsHeader 
-                    title={isNew ? "New Word" : "Edit Word"} 
-                    subtitle={isNew ? "Add to your vocabulary" : "Update word details"}
-                />
+                <NavigationHeader />
+                <div className="relative z-10 pt-24 px-6 text-center">
+                    <h1 className="text-3xl font-bold text-white mb-2">{isNew ? "New Word" : "Edit Word"}</h1>
+                    <p className="text-white/80">{isNew ? "Add to your vocabulary" : "Update word details"}</p>
+                </div>
 
                 <div className="relative z-10 px-6 pb-6 flex-1 overflow-auto">
                     <div className="max-w-4xl mx-auto mt-6">

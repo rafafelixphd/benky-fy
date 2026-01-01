@@ -24,6 +24,7 @@ import { StatCard } from "@/components/common/layout/stats/stat-card";
 import { GoalProgress } from "@/components/common/layout/progress/goal-progress";
 import { dashboardApiClient, DashboardStats } from "@/api/private/dashboard/client";
 import { getStatsConfig, recentModules } from "@/entities/dashboard";
+import { NavigationHeader } from "@/components/common/layout/navigation/navigation-header";
 
 export default function DashboardPage() {
   const { data: authData } = useAuth();
@@ -82,38 +83,12 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden">
         <FloatingElements />
 
-        {/* Header */}
-        <div className="relative z-10 p-6 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link href="/home" className="flex items-center">
-              <Image
-                src="/logo1.webp"
-                alt="BenkoFY logo"
-                width={60}
-                height={36}
-                className="cursor-pointer hover:opacity-80 transition-opacity"
-                unoptimized
-                priority
-              />
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold text-primary-foreground">
-                Welcome back, {authData?.user?.name?.split(" ")[0] || "Student"}!
-              </h1>
-              <p className="text-primary-foreground/80">
-                Ready to continue your Japanese learning journey?
-              </p>
-            </div>
-          </div>
+        <NavigationHeader />
 
-          {authData?.user && (
-            <UserMenu
-              user={authData.user}
-              onProfileClick={() => window.location.href = '/profile'}
-              onSettingsClick={() => window.location.href = '/settings'}
-            />
-          )}
-        </div>
+      <div className="relative z-10 pt-24 px-6 pb-6 text-center">
+        <h1 className="text-4xl font-bold text-white mb-2">Dashboard</h1>
+        <p className="text-white/80 text-lg">Track your progress</p>
+      </div>
 
         {/* Main Content */}
         <div className="relative z-10 px-6 pb-6">

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { FlashcardSettingsModal } from "./settings/";
 import { FlashcardSettings } from "@/entities/flashcards/settings"; // Correct type
-import { ProductsHeader } from "@/components/layout/header";
+import { NavigationHeader } from "@/components/common/layout/navigation/navigation-header";
 import { wordsApiClient } from "@/api/private/words/api-client";
 
 export default function CustomFlashcardPage() {
@@ -66,7 +66,12 @@ export default function CustomFlashcardPage() {
       <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden">
         <FloatingElements />
 
-        <ProductsHeader title={"Flashcards Session"} subtitle={"Personalized learning experience"} />
+        <NavigationHeader />
+
+        <div className="relative z-10 pt-24 px-6 pb-6 text-center">
+            <h1 className="text-3xl font-bold text-white mb-2">Flashcards Session</h1>
+            <p className="text-white/80">Personalized learning experience</p>
+        </div>
 
         {/* Main Content */}
         <div className="relative z-10 px-6 pb-6">

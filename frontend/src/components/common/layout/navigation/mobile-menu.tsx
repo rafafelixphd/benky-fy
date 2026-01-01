@@ -11,80 +11,83 @@ export function MobileMenu({
   className = "",
 }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [menuPosition, setMenuPosition] = useState(0);
 
-  // Update menu position when opened
+  // Prevent scrolling when menu is open
   useEffect(() => {
     if (isOpen) {
-      const menuTrigger = document.getElementById("mobile-menu");
-      if (menuTrigger) {
-        const rect = menuTrigger.getBoundingClientRect();
-        setMenuPosition(rect.bottom + window.scrollY);
-      }
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
     }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [isOpen]);
 
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const menu = document.getElementById("mobile-menu");
-      if (menu && !menu.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   return (
-    <div className="relative" id="mobile-menu">
+    <>
       {trigger ? (
-        <div onClick={() => setIsOpen(!isOpen)}>{trigger}</div>
+        <div onClick={() => setIsOpen(true)}>{trigger}</div>
       ) : (
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label={isOpen ? "Close menu" : "Open menu"}
+          onClick={() => setIsOpen(true)}
+          aria-label="Open menu"
           className={className}
         >
-          {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          <Menu className="w-5 h-5" />
         </Button>
       )}
 
+      {/* Overlay/Backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 animate-in fade-in-0"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Slide-over Menu */}
       <div
-        style={{
-          zIndex: 9999,
-          position: "fixed",
-          top: menuPosition,
-          right: "1rem",
-        }}
-        className={`w-48 rounded-lg shadow-lg bg-background/95 backdrop-blur-md border border-primary-purple/10 transition-all duration-300 ease-in-out ${isOpen
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-[10px] pointer-events-none"
-          }`}
+        className={`fixed inset-y-0 right-0 z-50 w-3/4 sm:max-w-sm bg-background p-6 shadow-xl transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
-        <div className="py-1">
-          {items.map((item, index) => {
-            const IconComponent = item.icon;
-            return (
-              <button
-                key={index}
-                type="button"
-                onClick={() => {
-                  setIsOpen(false);
-                  item.onClick();
-                }}
-                className="w-full text-left px-4 py-2 text-sm text-foreground/80 hover:text-primary-purple hover:bg-accent/50 flex items-center gap-2"
-              >
-                <IconComponent className="w-4 h-4" />
-                {item.label}
-              </button>
-            );
-          })}
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <span className="text-lg font-semibold">Menu</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(false)}
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            {items.map((item, index) => {
+              const IconComponent = item.icon;
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    item.onClick();
+                  }}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors text-left"
+                >
+                  <IconComponent className="w-5 h-5" />
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
