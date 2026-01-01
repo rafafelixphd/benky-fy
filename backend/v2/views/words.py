@@ -81,6 +81,8 @@ class WordResource(Resource):
         word = Word.query.get_or_404(id)
         data = request.json
 
+        if "surface" in data:
+            word.surface = data["surface"]
         if "reading" in data:
             word.reading = data["reading"]
         if "level" in data:
