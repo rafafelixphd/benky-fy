@@ -104,6 +104,15 @@ class WordsApiClient {
         return this.request<Word>(`/v2/words/${id}`);
     }
 
+    async getWordsList(startId?: number, endId?: number, q?: string): Promise<ApiResponse<Word[]>> {
+        const params = new URLSearchParams();
+        if (startId !== undefined) params.append("start_id", startId.toString());
+        if (endId !== undefined) params.append("end_id", endId.toString());
+        if (q) params.append("q", q);
+        
+        return this.request<Word[]>(`/v2/words/list?${params.toString()}`);
+    }
+
     async saveWord(word: Partial<Word>): Promise<ApiResponse<Word>> {
         if (word.id) {
             return this.request<Word>(`/v2/words/${word.id}`, {
