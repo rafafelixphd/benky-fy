@@ -17,3 +17,4 @@ isort==5.13.2
 pre-commit==3.6.0
 spacy
 google-genai
+groq

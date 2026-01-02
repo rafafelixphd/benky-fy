@@ -59,6 +59,7 @@ EXPOSE 8080
 ENV FLASK_ENV=production
 ENV PORT=8080
 ENV GOOGLE_GEMINI_API_KEY=${GOOGLE_GEMINI_API_KEY}
+ENV GROQ_API_KEY=${GROQ_API_KEY}
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
