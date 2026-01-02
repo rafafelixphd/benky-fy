@@ -1,13 +1,12 @@
 # v2/views/gemini.py
 from flask import request
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Resource, fields
 
-from ..controllers.api.gemini.vocabulary import VocabularyAnnotation
-from ..logger import get_logger
+from ...controllers.api.models import GeminiVocabularyAnnotation, GroqVocabularyAnnotation
+from ...logger import get_logger
+from .route import ns
 
-logger = get_logger("views/gemini")
-
-ns = Namespace("gemini", description="Gemini AI operations")
+logger = get_logger("lexicon/discover")
 
 annotation_model = ns.model(
     "AnnotationRequest",
@@ -17,27 +16,33 @@ annotation_model = ns.model(
     },
 )
 
-# Instantiate the controller once
-vocab_annotator = VocabularyAnnotation()
+logger.info("DiscoverWord initialized")
+groq_annotator = GroqVocabularyAnnotation()
+gemini_annotator = GeminiVocabularyAnnotation()
 
 
-@ns.route("/annotate")
-class AnnotateWord(Resource):
-    @ns.doc("annotate_word")
+@ns.route("/discover")
+class DiscoverWord(Resource):
+    @ns.doc("discover_word")
     @ns.expect(annotation_model)
     def post(self):
         """
-        Annotate a Japanese word using Gemini.
+        Discover a Japanese word using Gemini.
         """
         data = request.json
         word = data.get("word")
-        model = data.get("model", "gemini-2.5-flash")
+        model = data.get("model")
+        api_caller = data.get("api_caller", "groq")
 
         if not word:
             return {"error": "Word is required"}, 400
 
         try:
-            result = vocab_annotator.annotate(word, model=model)
+            if api_caller == "groq":
+                vocab_annotator = groq_annotator
+            else:
+                vocab_annotator = gemini_annotator
+            result = vocab_annotator(word, model)
 
             # Post-process to add structure if needed by frontend
             # The frontend expects "segments" which combines the splits
@@ -57,5 +62,7 @@ class AnnotateWord(Resource):
 
             return result, 200
         except Exception as e:
-            logger.error(f"Error calling Gemini: {e}")
+            import traceback
+
+            logger.error(f"Error calling {api_caller}: {traceback.format_exc()}")
             return {"error": str(e)}, 500

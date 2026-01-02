@@ -46,6 +46,7 @@ services:
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
       GOOGLE_GEMINI_API_KEY: ${GOOGLE_GEMINI_API_KEY}
+      GROQ_API_KEY: ${GROQ_API_KEY}
       # CORS origins
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:80}
       # Enable database seeding

@@ -1,10 +1,9 @@
 import spacy
 from flask import request
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Resource, fields
 
 from ...controllers.words.search import search_words
-
-ns = Namespace("lexicon", description="Lexicon operations")
+from .route import ns
 
 # Load spaCy model
 try:
