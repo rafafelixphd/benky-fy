@@ -22,7 +22,6 @@ export function TokenizerUniqueWords({ tokens, onReplace }: Props) {
   const uniqueTokens = useMemo(() => {
     const map = new Map<string, Token>();
     (tokens || []).forEach((t) => {
-        console.log("Token: ", t);
         if (!map.has(t.surface)) {
             map.set(t.surface, t);
         }
