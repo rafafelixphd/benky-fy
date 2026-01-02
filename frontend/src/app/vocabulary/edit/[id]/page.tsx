@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { AuthGuard } from "@/components/common/auth";
 import { FloatingElements } from "@/components/common/layout/background";
 import { NavigationHeader } from "@/components/common/layout/navigation/navigation-header";

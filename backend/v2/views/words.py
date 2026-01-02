@@ -7,6 +7,7 @@ from ..config.database import db
 from ..controllers.words.anki import AnkiDeck
 from ..controllers.words.flashcards import FlashCardsDeck
 from ..controllers.words.progress import ProgressController
+from ..controllers.words.search import search_words
 from ..logger import get_logger
 from ..models import Word
 
@@ -72,7 +73,6 @@ class WordListResource(Resource):
     @ns.param("q", "Search query")
     def get(self):
         """List words within a specific ID range or matching a query."""
-        from ...controllers.words.search import search_words
 
         start_id = request.args.get("start_id", type=int)
         end_id = request.args.get("end_id", type=int)
