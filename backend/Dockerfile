@@ -6,7 +6,13 @@ FROM python:3.11-slim AS builder
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    curl \
+    gnupg \
+    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+    && . $HOME/.cargo/env \
     && rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Create virtual environment
 RUN python -m venv /opt/venv
@@ -16,6 +22,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
+
+RUN python -m spacy download ja_core_news_sm
 
 # Stage 2: Production image
 FROM python:3.11-slim AS production
@@ -50,6 +58,7 @@ EXPOSE 8080
 # Set environment variables
 ENV FLASK_ENV=production
 ENV PORT=8080
+ENV GOOGLE_GEMINI_API_KEY=${GOOGLE_GEMINI_API_KEY}
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \

@@ -113,7 +113,7 @@ class WordsApiClient {
         return this.request<Word[]>(`/v2/words/list?${params.toString()}`);
     }
 
-    async saveWord(word: Partial<Word>): Promise<ApiResponse<Word>> {
+    saveWord(word: Partial<Word>): Promise<ApiResponse<Word>> {
         if (word.id) {
             return this.request<Word>(`/v2/words/${word.id}`, {
                 method: "PUT",
@@ -123,6 +123,13 @@ class WordsApiClient {
         return this.request<Word>("/v2/words/edit", {
             method: "POST",
             body: JSON.stringify(word),
+        });
+    }
+
+    async annotateWord(surface: string): Promise<ApiResponse<any>> {
+        return this.request<any>("/v2/gemini/annotate", {
+            method: "POST",
+            body: JSON.stringify({ word: surface }),
         });
     }
 }

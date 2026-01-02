@@ -36,6 +36,14 @@ export const learningModules: LearningModule[] = [
         color: "from-green-500 to-green-600",
     },
     {
+        id: "tokenizer",
+        name: "Tokenizer",
+        description: "Tokenize any sentence",
+        status: "Available",
+        icon: FileText,
+        color: "from-green-500 to-green-600",
+    },
+    {
         id: "kanjistrikes",
         name: "Kanji Strikes",
         description: "Practice your kanji writing",
