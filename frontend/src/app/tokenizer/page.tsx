@@ -7,9 +7,16 @@ import { Card } from "@/components/ui/card";
 import { useTokenizer } from "@/lib/tokenizer/useTokenizer";
 import { TokenizerEditor } from "./components/TokenizerEditor";
 import { TokenizerLegend } from "./components/TokenizerLegend";
+import { TokenizerUniqueWords } from "./components/TokenizerUniqueWords";
 
 export default function TokenizerPage() {
   const { text, setText, tokens, lexemes, isLoading } = useTokenizer();
+
+  const handleReplaceAll = (target: string, word: import("@/entities/word").Word) => {
+      // Global replace for MVP. 
+      const newText = text.replaceAll(target, word.reading.kanji);
+      setText(newText);
+  };
 
   return (
     <AuthGuard>
@@ -24,26 +31,36 @@ export default function TokenizerPage() {
         </div>
 
         {/* Main Content */}
-        <div className="relative z-10 px-6 pb-6">
-          <div className="max-w-4xl mx-auto">
-            <Card className="bg-background/95 backdrop-blur-sm border-white/20 p-6 shadow-xl">
-                <div className="mb-4">
-                  <TokenizerLegend />
-                </div>
-                
-                <TokenizerEditor 
-                    text={text} 
-                    setText={setText} 
-                    tokens={tokens} 
-                    lexemes={lexemes}
-                    isLoading={isLoading} 
-                />
+        <div className="relative z-10 px-6 pb-6 h-[calc(100vh-200px)]">
+          <div className="max-w-7xl mx-auto h-full grid grid-cols-1 lg:grid-cols-4 gap-6">
+            
+            {/* Left Col: Editor */}
+            <div className="lg:col-span-3 flex flex-col h-full">
+                <Card className="bg-background/95 backdrop-blur-sm border-white/20 p-6 shadow-xl flex-1 flex flex-col">
+                    <div className="mb-4">
+                    <TokenizerLegend />
+                    </div>
+                    
+                    <div className="flex-1 min-h-0"> 
+                        <TokenizerEditor 
+                            text={text} 
+                            setText={setText} 
+                            tokens={tokens} 
+                            lexemes={lexemes}
+                            isLoading={isLoading} 
+                        />
+                    </div>
+                </Card>
+            </div>
 
-                {/* <div className="mt-4 text-sm text-muted-foreground flex justify-end items-center gap-2">
-                    <span>Analysis engine: </span>
-                    <code className="bg-muted px-1 py-0.5 rounded text-xs">spaCy (ja_core_news_sm)</code>
-                </div> */}
-            </Card>
+            {/* Right Col: Unique Words Sidebar */}
+            <div className="lg:col-span-1 h-full min-h-0">
+                <TokenizerUniqueWords 
+                    tokens={tokens || []}
+                    onReplace={handleReplaceAll}
+                />
+            </div>
+
           </div>
         </div>
       </div>
