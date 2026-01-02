@@ -72,10 +72,6 @@ export default function CreateWordPage() {
             const res = await wordsApiClient.saveWord(payload);
             if (res.success) {
                 toast.success("Word created!");
-                // Redirect to edit page of the new word or back to list/tokenizer?
-                // Usually stick to edit or go back. Let's go back for now or to edit to add more details.
-                // If it came from Tokenizer (has search params), maybe go back?
-                // Let's just go to the edit page of the new word.
                 if (res.data?.id) {
                      router.push(`/vocabulary/edit/${res.data.id}`);
                 } else {

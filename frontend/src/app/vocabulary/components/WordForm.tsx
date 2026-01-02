@@ -4,7 +4,9 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, Save } from "lucide-react";
+import { Plus, Trash2, Save, Wand2, Loader2 } from "lucide-react";
+import { wordsApiClient } from "@/api/private/words/api-client";
+import { toast } from "sonner";
 
 export interface Segment {
     kanji: string;
@@ -94,11 +96,66 @@ export function WordForm({ initialData, onSubmit, isSaving, onCancel }: WordForm
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                         <Label className="text-white">Surface Form (Kanji/Main)</Label>
-                        <Input 
-                            {...register("surface", { required: true })}
-                            className="bg-white/10 border-white/20 text-white" 
-                            placeholder="e.g. 電気"
-                        />
+                        <div className="flex gap-2">
+                            <Input 
+                                {...register("surface", { required: true })}
+                                className="bg-white/10 border-white/20 text-white" 
+                                placeholder="e.g. 電気"
+                            />
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                disabled={isSaving}
+                                onClick={async () => {
+                                    const surface = watch("surface");
+                                    if (!surface) {
+                                        toast.error("Please enter a word first");
+                                        return;
+                                    }
+                                    
+                                    const toastId = toast.loading("Analyzing word...");
+                                    try {
+                                        const res = await wordsApiClient.annotateWord(surface);
+                                        if (res.success && res.data) {
+                                            const d = res.data;
+                                            
+                                            // 1. Level
+                                            if (d.level) {
+                                                setValue("level.jlpt", d.level.jlpt || "unknown");
+                                            }
+                                            
+                                            // 2. Reading
+                                            if (d.reading) {
+                                                setValue("reading.kanji", d.reading.kanji || surface);
+                                                setValue("reading.kana", d.reading.kana || "");
+                                                
+                                                // English is string[] -> { value: string }[]
+                                                const eng = (d.reading.english || []).map((e: string) => ({ value: e }));
+                                                setValue("reading.english", eng);
+                                            }
+                                            
+                                            // 3. Segments
+                                            if (d.segments) {
+                                                setValue("segments", d.segments);
+                                            }
+                                            
+                                            // 4. POS & Category
+                                            if (d.part_of_speech) setValue("part_of_speech", d.part_of_speech);
+                                            if (d.category) setValue("category", d.category);
+
+                                            toast.success("Word annotated!", { id: toastId });
+                                        } else {
+                                            toast.error("Failed to annotate", { id: toastId });
+                                        }
+                                    } catch (e) {
+                                        console.error(e);
+                                        toast.error("Error connecting to AI", { id: toastId });
+                                    }
+                                }}
+                            >
+                                <Wand2 className="w-4 h-4" />
+                            </Button>
+                        </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
