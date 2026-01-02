@@ -1,8 +1,9 @@
+import { Word } from "./word";
+
 export type Vocab = {
   known: boolean;
   word_id: number | null;
-  candidate_ids: number[];
-  candidate_scores: number[];
+  candidates: Word[];
 };
 
 export type Token = {

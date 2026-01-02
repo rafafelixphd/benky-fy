@@ -23,8 +23,9 @@ vocab_model = ns.model(
     {
         "known": fields.Boolean,
         "word_id": fields.Integer,
-        "candidate_ids": fields.List(fields.Integer),
-        "candidate_scores": fields.List(fields.Float),
+        "candidates": fields.List(
+            fields.Raw
+        ),  # Determine schema if we want strict typing, but Raw is safer for mixed JSONB
     },
 )
 
@@ -123,19 +124,9 @@ class Annotate(Resource):
 
                 vocab_data["known"] = True
                 vocab_data["word_id"] = best_match.id
-                vocab_data["candidate_ids"] = [c.id for c in candidates]
-                vocab_data["candidate_scores"] = [
-                    max(
-                        [
-                            len(set(tv) & set(cv)) / len(set(tv) | set(cv)) if (set(tv) | set(cv)) else 0.0
-                            for tv in {t.text, t.lemma_}
-                            for cv in {c.surface, c.reading.get("kana"), c.reading.get("kanji")}
-                            if cv
-                        ]
-                        or [0.0]
-                    )
-                    for c in candidates
-                ]
+                vocab_data["known"] = True
+                vocab_data["word_id"] = best_match.id
+                vocab_data["candidates"] = [c.to_dict() for c in candidates]
 
             token_obj = {
                 "token_id": i,
