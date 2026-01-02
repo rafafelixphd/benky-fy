@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { POS_COLORS } from "./TokenizerLegend";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronRight, Plus, RefreshCw } from "lucide-react"; // Assuming lucide-react is available as it's standard in shadcn/ui
+import { ChevronDown, ChevronRight, Plus, RefreshCw, Edit } from "lucide-react"; // Assuming lucide-react is available as it's standard in shadcn/ui
 
 type Props = {
   tokens: Token[];
@@ -22,6 +22,7 @@ export function TokenizerUniqueWords({ tokens, onReplace }: Props) {
   const uniqueTokens = useMemo(() => {
     const map = new Map<string, Token>();
     (tokens || []).forEach((t) => {
+        if (t.label === "PARTICLE" || t.label === "PUNC" || t.label === "PUNCT") return;
         if (!map.has(t.surface)) {
             map.set(t.surface, t);
         }
@@ -33,7 +34,7 @@ export function TokenizerUniqueWords({ tokens, onReplace }: Props) {
     const params = new URLSearchParams();
     params.set("surface", token.surface);
     params.set("lemma", token.lemma);
-    router.push(`/vocabulary/edit/new?${params.toString()}`);
+    window.open(`/vocabulary/edit/new?${params.toString()}`);
   };
 
   const toggleExpand = (id: string) => {
@@ -101,6 +102,21 @@ export function TokenizerUniqueWords({ tokens, onReplace }: Props) {
                                     <div key={word.id} className="bg-background/50 rounded p-2 border border-border/50">
                                         <div className="flex justify-between items-start mb-2">
                                             <div>
+                                                <div className="font-bold text-lg text-foreground flex items-center gap-2">
+                                                    {word.reading.kanji}
+                                                    <Button 
+                                                        size="icon" 
+                                                        variant="ghost" 
+                                                        className="h-6 w-6 text-muted-foreground hover:text-primary"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            window.open(`/vocabulary/edit/${word.id}`, "_blank");
+                                                        }}
+                                                        title="Edit Word"
+                                                    >
+                                                        <Edit className="w-3 h-3" />
+                                                    </Button>
+                                                </div>
                                                 <div className="font-medium text-purple-600 dark:text-purple-400">
                                                     {word.reading.kana}
                                                 </div>
@@ -109,14 +125,16 @@ export function TokenizerUniqueWords({ tokens, onReplace }: Props) {
                                                 </div>
                                             </div>
                                         </div>
-                                        <Button 
-                                            size="sm" 
-                                            variant="outline" 
-                                            className="w-full text-xs h-7 gap-1"
-                                            onClick={() => onReplace(token.surface, word)}
-                                        >
-                                            <RefreshCw className="w-3 h-3" /> Replace All
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            <Button 
+                                                size="sm" 
+                                                variant="outline" 
+                                                className="w-full text-xs h-7 gap-1"
+                                                onClick={() => onReplace(token.surface, word)}
+                                            >
+                                                <RefreshCw className="w-3 h-3" /> Replace
+                                            </Button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

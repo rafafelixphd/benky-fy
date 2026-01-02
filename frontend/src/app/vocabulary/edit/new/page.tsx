@@ -1,54 +1,127 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/common/auth";
 import { NavigationHeader } from "@/components/common/layout/navigation/navigation-header";
+import { FloatingElements } from "@/components/common/layout/background";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { WordForm, WordFormData } from "@/app/vocabulary/components/WordForm";
+import { wordsApiClient } from "@/api/private/words/api-client";
+import { toast } from "sonner";
+import { useState } from "react";
+import { Word } from "@/entities/word";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function CreateWordPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const surface = searchParams.get("surface") || "";
   const lemma = searchParams.get("lemma") || "";
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Pre-fill data from tokenizer params
+  const initialData: WordFormData = {
+      surface: surface,
+      level: { jlpt: "N5" },
+      reading: { 
+          kanji: surface, 
+          kana: lemma, 
+          english: [], 
+          romaji: [] 
+      },
+      segments: [],
+      part_of_speech: [],
+      category: []
+  };
+
+  const onSubmit = async (data: WordFormData) => {
+        setIsSaving(true);
+        try {
+            // Deconstruct segments back to arrays
+            const kanji_split: string[] = [];
+            const kana_split: string[] = [];
+            const kanji_split_type: string[] = [];
+
+            data.segments.forEach(s => {
+                kanji_split.push(s.kanji);
+                kana_split.push(s.kana);
+                kanji_split_type.push(s.type);
+            });
+
+            // Flatten English objects back to strings
+            const englishStrings = data.reading.english.map(e => e.value).filter(v => v.trim() !== "");
+
+            const payload: Partial<Word> = {
+                surface: data.surface,
+                level: {
+                    ...data.level,
+                    custom: data.level.custom ? Number(data.level.custom) : undefined
+                },
+                part_of_speech: data.part_of_speech,
+                category: data.category,
+                reading: {
+                    ...data.reading,
+                    english: englishStrings,
+                    kanji_split,
+                    kana_split,
+                    kanji_split_type
+                }
+            };
+
+            const res = await wordsApiClient.saveWord(payload);
+            if (res.success) {
+                toast.success("Word created!");
+                // Redirect to edit page of the new word or back to list/tokenizer?
+                // Usually stick to edit or go back. Let's go back for now or to edit to add more details.
+                // If it came from Tokenizer (has search params), maybe go back?
+                // Let's just go to the edit page of the new word.
+                if (res.data?.id) {
+                     router.push(`/vocabulary/edit/${res.data.id}`);
+                } else {
+                     router.push("/vocabulary");
+                }
+            } else {
+                toast.error(res.error || "Failed to save");
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error("Error saving word");
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-gray-50 dark:bg-zinc-950">
+      <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden flex flex-col">
+        <FloatingElements />
         <NavigationHeader />
         
-        <div className="pt-24 px-6 max-w-2xl mx-auto">
-          <Card className="p-6">
-            <h1 className="text-2xl font-bold mb-6">Add New Word</h1>
-            
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <Label>Surface Form (Kanji)</Label>
-                <Input defaultValue={surface} placeholder="e.g. 食べる" />
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Reading (Kana)</Label>
-                <Input defaultValue={lemma} placeholder="e.g. たべる" />
-              </div>
+        <div className="relative z-10 pt-24 px-6 text-center">
+            <h1 className="text-3xl font-bold text-white mb-2">New Word</h1>
+            <p className="text-white/80">Add to your vocabulary</p>
+        </div>
 
-               <div className="space-y-2">
-                <Label>English Meaning</Label>
-                <Input placeholder="e.g. to eat" />
-              </div>
-
-               <div className="space-y-2">
-                <Label>Part of Speech</Label>
-                <Input placeholder="e.g. Verb" />
-              </div>
-
-              <div className="pt-4 flex gap-4">
-                  <Button type="submit" className="w-full">Create Word</Button>
-                  <Button variant="outline" className="w-full" type="button" onClick={() => window.history.back()}>Cancel</Button>
-              </div>
-            </form>
-          </Card>
+        <div className="relative z-10 px-6 pb-6 flex-1 overflow-auto">
+          <div className="max-w-4xl mx-auto mt-6">
+             <Button 
+                variant="ghost" 
+                className="text-white/80 hover:text-white hover:bg-white/10 mb-4 pl-0"
+                onClick={() => router.back()}
+            >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+            </Button>
+            <Card className="bg-background/20 backdrop-blur-md border-white/20 p-6">
+                <WordForm 
+                    initialData={initialData} 
+                    onSubmit={onSubmit} 
+                    isSaving={isSaving}
+                    onCancel={() => router.back()}
+                />
+            </Card>
+          </div>
         </div>
       </div>
     </AuthGuard>
