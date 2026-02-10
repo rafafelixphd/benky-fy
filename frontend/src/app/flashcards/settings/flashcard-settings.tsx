@@ -199,19 +199,23 @@ export function FlashcardSettingsModal({
                         )}
                     </div>
 
-                    <div className="h-px bg-gray-100" />
+                    {settings.mode !== 'custom-list' && (
+                        <>
+                            <div className="h-px bg-gray-100" />
 
-                    <ContentSelector
-                        selectedLevel={settings.level}
-                        selectedTags={settings.tag}
-                        onLevelChange={(level) => setSettings(s => ({ ...s, level }))}
-                        onTagsChange={(tag) => setSettings(s => ({ ...s, tag }))}
-                    />
+                            <ContentSelector
+                                selectedLevel={settings.level}
+                                selectedTags={settings.tag}
+                                onLevelChange={(level) => setSettings(s => ({ ...s, level }))}
+                                onTagsChange={(tag) => setSettings(s => ({ ...s, tag }))}
+                            />
 
-                    <PartOfSpeechSelector
-                        selected={settings.partOfSpeech || []}
-                        onChange={(partOfSpeech) => setSettings(s => ({ ...s, partOfSpeech }))}
-                    />
+                            <PartOfSpeechSelector
+                                selected={settings.partOfSpeech || []}
+                                onChange={(partOfSpeech) => setSettings(s => ({ ...s, partOfSpeech }))}
+                            />
+                        </>
+                    )}
 
                     <SettingsSection
                         title="Display & Constraints"
