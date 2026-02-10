@@ -19,10 +19,12 @@ class FlashCardsDeck:
 
         # Filter by JLPT
         if level and level.get("jlpt"):
-            query = query.filter(Word.level["jlpt"].astext == level["jlpt"])
+            logger.debug(f"Filtering by JLPT: {level['jlpt']}")
+            query = query.filter(Word.level["jlpt"].astext == level["jlpt"].lower())
 
         # Filter by Custom Level
         if level and level.get("custom"):
+            logger.debug(f"Filtering by Custom Level: {level['custom']}")
             query = query.filter(Word.level["custom"].astext == str(level["custom"]))
 
         # Filter by Category (Tags)
@@ -31,11 +33,13 @@ class FlashCardsDeck:
         # Logic: if 'tag' in settings, use it to filter Word.category
         tags = self.settings.get("tag") or self.settings.get("categories")
         if tags:
+            logger.debug(f"Filtering by Tags: {tags}")
             query = query.filter(Word.category.overlap(tags))
 
         # Filter by Part of Speech
         pos = self.settings.get("partOfSpeech")
         if pos:
+            logger.info(f"Filtering by Part of Speech: {pos}")
             query = query.filter(Word.part_of_speech.overlap(pos))
 
         return query

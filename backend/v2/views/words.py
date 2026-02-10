@@ -190,7 +190,6 @@ class NextWord(Resource):
     def get(self):
         settings = flask_session.get("flashcard_settings", {})
 
-        # Use AnkiDeck if explicitly requested or if parameters suggest it
         if settings.get("mode") == "anki" or settings.get("learningRatio") is not None:
             user_id = flask_session.get("user_id")
             deck = AnkiDeck(settings, user_id=user_id)

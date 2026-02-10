@@ -34,6 +34,7 @@ export default function CustomFlashcardPage() {
         localStorage.setItem('flashcard-settings', JSON.stringify(currentSettings));
       }
 
+      console.log(currentSettings);
       // Only map if backend needs specific transformation, currently passing as is if compatible
       await wordsApiClient.initSession(currentSettings);
       setSettings(currentSettings);
