@@ -46,8 +46,11 @@ export interface FlashcardSettings {
 
     maxCards: number;
 
-    /** Session Mode: 'random' or 'anki' */
-    mode?: 'random' | 'anki';
+    /** Session Mode: 'random' or 'anki' or 'custom-list' */
+    mode?: 'random' | 'anki' | 'custom-list';
+
+    /** List ID for custom-list mode */
+    listId?: number;
 
     /** Ratio of new words (0.0 to 1.0) for Anki mode */
     learningRatio?: number;

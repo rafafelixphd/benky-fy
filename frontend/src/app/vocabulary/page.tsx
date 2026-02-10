@@ -133,6 +133,7 @@ export default function VocabularyPage() {
                                             variant="outline"
                                             size="icon"
                                             className="border-white/20 text-white hover:bg-white/10"
+
                                         >
                                             <Edit className="w-4 h-4" />
                                         </Button>

@@ -2,12 +2,16 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X, Settings as SettingsIcon, Brain, Shuffle } from "lucide-react";
+import { X, Settings as SettingsIcon, Brain, Shuffle, Star } from "lucide-react";
 import { ContentSelector } from './content-selector';
 import { PartOfSpeechSelector } from './part-of-speech-selector';
 import { InputConfig } from './input-config';
 import { FlashcardSettings, DEFAULT_FLASHCARD_SETTINGS, CardDisplayMode } from '@/entities/flashcards/settings';
 import { SettingsSection } from './settings-section';
+import { wordListsApiClient } from "@/api/private/word-lists/api-client";
+import { WordList } from "@/entities/word-list";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useEffect } from "react";
 
 export interface FlashcardSettingsModalProps {
     onClose: () => void;
@@ -29,6 +33,21 @@ export function FlashcardSettingsModal({
     const [settings, setSettings] = useState<FlashcardSettings>(initialSettings);
     const [isSaving, setIsSaving] = useState(false);
     const [displayExpanded, setDisplayExpanded] = useState(true);
+    const [lists, setLists] = useState<WordList[]>([]);
+
+    useEffect(() => {
+        const fetchLists = async () => {
+            try {
+                const res = await wordListsApiClient.getLists();
+                if (res.success && res.data) {
+                    setLists(res.data);
+                }
+            } catch (e) {
+                console.error("Failed to fetch lists", e);
+            }
+        };
+        fetchLists();
+    }, []);
 
     const handleSave = async () => {
         setIsSaving(true);
@@ -72,7 +91,7 @@ export function FlashcardSettingsModal({
                     {/* Study Mode Section */}
                     <div className="space-y-4">
                         <label className="text-sm font-medium text-gray-700">Study Mode</label>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-3 gap-4">
                             <button
                                 onClick={() => setSettings(s => ({ ...s, mode: 'random' }))}
                                 className={`
@@ -108,7 +127,52 @@ export function FlashcardSettingsModal({
                                     <div className="text-xs opacity-80 mt-1">Spaced repetition based on accuracy</div>
                                 </div>
                             </button>
+
+
+                            <button
+                                onClick={() => setSettings(s => ({ ...s, mode: 'custom-list' }))}
+                                className={`
+                                    flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all
+                                    ${settings.mode === 'custom-list'
+                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600'}
+                                `}
+                            >
+                                <div className={`p-3 rounded-full ${settings.mode === 'custom-list' ? 'bg-indigo-100' : 'bg-gray-100'}`}>
+                                    <Star className="w-6 h-6" />
+                                </div>
+                                <div className="text-center">
+                                    <div className="font-semibold">Favourite Decks</div>
+                                    <div className="text-xs opacity-80 mt-1">Practice custom lists</div>
+                                </div>
+                            </button>
                         </div>
+
+                        {/* List Selector (only for Custom List) */}
+                        {settings.mode === 'custom-list' && (
+                            <div className="pt-2 px-1 animate-in slide-in-from-top-2 duration-200">
+                                <label className="text-sm font-medium text-gray-700 mb-2 block">Select Deck</label>
+                                {lists.length === 0 ? (
+                                    <div className="text-sm text-red-500">No custom lists found. Create one in Vocabulary &gt; Lists.</div>
+                                ) : (
+                                    <Select 
+                                        value={settings.listId?.toString()} 
+                                        onValueChange={(val) => setSettings(s => ({ ...s, listId: parseInt(val) }))}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select a list..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {lists.map(list => (
+                                                <SelectItem key={list.id} value={list.id.toString()}>
+                                                    {list.name} ({list.entry_count} words)
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                )}
+                            </div>
+                        )}
 
                         {/* Learning Ratio Slider (only for Anki) */}
                         {settings.mode === 'anki' && (
