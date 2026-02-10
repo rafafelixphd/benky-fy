@@ -5,6 +5,7 @@ from flask_restx import Namespace, Resource, fields
 
 from ..config.database import db
 from ..controllers.words.anki import AnkiDeck
+from ..controllers.words.favourite import FavouriteDeck
 from ..controllers.words.flashcards import FlashCardsDeck
 from ..controllers.words.progress import ProgressController
 from ..controllers.words.search import search_words
@@ -193,6 +194,9 @@ class NextWord(Resource):
         if settings.get("mode") == "anki" or settings.get("learningRatio") is not None:
             user_id = flask_session.get("user_id")
             deck = AnkiDeck(settings, user_id=user_id)
+        elif settings.get("mode") == "custom-list":
+            user_id = flask_session.get("user_id")
+            deck = FavouriteDeck(settings, user_id=user_id)
         else:
             deck = FlashCardsDeck(settings)
 
