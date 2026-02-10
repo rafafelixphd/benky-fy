@@ -184,7 +184,7 @@ export default function WordListsPage() {
                                         <p className="text-white/60 text-sm line-clamp-2 min-h-[40px]">
                                             {list.description || "No description provided."}
                                         </p>
-                                    </div>text-primary-purple hover:bg-primary-purple/10 dark:border-white/30 dark:text-white dark:hover:bg-white/10
+                                    </div>
                                     <div className="px-6 py-4 bg-black/20 border-t border-white/5 flex justify-between items-center text-white/60 text-sm">
                                         <span>{list.entry_count ?? 0} words</span>
                                         <div className="flex items-center group-hover:translate-x-1 transition-transform text-primary-purple font-medium">
