@@ -162,6 +162,7 @@ export default function WordListsPage() {
                                     key={list.id}
                                     className="bg-white/10 backdrop-blur-md border-white/10 overflow-hidden hover:bg-white/15 transition-colors cursor-pointer group flex flex-col"
                                     onClick={() => router.push(`/vocabulary/lists/${list.id}`)}
+                                    interactive={true}
                                 >
                                     <div className="p-6 flex-1">
                                         <div className="flex justify-between items-start mb-4">
