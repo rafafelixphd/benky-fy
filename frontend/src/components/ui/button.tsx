@@ -12,7 +12,7 @@ const buttonVariants = cva(
           "bg-primary-purple text-white hover:bg-primary-purple/90 shadow-lg hover:shadow-xl transition-all duration-300",
         destructive: "bg-error text-white hover:bg-error/90",
         outline:
-          "border border-border bg-background hover:bg-accent text-foreground",
+          "border border-border bg-transparent hover:bg-accent text-foreground",
         secondary:
           "bg-secondary-purple text-white hover:bg-secondary-purple/80",
         ghost: "hover:bg-accent text-foreground",
