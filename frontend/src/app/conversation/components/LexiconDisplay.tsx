@@ -1,26 +1,39 @@
 import { ConversationalToken } from "./types";
 import { TokenPopover } from "./TokenPopover";
+import { POS_COLORS } from "../../tokenizer/components/TokenizerLegend";
+import { cn } from "@/lib/utils/utils";
 
 type Props = {
   text: string;
   lexicon?: ConversationalToken[];
   showMorphology: boolean;
+  displayMode: "surface" | "reading";
 };
 
-export function LexiconDisplay({ text, lexicon, showMorphology }: Props) {
+export function LexiconDisplay({ text, lexicon, showMorphology, displayMode }: Props) {
   if (!showMorphology || !lexicon || lexicon.length === 0) {
     return <span className="text-lg leading-relaxed">{text}</span>;
   }
 
   return (
-    <div className="flex flex-wrap items-end gap-x-1 gap-y-2 text-lg leading-relaxed">
-      {lexicon.map((token, index) => (
-        <TokenPopover key={`${token.surface}-${index}`} token={token}>
-          <span className="cursor-pointer border-b-2 border-transparent hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all rounded px-0.5">
-            {token.surface}
-          </span>
-        </TokenPopover>
-      ))}
+    <div className="flex flex-wrap items-end gap-x-1 gap-y-2 text-lg leading-relaxed font-sans">
+      {lexicon.map((token, index) => {
+        const colorClass = POS_COLORS[token.pos] || "bg-transparent";
+        const content = displayMode === "reading" ? token.reading : token.surface;
+        
+        return (
+          <TokenPopover key={`${token.surface}-${index}`} token={token}>
+            <span 
+                className={cn(
+                    "cursor-pointer rounded-sm px-[2px] mx-[-1px] border-b-2 border-transparent transition-all hover:opacity-80",
+                    colorClass
+                )}
+            >
+              {content}
+            </span>
+          </TokenPopover>
+        );
+      })}
     </div>
   );
 }

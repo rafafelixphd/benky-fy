@@ -9,6 +9,7 @@ type Props = {
   showEnglish: boolean;
   showJapanese: boolean;
   showMorphology: boolean;
+  displayMode: "surface" | "reading";
 };
 
 export function MessageBubble({
@@ -17,6 +18,7 @@ export function MessageBubble({
   showEnglish,
   showJapanese,
   showMorphology,
+  displayMode,
 }: Props) {
   return (
     <div
@@ -47,7 +49,8 @@ export function MessageBubble({
                     <LexiconDisplay 
                         text={part.japanese} 
                         lexicon={part.lexicon} 
-                        showMorphology={showMorphology} 
+                        showMorphology={showMorphology}
+                        displayMode={displayMode}
                     />
                 </div>
             )}

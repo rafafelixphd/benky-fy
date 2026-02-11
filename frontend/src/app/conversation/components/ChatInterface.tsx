@@ -28,6 +28,7 @@ export function ChatInterface() {
   const [showEnglish, setShowEnglish] = useState(true);
   const [showJapanese, setShowJapanese] = useState(true);
   const [showMorphology, setShowMorphology] = useState(false);
+  const [displayMode, setDisplayMode] = useState<"surface" | "reading">("surface");
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -132,6 +133,15 @@ export function ChatInterface() {
               ? "EN Only"
               : "JP Only"}
           </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setDisplayMode(displayMode === "surface" ? "reading" : "surface")}
+            className="h-8 gap-2 text-xs w-20"
+          >
+            <span>{displayMode === "surface" ? "Kanji" : "Kana"}</span>
+          </Button>
           
           <Button
             variant={showMorphology ? "default" : "outline"}
@@ -165,6 +175,7 @@ export function ChatInterface() {
             showEnglish={showEnglish}
             showJapanese={showJapanese}
             showMorphology={showMorphology}
+            displayMode={displayMode}
           />
         ))}
 
