@@ -46,8 +46,11 @@ export interface FlashcardSettings {
 
     maxCards: number;
 
-    /** Session Mode: 'random' or 'anki' */
-    mode?: 'random' | 'anki';
+    /** Session Mode: 'random' or 'anki' or 'custom-list' */
+    mode?: 'random' | 'anki' | 'custom-list';
+
+    /** List ID for custom-list mode */
+    listId?: number;
 
     /** Ratio of new words (0.0 to 1.0) for Anki mode */
     learningRatio?: number;
@@ -59,10 +62,10 @@ export interface FlashcardSettings {
 export const DEFAULT_FLASHCARD_SETTINGS: FlashcardSettings = {
     level: {jlpt: null, custom: 1},
     mode: "anki",
-    learningRatio: 0.2,
-    partOfSpeech: [],
+    learningRatio: 0.3,
+    partOfSpeech: ['verb'],
     tag: [],
-    maxCards: 3,
+    maxCards: 20,
     display: {
         cardDisplay: 'kanji',
         inputMode: ['english', 'kana'],

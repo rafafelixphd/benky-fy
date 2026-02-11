@@ -85,13 +85,21 @@ class AnkiDeck(FlashCardsDeck):
         # Accessing settings transparently
         level = self.settings.get("level", {})
         if level and level.get("jlpt"):
-            query = query.filter(Word.level["jlpt"].astext == level["jlpt"])
+            logger.debug("[seen words] Filtering by JLPT")
+            query = query.filter(Word.level["jlpt"].astext == level["jlpt"].lower())
 
         if level and level.get("custom"):
+            logger.debug("[seen words] Filtering by Custom Level")
             query = query.filter(Word.level["custom"].astext == str(level["custom"]))
+
+        pos = self.settings.get("partOfSpeech", [])
+        if pos:
+            logger.debug("[seen words] Filtering by Part of Speech")
+            query = query.filter(Word.part_of_speech.overlap(pos))
 
         tags = self.settings.get("tag") or self.settings.get("categories")
         if tags:
+            logger.debug("[seen words] Filtering by Tags")
             query = query.filter(Word.category.overlap(tags))
 
         words_in_scope = query.all()
@@ -118,13 +126,16 @@ class AnkiDeck(FlashCardsDeck):
 
         # Randomize
         words = query.order_by(func.random()).limit(limit).all()
+
+        logger.debug(f"[new words] {words}")
+
         return [w.id for w in words]
 
     def draw_next(self, session_store):
         queue = session_store.get("word_queue")
 
         if queue is None:
-            logger.info("Anki Queue uninitialized, building new batch...")
+            logger.debug("Anki Queue uninitialized, building new batch...")
 
             # 1. Determine counts
             total_cards = self.max_cards
@@ -134,7 +145,7 @@ class AnkiDeck(FlashCardsDeck):
             # 2. Fetch Seen
             seen_ids = self._get_seen_words(n_seen)
 
-            logger.info(f"{seen_ids=}")
+            logger.debug(f"{seen_ids=}")
             found_seen_count = len(seen_ids)
 
             # 3. Adjust New count if we didn't find enough Seen
@@ -143,7 +154,7 @@ class AnkiDeck(FlashCardsDeck):
 
             # 4. Fetch New
             new_ids = self._get_new_words(n_new)
-
+            logger.debug(f"{new_ids=}")
             # 5. Combine and Shuffle
             queue = seen_ids + new_ids
             random.shuffle(queue)
@@ -155,6 +166,8 @@ class AnkiDeck(FlashCardsDeck):
 
         if not queue:
             return None
+
+        logger.info(f"{queue=}")
 
         next_id = queue.pop(0)
         session_store["word_queue"] = queue

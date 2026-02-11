@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/common/auth";
 import { NavigationHeader } from "@/components/common/layout/navigation/navigation-header";
@@ -10,10 +11,10 @@ import { wordsApiClient } from "@/api/private/words/api-client";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Word } from "@/entities/word";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function CreateWordPage() {
+function CreateWordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const surface = searchParams.get("surface") || "";
@@ -88,19 +89,8 @@ export default function CreateWordPage() {
         }
     };
 
-  return (
-    <AuthGuard>
-      <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden flex flex-col">
-        <FloatingElements />
-        <NavigationHeader />
-        
-        <div className="relative z-10 pt-24 px-6 text-center">
-            <h1 className="text-3xl font-bold text-white mb-2">New Word</h1>
-            <p className="text-white/80">Add to your vocabulary</p>
-        </div>
-
-        <div className="relative z-10 px-6 pb-6 flex-1 overflow-auto">
-          <div className="max-w-4xl mx-auto mt-6">
+    return (
+        <div className="max-w-4xl mx-auto mt-6">
              <Button 
                 variant="ghost" 
                 className="text-white/80 hover:text-white hover:bg-white/10 mb-4 pl-0"
@@ -117,7 +107,26 @@ export default function CreateWordPage() {
                     onCancel={() => router.back()}
                 />
             </Card>
-          </div>
+      </div>
+    );
+}
+
+export default function CreateWordPage() {
+  return (
+    <AuthGuard>
+      <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden flex flex-col">
+        <FloatingElements />
+        <NavigationHeader />
+        
+        <div className="relative z-10 pt-24 px-6 text-center">
+            <h1 className="text-3xl font-bold text-white mb-2">New Word</h1>
+            <p className="text-white/80">Add to your vocabulary</p>
+        </div>
+
+        <div className="relative z-10 px-6 pb-6 flex-1 overflow-auto">
+            <Suspense fallback={<div className="text-white text-center py-10"><Loader2 className="w-8 h-8 animate-spin mx-auto"/> Loading form...</div>}>
+                <CreateWordContent />
+            </Suspense>
         </div>
       </div>
     </AuthGuard>

@@ -14,6 +14,20 @@ import { toast } from "sonner";
 import { WordForm, WordFormData, Segment } from "@/app/vocabulary/components/WordForm";
 
 
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { wordListsApiClient } from "@/api/private/word-lists/api-client";
+import { WordList } from "@/entities/word-list";
+import { Plus, Check } from "lucide-react";
+
 export default function VocabularyEditPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const router = useRouter();
@@ -21,6 +35,55 @@ export default function VocabularyEditPage({ params }: { params: Promise<{ id: s
     const [isLoading, setIsLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [initialData, setInitialData] = useState<WordFormData | undefined>(undefined);
+    
+    // Add to List state
+    const [lists, setLists] = useState<WordList[]>([]);
+    const [selectedListId, setSelectedListId] = useState<string>("");
+    const [isAddToListOpen, setIsAddToListOpen] = useState(false);
+    const [isAddingToList, setIsAddingToList] = useState(false);
+
+    const fetchLists = async () => {
+        try {
+            const res = await wordListsApiClient.getLists();
+            if (res.success && res.data) {
+                setLists(res.data);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    useEffect(() => {
+        if (isAddToListOpen) {
+            fetchLists();
+        }
+    }, [isAddToListOpen]);
+
+    const handleAddToList = async () => {
+        if (!selectedListId || !id || isNew) return;
+
+        setIsAddingToList(true);
+        try {
+            const listId = parseInt(selectedListId);
+            const wordId = parseInt(id);
+            const res = await wordListsApiClient.addWord(listId, wordId);
+            
+            if (res.success) {
+                toast.success("Added to list!");
+                setIsAddToListOpen(false);
+            } else {
+                 if (res.error?.includes("already exists") || res.error?.includes("UniqueConstraint")) {
+                     toast.info("Word is already in this list");
+                } else {
+                    toast.error(res.error || "Failed to add to list");
+                }
+            }
+        } catch (e) {
+            toast.error("Error adding to list");
+        } finally {
+            setIsAddingToList(false);
+        }
+    };
 
     useEffect(() => {
         if (!isNew) {
@@ -140,14 +203,55 @@ export default function VocabularyEditPage({ params }: { params: Promise<{ id: s
 
                 <div className="relative z-10 px-6 pb-6 flex-1 overflow-auto">
                     <div className="max-w-4xl mx-auto mt-6">
-                        <Button 
-                            variant="ghost" 
-                            className="text-white/80 hover:text-white hover:bg-white/10 mb-4 pl-0"
-                            onClick={() => router.back()}
-                        >
-                            <ArrowLeft className="w-4 h-4 mr-2" />
-                            Back
-                        </Button>
+                        <div className="flex justify-between items-center mb-4">
+                            <Button 
+                                variant="ghost" 
+                                className="text-white/80 hover:text-white hover:bg-white/10 pl-0"
+                                onClick={() => router.back()}
+                            >
+                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                Back
+                            </Button>
+
+                            {!isNew && (
+                                <Dialog open={isAddToListOpen} onOpenChange={setIsAddToListOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 gap-2">
+                                            <Plus className="w-4 h-4" /> Add to List
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-secondary-purple border-white/10 text-white">
+                                        <DialogHeader>
+                                            <DialogTitle>Add to Word List</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="py-4 space-y-4">
+                                            <Label>Select List</Label>
+                                            {lists.length === 0 ? (
+                                                <div className="text-white/60 text-sm">No lists found. Create one first!</div>
+                                            ) : (
+                                                <Select value={selectedListId} onValueChange={setSelectedListId}>
+                                                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                                                        <SelectValue placeholder="Select a list..." />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="bg-secondary-purple border-white/10 text-white">
+                                                        {lists.map(list => (
+                                                            <SelectItem key={list.id} value={list.id.toString()} className="focus:bg-white/10 focus:text-white">
+                                                                {list.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        </div>
+                                        <DialogFooter>
+                                            <Button onClick={handleAddToList} disabled={!selectedListId || isAddingToList} className="bg-primary-purple hover:bg-primary-purple/80 text-white">
+                                                {isAddingToList ? "Adding..." : "Add Word"}
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            )}
+                        </div>
 
                         <Card className="bg-background/20 backdrop-blur-md border-white/20 p-6">
                             {isLoading ? (

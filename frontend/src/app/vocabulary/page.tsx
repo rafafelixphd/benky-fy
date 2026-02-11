@@ -12,6 +12,7 @@ import { Word } from "@/entities/word";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"; 
 import { Search, Plus, ChevronLeft, ChevronRight, Edit } from "lucide-react"; 
+import { WordFilter, WordListFilters } from "./_components/word-filter"; 
 // Actually, let's implement inline debounce or use timer for simplicity if hook doesn't exist.
 // Let's check hooks folder first? No, let's just use simple setTimeout.
 
@@ -23,40 +24,41 @@ export default function VocabularyPage() {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
+    const [filters, setFilters] = useState<WordListFilters>({});
     
     // Simple debounce effect
     useEffect(() => {
         const timer = setTimeout(() => {
             setPage(1); // Reset to page 1 on new search
-            fetchWords(searchQuery);
+            fetchWords(searchQuery, filters);
         }, 300); // 300ms debounce
 
         return () => clearTimeout(timer);
-    }, [searchQuery]);
+    }, [searchQuery, filters]);
 
     // Page change effect needs to respect current search
     useEffect(() => {
-        fetchWords(searchQuery);
+        fetchWords(searchQuery, filters);
     }, [page]);
 
     // We don't have total count API yet, so we'll just check if we got full page
     const [hasMore, setHasMore] = useState(true); 
 
-    const fetchWords = async (q: string) => {
+    const fetchWords = async (q: string, currentFilters: WordListFilters) => {
         setLoading(true);
         try {
             const startId = (page - 1) * ITEMS_PER_PAGE + 1;
             const endId = page * ITEMS_PER_PAGE;
             let res;
-            if (q) {
-                res = await wordsApiClient.getWordsList(undefined, undefined, q);
+            if (q || Object.keys(currentFilters).length > 0) {
+                res = await wordsApiClient.getWordsList(undefined, undefined, q, currentFilters);
             } else {
                  res = await wordsApiClient.getWordsList(startId, endId);
             }
             
             if (res.success && res.data) {
                 setWords(res.data);
-                setHasMore(res.data.length > 0 && !q); // Disable next button on search for now as we don't paginate search
+                setHasMore(res.data.length > 0 && !q && Object.keys(currentFilters).length === 0); // Disable next button on search/filter for now
             } else {
                 setWords([]);
             }
@@ -98,6 +100,14 @@ export default function VocabularyPage() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
+                    <WordFilter filters={filters} onFilterChange={setFilters} />
+                    <div className="text-white/60 text-sm font-mono min-w-[80px] text-center">
+                        {loading ? (
+                            <span className="animate-pulse">...</span>
+                        ) : (
+                            <span>{words.length} found</span>
+                        )}
+                    </div>
                     <Button 
                         onClick={() => router.push("/vocabulary/edit/new")}
                         className="bg-primary-purple hover:bg-primary-purple/80 text-white"
@@ -133,6 +143,7 @@ export default function VocabularyPage() {
                                             variant="outline"
                                             size="icon"
                                             className="border-white/20 text-white hover:bg-white/10"
+
                                         >
                                             <Edit className="w-4 h-4" />
                                         </Button>

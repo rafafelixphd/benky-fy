@@ -104,11 +104,23 @@ class WordsApiClient {
         return this.request<Word>(`/v2/words/${id}`);
     }
 
-    async getWordsList(startId?: number, endId?: number, q?: string): Promise<ApiResponse<Word[]>> {
+    async getWordsList(startId?: number, endId?: number, q?: string, filters?: {
+        jlpt?: string;
+        custom_level?: number;
+        part_of_speech?: string[];
+        tags?: string[];
+    }): Promise<ApiResponse<Word[]>> {
         const params = new URLSearchParams();
         if (startId !== undefined) params.append("start_id", startId.toString());
         if (endId !== undefined) params.append("end_id", endId.toString());
         if (q) params.append("q", q);
+        
+        if (filters) {
+            if (filters.jlpt) params.append("jlpt", filters.jlpt);
+            if (filters.custom_level !== undefined) params.append("custom_level", filters.custom_level.toString());
+            if (filters.part_of_speech?.length) params.append("part_of_speech", filters.part_of_speech.join(","));
+            if (filters.tags?.length) params.append("tags", filters.tags.join(","));
+        }
         
         return this.request<Word[]>(`/v2/words/list?${params.toString()}`);
     }

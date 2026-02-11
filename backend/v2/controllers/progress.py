@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from ...config.database import db
-from ...logger import get_logger
-from ...models.user_word_map import UserWordMap
+from ..config.database import db
+from ..logger import get_logger
+from ..models.user_word_map import UserWordMap
 
 logger = get_logger(namespace="progress")
 

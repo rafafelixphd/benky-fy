@@ -4,10 +4,11 @@ from flask import session as flask_session
 from flask_restx import Namespace, Resource, fields
 
 from ..config.database import db
+from ..controllers.progress import ProgressController
 from ..controllers.words.anki import AnkiDeck
+from ..controllers.words.favourite import FavouriteDeck
 from ..controllers.words.flashcards import FlashCardsDeck
-from ..controllers.words.progress import ProgressController
-from ..controllers.words.search import search_words
+from ..controllers.words.search import WordQuery
 from ..logger import get_logger
 from ..models import Word
 
@@ -71,36 +72,49 @@ class WordListResource(Resource):
     @ns.param("start_id", "Start ID (inclusive)")
     @ns.param("end_id", "End ID (inclusive)")
     @ns.param("q", "Search query")
+    @ns.param("jlpt", "JLPT Level (e.g. N5)")
+    @ns.param("custom_level", "Custom Level (integer)")
+    @ns.param("part_of_speech", "Part of Speech (comma separated)")
+    @ns.param("tags", "Tags/Categories (comma separated)")
+    @ns.param("limit", "Max number of results (default 100)")
     def get(self):
         """List words within a specific ID range or matching a query."""
 
         start_id = request.args.get("start_id", type=int)
         end_id = request.args.get("end_id", type=int)
         q = request.args.get("q", type=str)
+        limit = request.args.get("limit", type=int, default=100)
 
-        if q:
-            words = search_words(q)
-            return [word.to_dict() for word in words]
+        # Filters
+        jlpt = request.args.get("jlpt", type=str)
+        custom_level = request.args.get("custom_level", type=int)
 
-        query = Word.query
+        # Handle list params
+        part_of_speech = request.args.getlist("part_of_speech")
+        if not part_of_speech and request.args.get("part_of_speech"):
+            part_of_speech = request.args.get("part_of_speech").split(",")
 
-        if start_id is not None:
-            query = query.filter(Word.id >= start_id)
-        if end_id is not None:
-            query = query.filter(Word.id <= end_id)
+        tags = request.args.getlist("tags")
+        if not tags and request.args.get("tags"):
+            tags = request.args.get("tags").split(",")
 
-        # Default limit if no range provided, or just safety cap?
-        # User asked for pagination via IDs, so we trust the range.
-        # But let's add a sane default order.
-        words = query.order_by(Word.id.asc()).limit(100).all()  # Safety limit of 100
+        filters = {
+            "q": q,
+            "jlpt": jlpt,
+            "custom_level": custom_level,
+            "part_of_speech": part_of_speech,
+            "tags": tags,
+            "start_id": start_id,
+            "end_id": end_id,
+        }
 
-        # If user explicitly asks for a large range, we might want to respect it,
-        # but for now 100 seems safe for "20 words at a time" requirement.
-        # Actually, let's make the limit dynamic or just rely on IDs.
-        if start_id is not None and end_id is not None and (end_id - start_id) > 100:
-            # Just a safety check, but we will return what's asked within reason
-            pass
+        query_builder = WordQuery()
+        query_builder.apply_filters(filters)
 
+        if any(filters.values()):
+            logger.info(f"[WORDS] Searching with filters: {filters}")
+
+        words = query_builder.execute(limit=limit)
         return [word.to_dict() for word in words]
 
 
@@ -190,10 +204,12 @@ class NextWord(Resource):
     def get(self):
         settings = flask_session.get("flashcard_settings", {})
 
-        # Use AnkiDeck if explicitly requested or if parameters suggest it
         if settings.get("mode") == "anki" or settings.get("learningRatio") is not None:
             user_id = flask_session.get("user_id")
             deck = AnkiDeck(settings, user_id=user_id)
+        elif settings.get("mode") == "custom-list":
+            user_id = flask_session.get("user_id")
+            deck = FavouriteDeck(settings, user_id=user_id)
         else:
             deck = FlashCardsDeck(settings)
 

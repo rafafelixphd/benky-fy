@@ -1,7 +1,7 @@
 from flask import session
 from flask_restx import Namespace, Resource
 
-from ..controllers.words.progress import ProgressController
+from ..controllers.progress import ProgressController
 from ..logger import get_logger
 
 logger = get_logger(namespace="dashboard")
