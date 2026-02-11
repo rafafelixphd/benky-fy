@@ -1,3 +1,5 @@
+import traceback
+
 from flask import session
 from flask_restx import Namespace, Resource
 
@@ -25,4 +27,5 @@ class DashboardStats(Resource):
             return {"success": True, "data": stats}, 200
         except Exception as e:
             logger.error(f"Error fetching dashboard stats: {e}")
+            traceback.print_exc()
             return {"success": False, "error": str(e)}, 500
