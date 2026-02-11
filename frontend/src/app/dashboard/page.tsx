@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { AuthGuard } from "@/components/common/auth/auth-guard";
 import { UserMenu } from "@/components/common/layout/navigation/user-menu";
 import { useAuth } from "@/lib/hooks/hooks";
+import { NavigationHeader } from "@/components/common/layout/navigation/navigation-header";
 import { FloatingElements } from "@/components/common/layout/background";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +25,6 @@ import { StatCard } from "@/components/common/layout/stats/stat-card";
 import { GoalProgress } from "@/components/common/layout/progress/goal-progress";
 import { dashboardApiClient, DashboardStats } from "@/api/private/dashboard/client";
 import { getStatsConfig, recentModules } from "@/entities/dashboard";
-import { NavigationHeader } from "@/components/common/layout/navigation/navigation-header";
 
 export default function DashboardPage() {
   const { data: authData } = useAuth();

@@ -2,6 +2,7 @@ from datetime import datetime
 
 from ..config.database import db
 from ..logger import get_logger
+from ..models import Word
 from ..models.user_word_map import UserWordMap
 
 logger = get_logger(namespace="progress")
@@ -18,10 +19,6 @@ class ProgressController:
             "input_modes": ["kana", "romaji", ...]
         }
         """
-        logger.info(f"{user_id=}")
-        logger.info(f"{word_id=}")
-        logger.info(f"{session_id=}")
-        logger.info(f"{feedback_data=}")
         try:
             # Find or create map
             word_map = UserWordMap.query.filter_by(user_id=user_id, word_id=word_id).first()
@@ -217,7 +214,6 @@ class ProgressController:
             top_viewed_ids = [x["word_id"] for x in word_views[:10]]
 
             # Fetch Word details
-            from ...models import Word
 
             def get_word_details(ids):
                 if not ids:

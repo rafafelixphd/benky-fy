@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/common/auth";
+import { NavigationHeader } from "@/components/common/layout/navigation/navigation-header";
 import { FloatingElements } from "@/components/common/layout/background";
-import { NavigationHeader } from "@/components/common/layout/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { wordsApiClient } from "@/api/private/words/api-client";
@@ -76,16 +76,16 @@ export default function VocabularyPage() {
         if (page > 1) setPage(p => p - 1);
     };
 
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   return (
-    <AuthGuard>
-      <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden">
         <FloatingElements />
 
         <NavigationHeader />
 
         <div className="relative z-10 pt-24 px-6 pb-6 text-center">
-            <h1 className="text-3xl font-bold text-white mb-2">Vocabulary</h1>
-            <p className="text-white/80">Change and edit words</p>
+            <h1 className="text-4xl font-bold text-white mb-2">Vocabulary</h1>
+            <p className="text-white/80 text-lg">Change and edit words</p>
         </div>
 
         <div className="relative z-10 px-6 pb-6 flex-1 overflow-auto">
@@ -121,37 +121,37 @@ export default function VocabularyPage() {
                         <div className="grid grid-cols-[80px_1fr_1fr_1fr_100px] gap-4 p-4 border-b border-white/10 text-white/70 font-medium text-sm">
                             <div>ID</div>
                             <div>Surface</div>
-                            <div>Reading</div>
-                            <div>Meaning</div>
-                            <div className="text-right">Actions</div>
-                        </div>
-                        
-                        {loading ? (
-                            <div className="p-8 text-center text-white/50">Loading...</div>
-                        ) : words.length === 0 ? (
-                            <div className="p-8 text-center text-white/50">No words found in this range.</div>
-                        ) : (
-                            words.map((word) => (
-                                <div key={word.id} className="grid grid-cols-[80px_1fr_1fr_1fr_100px] gap-4 p-4 border-b border-white/10 text-white/70">
-                                    <div>{word.id}</div>
-                                    <div>{word.surface}</div>
-                                    <div>{word.reading.kana}</div>
-                                    <div>{word.reading.english?.join(", ")}</div>
-                                    <div className="text-right">
-                                        <Button 
-                                            onClick={() => router.push(`/vocabulary/edit/${word.id}`)}
-                                            variant="outline"
-                                            size="icon"
-                                            className="border-white/20 text-white hover:bg-white/10"
-
-                                        >
-                                            <Edit className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            ))
-                        )}
+                        <div>Reading</div>
+                        <div>Meaning</div>
+                        <div className="text-right">Actions</div>
                     </div>
+                    
+                    {loading ? (
+                        <div className="p-8 text-center text-white/50">Loading...</div>
+                    ) : words.length === 0 ? (
+                        <div className="p-8 text-center text-white/50">No words found in this range.</div>
+                    ) : (
+                        words.map((word) => (
+                            <div key={word.id} className="grid grid-cols-[80px_1fr_1fr_1fr_100px] gap-4 p-4 border-b border-white/10 text-white/70">
+                                <div>{word.id}</div>
+                                <div>{word.surface}</div>
+                                <div>{word.reading.kana}</div>
+                                <div>{word.reading.english?.join(", ")}</div>
+                                <div className="text-right">
+                                    <Button 
+                                        onClick={() => router.push(`/vocabulary/edit/${word.id}`)}
+                                        variant="outline"
+                                        size="icon"
+                                        className="border-white/20 text-white hover:bg-white/10"
+
+                                    >
+                                        <Edit className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
                 </Card>
 
                 <div className="flex justify-between items-center mt-4">
@@ -172,9 +172,6 @@ export default function VocabularyPage() {
                 </div>
             </div>
         </div>
-
-
-      </div>
-    </AuthGuard>
+    </div>
   );
 }
