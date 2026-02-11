@@ -52,10 +52,10 @@ export const learningModules: LearningModule[] = [
         color: "from-green-500 to-green-600",
     },
     {
-        id: "chat",
+        id: "conversation",
         name: "AI Tutor Chat",
         description: "Chat with AI tutors for personalized help",
-        status: "Mock Up",
+        status: "Available",
         icon: MessageSquare,
         color: "from-orange-500 to-orange-600",
     },
