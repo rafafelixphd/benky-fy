@@ -30,7 +30,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
     const [inputFeedbacks, setInputFeedbacks] = useState<Record<string, 'correct' | 'incorrect'>>({});
     const [attempts, setAttempts] = useState(0);
 
-    const MAX_ATTEMPTS = 2;
+    const MAX_ATTEMPTS = 3;
 
     // Refs for focus management
     const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
