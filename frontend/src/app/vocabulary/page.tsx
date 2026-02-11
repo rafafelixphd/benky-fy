@@ -101,6 +101,13 @@ export default function VocabularyPage() {
                         />
                     </div>
                     <WordFilter filters={filters} onFilterChange={setFilters} />
+                    <div className="text-white/60 text-sm font-mono min-w-[80px] text-center">
+                        {loading ? (
+                            <span className="animate-pulse">...</span>
+                        ) : (
+                            <span>{words.length} found</span>
+                        )}
+                    </div>
                     <Button 
                         onClick={() => router.push("/vocabulary/edit/new")}
                         className="bg-primary-purple hover:bg-primary-purple/80 text-white"

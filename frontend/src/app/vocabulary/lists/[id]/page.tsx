@@ -225,8 +225,13 @@ export default function WordListDetailsPage() {
                                 )}
                             </div>
 
-                            <div className="mb-4">
+                            <div className="mb-4 flex items-center justify-between">
                                 <WordFilter filters={filters} onFilterChange={setFilters} />
+                                {searchResults.length > 0 && (
+                                     <div className="text-white/60 text-xs font-mono">
+                                        {searchResults.length} found
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-2 max-h-[60vh] overflow-auto pr-1 scrollbar-thin scrollbar-thumb-white/20">
