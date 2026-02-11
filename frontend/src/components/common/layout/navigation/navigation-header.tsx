@@ -12,6 +12,7 @@ import {
   Brain,
   BarChart3,
   Menu,
+  BookText,
 } from "lucide-react";
 import { MobileMenu } from "@/components/common/layout/navigation/mobile-menu";
 import { UserMenu } from "@/components/common/layout/navigation/user-menu";
@@ -53,71 +54,70 @@ export function NavigationHeader({
 
   const navigationItems = [
     { href: "/", label: "Home", icon: Home },
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/flashcards", label: "Flashcards", icon: Brain },
     { href: "/products", label: "Modules", icon: BookOpen },
+    { href: "/flashcards", label: "Flashcards", icon: Brain },
+    { href: "/vocabulary", label: "Vocabulary", icon: BookText },
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   ];
 
   return (
     <>
-      {/* Desktop Header */}
+      {/* Desktop Header - Floating Glass Island */}
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 transform",
-          isHeaderVisible ? "translate-y-0" : "-translate-y-full",
-          isScrolled
-            ? "bg-background/95 backdrop-blur-md shadow-sm border-b border-border/50"
-            : "bg-transparent"
+          "fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 w-[95%] max-w-7xl rounded-2xl",
+          isScrolled || isHeaderVisible
+            ? "bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl translate-y-0 opacity-100"
+            : "-translate-y-full opacity-0 pointer-events-none"
         )}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex-shrink-0">
-              <Link href="/home" className="flex items-center gap-2">
+            {/* Logo Area */}
+            <div className="flex-shrink-0 flex items-center gap-3 group cursor-pointer" onClick={() => router.push("/home")}>
+              <div className="relative w-10 h-10 transition-transform duration-300 group-hover:scale-110">
                 <Image
                   src="/logo1.webp"
-                  alt="BenkoFY logo"
+                  alt="BenkyFY"
                   width={40}
                   height={40}
-                  className="cursor-pointer hover:opacity-80 transition-opacity w-auto h-8"
+                  className="object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
                   unoptimized
                   priority
                 />
-                <span className="font-bold text-xl tracking-tight hidden sm:block">
-                  Benky<span className="text-primary">FY</span>
-                </span>
-              </Link>
+              </div>
+              <span className="font-bold text-xl tracking-tight hidden sm:block text-white">
+                Benky<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-purple to-pink-400">FY</span>
+              </span>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-1">
+            {/* Desktop Navigation - Pill Design */}
+            <nav className="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/5 shadow-inner">
               {navigationItems.map((item) => {
                 const IconComponent = item.icon;
-                const isActive = pathname === item.href;
+                const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
 
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                      "relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
                       isActive
-                        ? "text-primary bg-primary/10"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                        ? "text-white bg-primary-purple shadow-[0_0_20px_rgba(168,85,247,0.4)]"
+                        : "text-white/60 hover:text-white hover:bg-white/10"
                     )}
                   >
-                    <IconComponent className="w-4 h-4" />
+                    <IconComponent className={cn("w-4 h-4", isActive && "animate-pulse")} />
                     {item.label}
                   </Link>
                 );
               })}
             </nav>
 
-            {/* Right Side Actions */}
-            <div className="flex items-center gap-2">
-              {/* Desktop User Menu */}
-              {showUserMenu && authData?.user ? (
+            {/* Right Side Actions & User */}
+            <div className="flex items-center gap-4">
+              {showUserMenu && authData?.user && (
                 <div className="hidden md:block">
                   <UserMenu 
                     user={authData.user} 
@@ -125,51 +125,15 @@ export function NavigationHeader({
                     onSettingsClick={() => router.push("/settings")}
                   />
                 </div>
-              ) : (
-                 // Placeholder for logic if needed when no user, e.g. Login button
-                 null
               )}
-              
-              {/* Mobile Menu Trigger (replaces the old one in header, but we actually use the one below for bottom nav or side drawer) */}
-              <div className="md:hidden">
-                 <MobileMenu
-                  trigger={
-                     <Button variant="ghost" size="icon" className="md:hidden">
-                       <Menu className="w-5 h-5" />
-                     </Button>
-                  }
-                  items={[
-                    ...navigationItems.map((item) => ({
-                      icon: item.icon,
-                      label: item.label,
-                      onClick: () => router.push(item.href),
-                    })),
-                    ...(showUserMenu && authData?.user
-                      ? [
-                        {
-                          icon: User,
-                          label: "Profile",
-                          onClick: () => router.push("/profile"),
-                        },
-                        {
-                          icon: Settings,
-                          label: "Settings",
-                          onClick: () => router.push("/settings"),
-                        },
-                      ]
-                      : []),
-                  ]}
-                />
-              </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation - kept for quick access, but maybe redundant if MobileMenu is comprehensive. 
-          The user requested "better components", so improving this to be cleaner. */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border shadow-[0_-1px_3px_rgba(0,0,0,0.05)] pb-safe">
-        <div className="flex items-center justify-around h-16 px-2">
+      {/* Mobile Bottom Navigation - Floating Glass Dock */}
+      <nav className="md:hidden fixed bottom-6 left-4 right-4 z-50">
+        <div className="bg-black/40 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-2xl px-2 py-3 flex items-center justify-around">
           {navigationItems.slice(0, 4).map((item) => {
             const IconComponent = item.icon;
             const isActive = pathname === item.href;
@@ -178,27 +142,32 @@ export function NavigationHeader({
               <Link
                 key={item.href}
                 href={item.href}
-                className={cn(
-                  "flex flex-col items-center justify-center min-w-[64px] min-h-[44px] rounded-lg px-2 py-1 transition-all duration-200",
-                  isActive
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-primary"
-                )}
+                className="relative group"
               >
-                <IconComponent className={cn("w-6 h-6 mb-1 transition-transform", isActive && "scale-110")} />
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <div className={cn(
+                   "absolute inset-0 bg-primary-purple/20 blur-xl rounded-full transition-opacity duration-300",
+                   isActive ? "opacity-100" : "opacity-0"
+                )} />
+                <div className={cn(
+                  "relative flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300",
+                  isActive
+                    ? "text-white bg-white/10 shadow-inner"
+                    : "text-white/40 hover:text-white hover:bg-white/5"
+                )}>
+                  <IconComponent className={cn("w-5 h-5 mb-0.5 transition-transform duration-300", isActive && "scale-110")} />
+                  {isActive && <span className="absolute -bottom-1 w-1 h-1 bg-primary-purple rounded-full shadow-[0_0_5px_currentColor]" />}
+                </div>
               </Link>
             );
           })}
           
-           {/* "More" button for mobile menu if needing more items than fit */}
+           {/* Mobile Menu More Button */}
            <MobileMenu
              trigger={
-               <button
-                 className="flex flex-col items-center justify-center min-w-[64px] min-h-[44px] rounded-lg px-2 py-1 text-muted-foreground hover:text-primary transition-all duration-200"
-               >
-                 <Menu className="w-6 h-6 mb-1" />
-                 <span className="text-[10px] font-medium">More</span>
+               <button className="relative group">
+                 <div className="relative flex flex-col items-center justify-center w-12 h-12 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-all duration-300">
+                   <Menu className="w-5 h-5" />
+                 </div>
                </button>
              }
              items={[
