@@ -1,6 +1,6 @@
 import { ConversationalToken } from "./types";
 import { Card } from "@/components/ui/card";
-import { POS_COLORS } from "../../tokenizer/components/TokenizerLegend";
+import { getPosColor } from "../../tokenizer/components/TokenizerLegend";
 import { cn } from "@/lib/utils/utils";
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
 };
 
 export function TokenDetailCard({ token }: Props) {
-  const colorClass = POS_COLORS[token.pos] || "bg-secondary";
+  const colorClass = getPosColor(token.pos);
 
   return (
     <Card className="fixed bottom-4 left-4 right-4 z-50 p-4 shadow-xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur border border-border animate-in fade-in slide-in-from-bottom-4 duration-200 xl:top-24 xl:right-8 xl:left-auto xl:bottom-auto xl:w-80 xl:slide-in-from-right-4">

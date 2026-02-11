@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { Lexeme, Token } from "@/entities/lexicon";
-import { POS_COLORS } from "./TokenizerLegend";
+import { getPosColor } from "./TokenizerLegend";
 import { romajiToHiragana } from "@/lib/utils/romaji-conversion";
 
 type Props = {
@@ -50,7 +50,7 @@ export function TokenizerEditor({ text, setText, tokens, isLoading }: Props) {
       }
 
       // The token itself
-      const colorClass = POS_COLORS[token.label] || "bg-transparent";
+      const colorClass = getPosColor(token.label);
       
       elements.push(
         <span

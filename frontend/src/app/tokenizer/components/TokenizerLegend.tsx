@@ -16,6 +16,15 @@ export const POS_COLORS: Record<string, string> = {
   OTHER: "bg-transparent",
 };
 
+
+
+export function getPosColor(pos: string): string {
+  if (!pos) return "bg-transparent";
+  const normalizedPos = pos.toUpperCase();
+  console.log(normalizedPos);
+  return POS_COLORS[normalizedPos] || "bg-transparent";
+}
+
 export function TokenizerLegend() {
   const commonTags = ["NOUN", "VERB", "ADJ", "PARTICLE", "AUX"];
 

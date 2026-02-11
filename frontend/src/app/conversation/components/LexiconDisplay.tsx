@@ -1,6 +1,6 @@
 import { ConversationalToken } from "./types";
 import { InteractiveToken } from "./TokenPopover";
-import { POS_COLORS } from "../../tokenizer/components/TokenizerLegend";
+import { getPosColor } from "../../tokenizer/components/TokenizerLegend";
 import { cn } from "@/lib/utils/utils";
 
 type Props = {
@@ -19,7 +19,7 @@ export function LexiconDisplay({ text, lexicon, showMorphology, displayMode, onS
   return (
     <div className="flex flex-wrap items-end gap-x-1 gap-y-2 text-lg leading-relaxed font-sans">
       {lexicon.map((token, index) => {
-        const colorClass = POS_COLORS[token.pos] || "bg-transparent";
+        const colorClass = getPosColor(token.pos);
         const content = displayMode === "reading" ? token.reading : token.surface;
         
         return (
