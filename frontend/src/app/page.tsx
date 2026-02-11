@@ -16,10 +16,10 @@ export default function LandingPage() {
             <div className="mb-6">
               <Link href="/home">
                 <Image
-                  src="/logo2.webp"
+                  src="/logo3.webp"
                   alt="BenkyoFY logo"
-                  width={200}
-                  height={120}
+                  width={128}
+                  height={180}
                   className="mx-auto cursor-pointer hover:opacity-80 transition-opacity"
                   unoptimized
                   priority
@@ -27,7 +27,7 @@ export default function LandingPage() {
               </Link>
             </div>
             <h1 className="text-6xl md:text-8xl font-bold text-primary-foreground mb-4">
-              Benky-Fy
+                Benky<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-purple to-pink-400">FY</span>
             </h1>
             <p className="text-xl md:text-2xl text-primary-foreground/90 mb-8">
               Your AI-powered Japanese learning companion

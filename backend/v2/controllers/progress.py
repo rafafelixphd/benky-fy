@@ -55,19 +55,34 @@ class ProgressController:
             # Expected format: results={'english': 'correct', 'kana': 'incorrect'}
             results_map = feedback_data.get("results", {})
 
+            # Session Stats Tracking
+            current_session_id = word_map.latest_session_id
+            if current_session_id != session_id:
+                # New session for this word, reset session_stats
+                stats["session_stats"] = {"req_input": {}, "req_stats": {}}
+
+            # Ensure session_stats structure exists
+            if "session_stats" not in stats:
+                stats["session_stats"] = {"req_input": {}, "req_stats": {}}
+
+            session_stats = stats["session_stats"]
+
             for mode, result_status in results_map.items():
                 key = map_key(mode)
                 # Track usage
                 stats["requested_input"][key] = stats["requested_input"].get(key, 0) + 1
+                session_stats["req_input"][key] = session_stats["req_input"].get(key, 0) + 1
 
                 # Track correctness per mode (if correct)
                 if result_status == "correct":
                     stats["requested_stats"][key] = stats["requested_stats"].get(key, 0) + 1
+                    session_stats["req_stats"][key] = session_stats["req_stats"].get(key, 0) + 1
 
             # Note: 'results' and 'last_result' are NOT in the spec, so we do not store them.
             # We rely on 'latest_session_id' to identify participation in the current session.
 
             # Force update of JSONB field
+            stats["session_stats"] = session_stats
             word_map.stats = dict(stats)
             word_map.latest_session_id = session_id
             word_map.updated_at = datetime.utcnow()
@@ -114,12 +129,15 @@ class ProgressController:
         for w in words_reviewed:
             stats = w.stats or {}
 
-            # Extract aggregate counts
-            # Note: These are cumulative stats!
-            # Ideally we would want session-specifics, but we only have cumulative per strict schema.
-            # We classify the *current status* of the word.
-            req_input = stats.get("requested_input", {})
-            req_stats = stats.get("requested_stats", {})  # Correct answers
+            session_stats = stats.get("session_stats", {})
+
+            # Fallback for old records or if structure is missing
+            req_input = session_stats.get("req_input", {})
+            req_stats = session_stats.get("req_stats", {})  # Correct answers
+
+            if not req_input and stats.get("requested_input"):
+                req_input = stats.get("requested_input", {})
+                req_stats = stats.get("requested_stats", {})
 
             total_attempts = sum(req_input.values())
             total_correct = sum(req_stats.values())
@@ -144,6 +162,9 @@ class ProgressController:
         return {
             "total_cards": total_cards,
             "correct": correct,
+            "incorrect": incorrect,
+            "half": half,
+            "gave_up": gave_up,
         }
 
     def get_dashboard_stats(self, user_id):

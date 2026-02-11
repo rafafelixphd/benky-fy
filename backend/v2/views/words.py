@@ -4,7 +4,9 @@ from flask import session as flask_session
 from flask_restx import Namespace, Resource, fields
 
 from ..config.database import db
+from ..config.session import SessionContext
 from ..controllers.progress import ProgressController
+from ..controllers.users import UserController
 from ..controllers.words.anki import AnkiDeck
 from ..controllers.words.favourite import FavouriteDeck
 from ..controllers.words.flashcards import FlashCardsDeck
@@ -15,6 +17,20 @@ from ..models import Word
 logger = get_logger(namespace="words")
 ns = Namespace("words", description="Words operations")
 progress_controller = ProgressController()
+
+
+# Helpers
+def get_user_controller():
+    ctx = SessionContext(flask_session)
+    return ctx, UserController(ctx)
+
+
+def check_auth(user_controller):
+    auth_result, status = user_controller.check_auth()
+    if status != 200 or not auth_result.get("authenticated"):
+        return None
+    return auth_result.get("user")
+
 
 reading_model = ns.model(
     "Reading",
@@ -193,6 +209,12 @@ class WordSettings(Resource):
         flask_session["session_id"] = session_id
         flask_session.pop("word_queue", None)
 
+        # Store user_id in session if authenticated (optional, but good for context)
+        ctx, user_controller = get_user_controller()
+        user = check_auth(user_controller)
+        if user:
+            flask_session["user_id"] = user["id"]
+
         logger.debug(f"Updated session settings: {session_settings}, Session ID: {session_id}")
         return {"message": "Session initialized", "settings": session_settings, "session_id": session_id}, 200
 
@@ -204,11 +226,18 @@ class NextWord(Resource):
     def get(self):
         settings = flask_session.get("flashcard_settings", {})
 
+        # Ensure user_id is available for deck logic
+        ctx, user_controller = get_user_controller()
+        user = check_auth(user_controller)
+        user_id = user["id"] if user else None
+
+        # Update session with current user_id if not present
+        if user_id:
+            flask_session["user_id"] = user_id
+
         if settings.get("mode") == "anki" or settings.get("learningRatio") is not None:
-            user_id = flask_session.get("user_id")
             deck = AnkiDeck(settings, user_id=user_id)
         elif settings.get("mode") == "custom-list":
-            user_id = flask_session.get("user_id")
             deck = FavouriteDeck(settings, user_id=user_id)
         else:
             deck = FlashCardsDeck(settings)
@@ -228,8 +257,14 @@ class WordFeedback(Resource):
         Expected payload: { "word_id": 123, "result": "correct", ... }
         """
         data = request.json
-        # TODO: Get actual user ID from authcontext. Defaulting to 1 for MVP/Demo based on single user context.
-        user_id = 1
+
+        ctx, user_controller = get_user_controller()
+        user = check_auth(user_controller)
+
+        if not user:
+            return {"error": "Unauthorized"}, 401
+
+        user_id = user["id"]
 
         session_id = flask_session.get("session_id")
         if not session_id:
@@ -255,7 +290,14 @@ class SessionStats(Resource):
         Get stats for the current session (or latest active if none in context).
         """
         session_id = flask_session.get("session_id")
-        user_id = 8  # Same placeholder
+
+        ctx, user_controller = get_user_controller()
+        user = check_auth(user_controller)
+
+        if not user:
+            return {"error": "Unauthorized"}, 401
+
+        user_id = user["id"]
 
         try:
             # Controller handles session_id lookup if None

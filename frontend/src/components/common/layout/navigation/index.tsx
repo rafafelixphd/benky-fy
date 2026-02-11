@@ -70,7 +70,7 @@ export function NavigationHeader({
             <div className="flex-shrink-0">
               <Link href="/home" className="flex items-center">
                 <Image
-                  src="/logo1.webp"
+                  src="/logo3.webp"
                   alt="BenkoFY logo"
                   width={60}
                   height={36}
