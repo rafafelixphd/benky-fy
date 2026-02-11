@@ -60,12 +60,12 @@ export interface FlashcardSettings {
 }
 
 export const DEFAULT_FLASHCARD_SETTINGS: FlashcardSettings = {
-    level: {jlpt: null, custom: 1},
+    level: {jlpt: "N5", custom: null},
     mode: "anki",
     learningRatio: 0.3,
-    partOfSpeech: ['verb'],
+    partOfSpeech: [],
     tag: [],
-    maxCards: 20,
+    maxCards: 10,
     display: {
         cardDisplay: 'kanji',
         inputMode: ['english', 'kana'],
