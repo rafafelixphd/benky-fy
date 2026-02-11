@@ -23,7 +23,7 @@ export const learningModules: LearningModule[] = [
         id: "lessons",
         name: "Lessons",
         description: "Structured Japanese lessons with grammar and vocabulary",
-        status: "Mock Up",
+        status: "Available",
         icon: GraduationCap,
         color: "from-blue-500 to-blue-600",
     },
