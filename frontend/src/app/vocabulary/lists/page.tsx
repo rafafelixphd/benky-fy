@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/common/auth";
+import { NavigationHeader } from "@/components/common/layout/navigation/navigation-header";
 import { FloatingElements } from "@/components/common/layout/background";
-import { NavigationHeader } from "@/components/common/layout/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { wordListsApiClient } from "@/api/private/word-lists/api-client";
@@ -92,7 +92,6 @@ export default function WordListsPage() {
     };
 
     return (
-        <AuthGuard>
             <div className="min-h-screen bg-gradient-to-br from-primary-purple to-secondary-purple relative overflow-hidden flex flex-col">
                 <FloatingElements />
                 <NavigationHeader />
@@ -197,6 +196,5 @@ export default function WordListsPage() {
                     )}
                 </div>
             </div>
-        </AuthGuard>
     );
 }
