@@ -4,10 +4,10 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Languages, ScanText, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { fetchConversation } from "../api";
-import { ConversationalMessagePart } from "./types";
+import { ConversationalMessagePart, ConversationalToken } from "./types";
 import { MessageBubble } from "./MessageBubble";
+import { TokenDetailCard } from "./TokenDetailCard";
 import { cn } from "@/lib/utils/utils";
 
 type Message = {
@@ -29,6 +29,7 @@ export function ChatInterface() {
   const [showJapanese, setShowJapanese] = useState(true);
   const [showMorphology, setShowMorphology] = useState(false);
   const [displayMode, setDisplayMode] = useState<"surface" | "reading">("surface");
+  const [selectedToken, setSelectedToken] = useState<ConversationalToken | null>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -111,9 +112,15 @@ export function ChatInterface() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-14rem)] w-full max-w-4xl mx-auto rounded-xl overflow-hidden bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-      {/* Header / Controls */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white/80 dark:bg-zinc-900/80 border-b border-border">
+    <>
+      {/* Side Token Hint Overlay */}
+      {selectedToken && (
+         <TokenDetailCard token={selectedToken} />
+      )}
+
+      <div className="flex flex-col h-[calc(100vh-14rem)] w-full max-w-4xl mx-auto rounded-xl overflow-hidden bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl relative">
+        {/* Header / Controls */}
+        <div className="flex items-center justify-between px-4 py-3 bg-white/80 dark:bg-zinc-900/80 border-b border-border z-10">
         <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <MessageSquare className="w-4 h-4" />
           <span>Benky Chat</span>
@@ -158,7 +165,7 @@ export function ChatInterface() {
       {/* Messages Area */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth"
+        className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth relative"
       >
         {messages.length === 0 && (
             <div className="h-full flex flex-col items-center justify-center text-muted-foreground opacity-50">
@@ -176,6 +183,7 @@ export function ChatInterface() {
             showJapanese={showJapanese}
             showMorphology={showMorphology}
             displayMode={displayMode}
+            onSelectToken={setSelectedToken}
           />
         ))}
 
@@ -212,6 +220,7 @@ export function ChatInterface() {
             Press Enter to send
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

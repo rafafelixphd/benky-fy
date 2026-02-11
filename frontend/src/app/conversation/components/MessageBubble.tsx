@@ -1,4 +1,4 @@
-import { ConversationalMessagePart } from "./types";
+import { ConversationalMessagePart, ConversationalToken } from "./types";
 import { LexiconDisplay } from "./LexiconDisplay";
 import { cn } from "@/lib/utils/utils";
 import { Bot, User } from "lucide-react";
@@ -10,6 +10,7 @@ type Props = {
   showJapanese: boolean;
   showMorphology: boolean;
   displayMode: "surface" | "reading";
+  onSelectToken: (token: ConversationalToken | null) => void;
 };
 
 export function MessageBubble({
@@ -19,6 +20,7 @@ export function MessageBubble({
   showJapanese,
   showMorphology,
   displayMode,
+  onSelectToken,
 }: Props) {
   return (
     <div
@@ -29,8 +31,8 @@ export function MessageBubble({
     >
       {!isUser && (
         <div className="flex-shrink-0">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-            <Bot size={18} />
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <Bot className="w-5 h-5 text-primary" />
           </div>
         </div>
       )}
@@ -39,18 +41,19 @@ export function MessageBubble({
         className={cn(
           "relative px-4 py-3 rounded-2xl shadow-sm text-sm border",
           isUser
-            ? "bg-primary text-primary-foreground border-primary rounded-tr-none"
+            ? "bg-secondary text-secondary-foreground border-secondary-foreground/10 rounded-tr-none"
             : "bg-background border-border rounded-tl-none"
         )}
       >
         <div className="flex flex-col gap-2">
             {showJapanese && (
-                <div className={cn("font-medium", isUser ? "text-white" : "text-foreground")}>
+                <div className="font-medium text-foreground">
                     <LexiconDisplay 
                         text={part.japanese} 
                         lexicon={part.lexicon} 
                         showMorphology={showMorphology}
                         displayMode={displayMode}
+                        onSelect={onSelectToken}
                     />
                 </div>
             )}
