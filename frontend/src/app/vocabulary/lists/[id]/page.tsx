@@ -13,6 +13,7 @@ import { wordsApiClient } from "@/api/private/words/api-client";
 import { WordList, WordListEntry } from "@/entities/word-list";
 import { Word } from "@/entities/word";
 import { Search, Plus, Trash2, ArrowLeft, Loader2, Save } from "lucide-react";
+import { WordFilter, WordListFilters } from "../../_components/word-filter";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils/utils";
 
@@ -42,8 +43,10 @@ export default function WordListDetailsPage() {
     // Search state
     const [searchQuery, setSearchQuery] = useState("");
     const debouncedSearch = useDebounce(searchQuery, 300);
+
     const [searchResults, setSearchResults] = useState<Word[]>([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [filters, setFilters] = useState<WordListFilters>({});
 
     const fetchListDetails = useCallback(async () => {
         setLoading(true);
@@ -82,7 +85,7 @@ export default function WordListDetailsPage() {
             setIsSearching(true);
             try {
                 // Determine if we are searching by ID or text? API supports 'q'.
-                const res = await wordsApiClient.getWordsList(undefined, undefined, debouncedSearch);
+                const res = await wordsApiClient.getWordsList(undefined, undefined, debouncedSearch, filters);
                 if (res.success && res.data) {
                     // Filter out already added words? Optional visualization.
                     setSearchResults(res.data);
@@ -95,7 +98,7 @@ export default function WordListDetailsPage() {
         };
 
         doSearch();
-    }, [debouncedSearch]);
+    }, [debouncedSearch, filters]);
 
 
     const handleAddWord = async (word: Word) => {
@@ -220,6 +223,10 @@ export default function WordListDetailsPage() {
                                         <Loader2 className="w-4 h-4 animate-spin text-white/50" />
                                     </div>
                                 )}
+                            </div>
+
+                            <div className="mb-4">
+                                <WordFilter filters={filters} onFilterChange={setFilters} />
                             </div>
 
                             <div className="space-y-2 max-h-[60vh] overflow-auto pr-1 scrollbar-thin scrollbar-thumb-white/20">

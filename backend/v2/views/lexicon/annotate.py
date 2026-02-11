@@ -2,7 +2,7 @@ import spacy
 from flask import request
 from flask_restx import Resource, fields
 
-from ...controllers.words.search import search_words
+from ...controllers.words.search import WordQuery
 from .route import ns
 
 # Load spaCy model
@@ -105,9 +105,9 @@ class Annotate(Resource):
         for i, t in enumerate(doc):
             label = POS_MAPPING.get(t.pos_, t.pos_)
 
-            candidates = search_words(t.lemma_, limit=5)
+            candidates = WordQuery().filter_by_text(t.lemma_).execute(limit=5)
             if not candidates and t.text != t.lemma_:
-                candidates = search_words(t.text, limit=5)
+                candidates = WordQuery().filter_by_text(t.text).execute(limit=5)
 
             vocab_data = {"known": False, "word_id": None, "candidate_ids": [], "candidate_scores": []}
 
