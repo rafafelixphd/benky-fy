@@ -77,10 +77,10 @@ export function NavigationHeader({
             <div className="flex-shrink-0 flex items-center gap-3 group cursor-pointer" onClick={() => router.push("/home")}>
               <div className="relative w-10 h-10 transition-transform duration-300 group-hover:scale-110">
                 <Image
-                  src="/logo1.webp"
+                  src="/logo3.webp"
                   alt="BenkyFY"
-                  width={40}
-                  height={40}
+                  width={60}
+                  height={60}
                   className="object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
                   unoptimized
                   priority
