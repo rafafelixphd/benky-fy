@@ -1,4 +1,4 @@
-from .gemini import GeminiVocabularyAnnotation
-from .groq_api import GroqVocabularyAnnotation
+from .annotation import GeminiVocabularyAnnotation, GroqVocabularyAnnotation
+from .conversational import GroqConversationalAgent
 
-__all__ = ["GeminiVocabularyAnnotation", "GroqVocabularyAnnotation"]
+__all__ = ["GeminiVocabularyAnnotation", "GroqVocabularyAnnotation", "GroqConversationalAgent"]

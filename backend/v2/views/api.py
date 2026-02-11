@@ -6,6 +6,7 @@ from flask_restx import Api
 from backend.v2 import __version__
 
 from .auth import ns as auth_ns
+from .conversation import ns as conversation_ns
 from .dashboard import ns as dashboard_ns
 from .lexicon import ns as lexicon_ns
 from .test_auth import ns as test_auth_ns
@@ -37,5 +38,6 @@ api.add_namespace(test_auth_ns)
 api.add_namespace(words_ns)
 api.add_namespace(word_lists_ns)
 api.add_namespace(lexicon_ns)
+api.add_namespace(conversation_ns)
 
 api.add_namespace(dashboard_ns)
