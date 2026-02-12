@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Languages, ScanText, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { fetchConversation } from "../api";
-import { ConversationalMessagePart, ConversationalToken } from "./types";
+import { fetchConversation, fetchSystemTokenization } from "../api";
+import { ConversationalMessagePart, ConversationalToken, TokenizationMode, SystemToken } from "./types";
 import { MessageBubble } from "./MessageBubble";
 import { TokenDetailCard } from "./TokenDetailCard";
 import { cn } from "@/lib/utils/utils";
@@ -16,6 +16,7 @@ type Message = {
   content: ConversationalMessagePart;
   timestamp: number;
   isOptimistic?: boolean;
+  systemTokens?: SystemToken[]; // Store system tokens per message
 };
 
 export function ChatInterface() {
@@ -27,9 +28,12 @@ export function ChatInterface() {
   // Toggles
   const [showEnglish, setShowEnglish] = useState(true);
   const [showJapanese, setShowJapanese] = useState(true);
-  const [showMorphology, setShowMorphology] = useState(false);
+  const [tokenizationMode, setTokenizationMode] = useState<TokenizationMode>("ai");
   const [displayMode, setDisplayMode] = useState<"surface" | "reading">("surface");
   const [selectedToken, setSelectedToken] = useState<ConversationalToken | null>(null);
+  const [pinnedToken, setPinnedToken] = useState<ConversationalToken | null>(null);
+  const [selectedSystemToken, setSelectedSystemToken] = useState<SystemToken | null>(null);
+  const [pinnedSystemToken, setPinnedSystemToken] = useState<SystemToken | null>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -75,15 +79,45 @@ export function ChatInterface() {
         }
 
         // Add agent response
-        newMessages.push({
+        const agentMsg: Message = {
           id: (Date.now() + 1).toString(),
           role: "agent",
           content: data.agent_response,
           timestamp: Date.now(),
-        });
+        };
+        newMessages.push(agentMsg);
 
         return newMessages;
       });
+
+      // Fetch system tokenization if in system mode
+      if (tokenizationMode === "system") {
+        // Tokenize user input
+        if (data.user_input.japanese) {
+          const userTokenData = await fetchSystemTokenization(data.user_input.japanese);
+          setMessages((prev) => {
+            const updated = [...prev];
+            const userMsgIndex = updated.findIndex((m) => m.id === tempId);
+            if (userMsgIndex !== -1) {
+              updated[userMsgIndex].systemTokens = userTokenData.tokens;
+            }
+            return updated;
+          });
+        }
+        
+        // Tokenize agent response
+        if (data.agent_response.japanese) {
+          const agentTokenData = await fetchSystemTokenization(data.agent_response.japanese);
+          setMessages((prev) => {
+            const updated = [...prev];
+            const lastMsg = updated[updated.length - 1];
+            if (lastMsg.role === "agent") {
+              lastMsg.systemTokens = agentTokenData.tokens;
+            }
+            return updated;
+          });
+        }
+      }
     } catch (error) {
       console.error("Failed to send message:", error);
       // Could show error toast here
@@ -111,11 +145,99 @@ export function ChatInterface() {
     }
   };
 
+  const toggleTokenization = async () => {
+    if (tokenizationMode === "ai") {
+      setTokenizationMode("system");
+      // Fetch system tokenization for all existing messages
+      const allMessages = messages.filter(m => m.content.japanese);
+      
+      for (const msg of allMessages) {
+        try {
+          const tokenData = await fetchSystemTokenization(msg.content.japanese);
+          
+          // Update message with its tokens
+          setMessages((prev) => {
+            const updated = [...prev];
+            const msgIndex = updated.findIndex(m => m.id === msg.id);
+            if (msgIndex !== -1) {
+              updated[msgIndex].systemTokens = tokenData.tokens;
+            }
+            return updated;
+          });
+        } catch (error) {
+          console.error("Failed to fetch system tokenization:", error);
+        }
+      }
+    } else if (tokenizationMode === "system") {
+      setTokenizationMode("none");
+    } else {
+      setTokenizationMode("ai");
+    }
+  };
+
+  // Handle token selection with pinning logic
+  const handleTokenSelect = (token: ConversationalToken | null) => {
+    // Only update if not pinned
+    if (!pinnedToken) {
+      setSelectedToken(token);
+    }
+  };
+
+  const handleTokenClick = (token: ConversationalToken) => {
+    if (pinnedToken?.surface === token.surface) {
+      // Clicking the same token unpins it
+      setPinnedToken(null);
+      setSelectedToken(null);
+    } else {
+      // Clicking a different token pins it
+      setPinnedToken(token);
+      setSelectedToken(token);
+    }
+  };
+
+  const handleSystemTokenSelect = (token: SystemToken | null) => {
+    // Only update if not pinned
+    if (!pinnedSystemToken) {
+      setSelectedSystemToken(token);
+    }
+  };
+
+  const handleSystemTokenClick = (token: SystemToken) => {
+    if (pinnedSystemToken?.token_id === token.token_id) {
+      // Clicking the same token unpins it
+      setPinnedSystemToken(null);
+      setSelectedSystemToken(null);
+    } else {
+      // Clicking a different token pins it
+      setPinnedSystemToken(token);
+      setSelectedSystemToken(token);
+    }
+  };
+
+  // Show pinned token or hovered token
+  const displayedToken = pinnedToken || selectedToken;
+  const displayedSystemToken = pinnedSystemToken || selectedSystemToken;
+
   return (
     <>
-      {/* Side Token Hint Overlay */}
-      {selectedToken && (
-         <TokenDetailCard token={selectedToken} />
+      {/* Token Detail Overlays */}
+      {displayedToken && tokenizationMode === "ai" && (
+         <TokenDetailCard 
+           aiToken={displayedToken} 
+           onClose={() => {
+             setPinnedToken(null);
+             setSelectedToken(null);
+           }} 
+         />
+      )}
+      {displayedSystemToken && tokenizationMode === "system" && (
+         <TokenDetailCard 
+           systemToken={displayedSystemToken} 
+           onClose={() => {
+             setPinnedSystemToken(null);
+             setSelectedSystemToken(null);
+           }} 
+         />
       )}
 
       <div className="flex flex-col h-[calc(100vh-14rem)] w-full max-w-4xl mx-auto rounded-xl overflow-hidden bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl relative">
@@ -151,13 +273,13 @@ export function ChatInterface() {
           </Button>
           
           <Button
-            variant={showMorphology ? "default" : "outline"}
+            variant={tokenizationMode !== "none" ? "default" : "outline"}
             size="sm"
-            onClick={() => setShowMorphology(!showMorphology)}
+            onClick={toggleTokenization}
             className="h-8 gap-2 text-xs"
           >
             <ScanText className="w-3.5 h-3.5" />
-            Tokens: {showMorphology ? "ON" : "OFF"}
+            {tokenizationMode === "ai" ? "AI" : tokenizationMode === "system" ? "System" : "None"}
           </Button>
         </div>
       </div>
@@ -181,9 +303,13 @@ export function ChatInterface() {
             isUser={msg.role === "user"}
             showEnglish={showEnglish}
             showJapanese={showJapanese}
-            showMorphology={showMorphology}
+            tokenizationMode={tokenizationMode}
+            systemTokens={msg.systemTokens}
             displayMode={displayMode}
-            onSelectToken={setSelectedToken}
+            onSelectToken={handleTokenSelect}
+            onClickToken={handleTokenClick}
+            onSelectSystemToken={handleSystemTokenSelect}
+            onClickSystemToken={handleSystemTokenClick}
           />
         ))}
 

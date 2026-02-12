@@ -113,19 +113,29 @@ class Annotate(Resource):
 
             if candidates:
                 best_match = None
-                for c in candidates:
+                best_match_index = -1
+
+                # Find exact match for lemma
+                for idx, c in enumerate(candidates):
                     if c.surface == t.lemma_ or c.reading.get("kana") == t.lemma_ or c.reading.get("kanji") == t.lemma_:
                         best_match = c
+                        best_match_index = idx
                         break
 
                 if not best_match:
                     best_match = candidates[0]
+                    best_match_index = 0
 
                 vocab_data["known"] = True
                 vocab_data["word_id"] = best_match.id
-                vocab_data["known"] = True
-                vocab_data["word_id"] = best_match.id
-                vocab_data["candidates"] = [c.to_dict() for c in candidates]
+
+                # Reorder candidates to put best match first
+                ordered_candidates = [best_match]
+                for idx, c in enumerate(candidates):
+                    if idx != best_match_index:
+                        ordered_candidates.append(c)
+
+                vocab_data["candidates"] = [c.to_dict() for c in ordered_candidates]
 
             token_obj = {
                 "token_id": i,

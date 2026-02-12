@@ -1,5 +1,6 @@
-import { ConversationalMessagePart, ConversationalToken } from "./types";
+import { ConversationalMessagePart, ConversationalToken, TokenizationMode, SystemToken } from "./types";
 import { LexiconDisplay } from "./LexiconDisplay";
+import { SystemTokenDisplay } from "./SystemTokenDisplay";
 import { cn } from "@/lib/utils/utils";
 import { Bot, User } from "lucide-react";
 
@@ -8,9 +9,13 @@ type Props = {
   isUser: boolean;
   showEnglish: boolean;
   showJapanese: boolean;
-  showMorphology: boolean;
+  tokenizationMode: TokenizationMode;
+  systemTokens?: SystemToken[];
   displayMode: "surface" | "reading";
   onSelectToken: (token: ConversationalToken | null) => void;
+  onClickToken: (token: ConversationalToken) => void;
+  onSelectSystemToken: (token: SystemToken | null) => void;
+  onClickSystemToken: (token: SystemToken) => void;
 };
 
 export function MessageBubble({
@@ -18,10 +23,17 @@ export function MessageBubble({
   isUser,
   showEnglish,
   showJapanese,
-  showMorphology,
+  tokenizationMode,
+  systemTokens,
   displayMode,
   onSelectToken,
+  onClickToken,
+  onSelectSystemToken,
+  onClickSystemToken,
 }: Props) {
+  const showAiMorphology = tokenizationMode === "ai";
+  const showSystemMorphology = tokenizationMode === "system";
+
   return (
     <div
       className={cn(
@@ -48,13 +60,26 @@ export function MessageBubble({
         <div className="flex flex-col gap-2">
             {showJapanese && (
                 <div className="font-medium text-foreground">
-                    <LexiconDisplay 
-                        text={part.japanese} 
-                        lexicon={part.lexicon} 
-                        showMorphology={showMorphology}
-                        displayMode={displayMode}
-                        onSelect={onSelectToken}
-                    />
+                    {showAiMorphology ? (
+                      <LexiconDisplay 
+                          text={part.japanese} 
+                          lexicon={part.lexicon} 
+                          showMorphology={showAiMorphology}
+                          displayMode={displayMode}
+                          onSelect={onSelectToken}
+                          onClick={onClickToken}
+                      />
+                    ) : showSystemMorphology && systemTokens ? (
+                      <SystemTokenDisplay
+                          text={part.japanese}
+                          tokens={systemTokens}
+                          displayMode={displayMode}
+                          onSelectToken={onSelectSystemToken}
+                          onClickToken={onClickSystemToken}
+                      />
+                    ) : (
+                      <span className="text-lg leading-relaxed">{part.japanese}</span>
+                    )}
                 </div>
             )}
             
