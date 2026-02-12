@@ -14,9 +14,6 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-
-RUN ls -la
-RUN pwd
 COPY frontend/ .
 
 # Environment variables will be set at runtime
@@ -27,6 +24,9 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+
+# Install wget for healthcheck
+RUN apk add --no-cache wget
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
