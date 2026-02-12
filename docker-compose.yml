@@ -54,9 +54,9 @@ services:
     depends_on:
       database:
         condition: service_healthy
-    volumes:
+    # volumes:
       # Mount backend source code for hot reload (Flask auto-reloads in debug mode)
-      - ./backend:/app/backend:delegated
+      # - ./backend:/app/backend:delegated
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     healthcheck:
@@ -85,13 +85,13 @@ services:
     depends_on:
       backend:
         condition: service_healthy
-    volumes:
-      # Mount source code for hot reload
-      - ./frontend/src:/app/src:delegated
-      - ./frontend/public:/app/public:delegated
-      # Preserve node_modules in container (don't overwrite with host)
-      - /app/node_modules
-      - /app/.next
+    # volumes:
+    #   # Mount source code for hot reload
+    #   - ./frontend/src:/app/src:delegated
+    #   - ./frontend/public:/app/public:delegated
+    #   # Preserve node_modules in container (don't overwrite with host)
+    #   - /app/node_modules
+    #   - /app/.next
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     healthcheck:
