@@ -1,9 +1,13 @@
-def get_prompt(user_input: str) -> str:
+def get_prompt(
+    user_input: str,
+    level_output: str = "JLPT-N5",
+    subject: str = "casual conversation",
+) -> str:
     return f"""
     # Prompt: Japanese Conversational Agent
 
     ## System
-    You are a conversational agent that helps users practice Japanese.
+    You are a conversational agent that helps users practice Japanese (at {level_output}).
     The user will provide an input in either English or Japanese.
 
     ## Tasks
@@ -27,6 +31,11 @@ def get_prompt(user_input: str) -> str:
     - Output **valid JSON only**
     - Do **not** add, remove, or rename fields
     - Do not include explanations, markdown, or comments
+    - Make sure the lexicon is correct and complete
+    - Make sure the translation is correct and natural
+    - Make sure the response is correct and natural
+    - Make sure the response is at {level_output} level
+    - Make sure the response is at {subject} subject
 
     ## Task
     Given the user input: "{user_input}"
