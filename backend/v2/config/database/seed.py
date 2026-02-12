@@ -107,15 +107,22 @@ def init_seed_database(app, db):
         return
     logger.info("Seeding database...")
     with app.app_context():
-        for file in DATA_DIR.glob("*.csv"):
-            table_name = file.stem  # users.csv → "users"
-            model = MODEL_REGISTRY.get(table_name)
+        # Define seeding order to respect foreign key constraints
+        # Parent tables must be seeded before child tables
+        seed_order = ["users", "user_sessions"]
 
-            if not model:
-                print(f"Skipping {file.name}: no model registered")
+        for table_name in seed_order:
+            csv_path = DATA_DIR / f"{table_name}.csv"
+            if not csv_path.exists():
+                logger.warning(f"Skipping {table_name}: CSV file not found at {csv_path}")
                 continue
 
-            seed_table(table_name, model, file, db)
+            model = MODEL_REGISTRY.get(table_name)
+            if not model:
+                logger.warning(f"Skipping {table_name}: no model registered")
+                continue
+
+            seed_table(table_name, model, csv_path, db)
 
         # 2. Seed Words from JSON
         seed_words(app, db)
