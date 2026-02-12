@@ -6,8 +6,8 @@ export function getBaseUrl() {
     return "";
   }
 
-  if (process.env.AUTH_BASE_URL) {
-    return process.env.AUTH_BASE_URL;
+  if (process.env.NEXT_PUBLIC_API_BASE_URL) {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
   }
 
   // Assume localhost
