@@ -82,13 +82,13 @@ services:
     depends_on:
       backend:
         condition: service_healthy
-    # volumes:
-    #   # Mount source code for hot reload
-    #   - ./frontend/src:/app/src:delegated
-    #   - ./frontend/public:/app/public:delegated
-    #   # Preserve node_modules in container (don't overwrite with host)
-    #   - /app/node_modules
-    #   - /app/.next
+    volumes:
+      # Mount source code for hot reload
+      - ./frontend/src:/app/src:delegated
+      - ./frontend/public:/app/public:delegated
+      # Preserve node_modules in container (don't overwrite with host)
+      - /app/node_modules
+      - /app/.next
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     healthcheck:
