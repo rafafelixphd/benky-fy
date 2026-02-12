@@ -3,16 +3,17 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getPosColor } from "../../tokenizer/components/TokenizerLegend";
 import { cn } from "@/lib/utils/utils";
-import { Edit, Plus, BookmarkPlus } from "lucide-react";
+import { Edit, Plus, BookmarkPlus, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { SaveToListDialog } from "./SaveToListDialog";
 
 type Props = {
   token: SystemToken;
+  onClose?: () => void;
 };
 
-export function SystemTokenDetailCard({ token }: Props) {
+export function SystemTokenDetailCard({ token, onClose }: Props) {
   const colorClass = getPosColor(token.label);
   const vocab = token.vocab;
   const hasWord = vocab.known && vocab.candidates.length > 0;
@@ -23,9 +24,20 @@ export function SystemTokenDetailCard({ token }: Props) {
     <Card className="fixed bottom-4 left-4 right-4 z-50 p-4 shadow-xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur border border-border animate-in fade-in slide-in-from-bottom-4 duration-200 xl:top-24 xl:right-8 xl:left-auto xl:bottom-auto xl:w-80 xl:slide-in-from-right-4">
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-bold text-2xl">{token.surface}</h3>
-        <span className={cn("px-2 py-0.5 rounded text-xs font-semibold", colorClass)}>
-          {token.pos}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className={cn("px-2 py-0.5 rounded text-xs font-semibold", colorClass)}>
+            {token.pos}
+          </span>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-1 hover:bg-muted rounded transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
       
       <div className="text-sm text-muted-foreground mb-4">
@@ -77,7 +89,7 @@ export function SystemTokenDetailCard({ token }: Props) {
             </Button>
           </>
         ) : (
-          <Link href={`/vocabulary/annotate?text=${encodeURIComponent(token.surface)}`} target="_blank">
+          <Link href={`/vocabulary/edit/new?surface=${encodeURIComponent(token.surface)}&lemma=${encodeURIComponent(token.lemma)}`} target="_blank">
             <Button variant="outline" size="sm" className="w-full gap-2">
               <Plus className="w-4 h-4" />
               Create New Word

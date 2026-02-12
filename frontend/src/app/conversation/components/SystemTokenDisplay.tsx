@@ -7,9 +7,10 @@ type Props = {
   tokens: SystemToken[];
   displayMode: "surface" | "reading";
   onSelectToken?: (token: SystemToken | null) => void;
+  onClickToken?: (token: SystemToken) => void;
 };
 
-export function SystemTokenDisplay({ text, tokens, displayMode, onSelectToken }: Props) {
+export function SystemTokenDisplay({ text, tokens, displayMode, onSelectToken, onClickToken }: Props) {
   if (!tokens || tokens.length === 0) {
     return <span className="text-lg leading-relaxed">{text}</span>;
   }
@@ -34,7 +35,7 @@ export function SystemTokenDisplay({ text, tokens, displayMode, onSelectToken }:
             onMouseLeave={() => onSelectToken?.(null)}
             onClick={(e) => {
               e.stopPropagation();
-              onSelectToken?.(token);
+              onClickToken?.(token);
             }}
           >
             {content}

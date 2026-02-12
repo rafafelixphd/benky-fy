@@ -32,7 +32,9 @@ export function ChatInterface() {
   const [tokenizationMode, setTokenizationMode] = useState<TokenizationMode>("ai");
   const [displayMode, setDisplayMode] = useState<"surface" | "reading">("surface");
   const [selectedToken, setSelectedToken] = useState<ConversationalToken | null>(null);
+  const [pinnedToken, setPinnedToken] = useState<ConversationalToken | null>(null);
   const [selectedSystemToken, setSelectedSystemToken] = useState<SystemToken | null>(null);
+  const [pinnedSystemToken, setPinnedSystemToken] = useState<SystemToken | null>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -174,14 +176,69 @@ export function ChatInterface() {
     }
   };
 
+  // Handle token selection with pinning logic
+  const handleTokenSelect = (token: ConversationalToken | null) => {
+    // Only update if not pinned
+    if (!pinnedToken) {
+      setSelectedToken(token);
+    }
+  };
+
+  const handleTokenClick = (token: ConversationalToken) => {
+    if (pinnedToken?.surface === token.surface) {
+      // Clicking the same token unpins it
+      setPinnedToken(null);
+      setSelectedToken(null);
+    } else {
+      // Clicking a different token pins it
+      setPinnedToken(token);
+      setSelectedToken(token);
+    }
+  };
+
+  const handleSystemTokenSelect = (token: SystemToken | null) => {
+    // Only update if not pinned
+    if (!pinnedSystemToken) {
+      setSelectedSystemToken(token);
+    }
+  };
+
+  const handleSystemTokenClick = (token: SystemToken) => {
+    if (pinnedSystemToken?.token_id === token.token_id) {
+      // Clicking the same token unpins it
+      setPinnedSystemToken(null);
+      setSelectedSystemToken(null);
+    } else {
+      // Clicking a different token pins it
+      setPinnedSystemToken(token);
+      setSelectedSystemToken(token);
+    }
+  };
+
+  // Show pinned token or hovered token
+  const displayedToken = pinnedToken || selectedToken;
+  const displayedSystemToken = pinnedSystemToken || selectedSystemToken;
+
   return (
     <>
       {/* Token Detail Overlays */}
-      {selectedToken && tokenizationMode === "ai" && (
-         <TokenDetailCard token={selectedToken} />
+      {displayedToken && tokenizationMode === "ai" && (
+         <TokenDetailCard 
+           token={displayedToken} 
+           onClose={() => {
+             setPinnedToken(null);
+             setSelectedToken(null);
+           }} 
+         />
       )}
-      {selectedSystemToken && tokenizationMode === "system" && (
-         <SystemTokenDetailCard token={selectedSystemToken} />
+      {displayedSystemToken && tokenizationMode === "system" && (
+         <SystemTokenDetailCard 
+           token={displayedSystemToken} 
+           onClose={() => {
+             setPinnedSystemToken(null);
+             setSelectedSystemToken(null);
+           }} 
+         />
       )}
 
       <div className="flex flex-col h-[calc(100vh-14rem)] w-full max-w-4xl mx-auto rounded-xl overflow-hidden bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl relative">
@@ -250,8 +307,10 @@ export function ChatInterface() {
             tokenizationMode={tokenizationMode}
             systemTokens={msg.systemTokens}
             displayMode={displayMode}
-            onSelectToken={setSelectedToken}
-            onSelectSystemToken={setSelectedSystemToken}
+            onSelectToken={handleTokenSelect}
+            onClickToken={handleTokenClick}
+            onSelectSystemToken={handleSystemTokenSelect}
+            onClickSystemToken={handleSystemTokenClick}
           />
         ))}
 

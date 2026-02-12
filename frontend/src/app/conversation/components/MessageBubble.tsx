@@ -13,7 +13,9 @@ type Props = {
   systemTokens?: SystemToken[];
   displayMode: "surface" | "reading";
   onSelectToken: (token: ConversationalToken | null) => void;
+  onClickToken: (token: ConversationalToken) => void;
   onSelectSystemToken: (token: SystemToken | null) => void;
+  onClickSystemToken: (token: SystemToken) => void;
 };
 
 export function MessageBubble({
@@ -25,7 +27,9 @@ export function MessageBubble({
   systemTokens,
   displayMode,
   onSelectToken,
+  onClickToken,
   onSelectSystemToken,
+  onClickSystemToken,
 }: Props) {
   const showAiMorphology = tokenizationMode === "ai";
   const showSystemMorphology = tokenizationMode === "system";
@@ -63,6 +67,7 @@ export function MessageBubble({
                           showMorphology={showAiMorphology}
                           displayMode={displayMode}
                           onSelect={onSelectToken}
+                          onClick={onClickToken}
                       />
                     ) : showSystemMorphology && systemTokens ? (
                       <SystemTokenDisplay
@@ -70,6 +75,7 @@ export function MessageBubble({
                           tokens={systemTokens}
                           displayMode={displayMode}
                           onSelectToken={onSelectSystemToken}
+                          onClickToken={onClickSystemToken}
                       />
                     ) : (
                       <span className="text-lg leading-relaxed">{part.japanese}</span>
