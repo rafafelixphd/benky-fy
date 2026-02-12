@@ -1,0 +1,9 @@
+# Development dependencies
+-r requirements.prod.txt
+
+# Code quality tools
+colorama==0.4.6
+black==23.12.1
+flake8==7.0.0
+isort==5.13.2
+pre-commit==3.6.0

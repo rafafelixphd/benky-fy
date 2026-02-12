@@ -28,7 +28,7 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     container_name: benky-fy-backend
-    command: [ "flask", "run", "--host=0.0.0.0", "--port=8080" ]
+    command: ["flask", "run", "--host=0.0.0.0", "--port=8080"]
     environment:
       # Database connection
       DB_HOST: database
@@ -78,7 +78,7 @@ services:
       FLASK_API_URL: ${FLASK_API_URL:-http://backend:8080}
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend:8080}
     # depends_on:
       # backend:
         # condition: service_healthy
