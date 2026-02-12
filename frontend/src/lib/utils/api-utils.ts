@@ -1,4 +1,4 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://backend:8080";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export function getBaseUrl() {
   if (typeof window !== "undefined") {
@@ -6,8 +6,8 @@ export function getBaseUrl() {
     return "";
   }
 
-  if (process.env.AUTH_BASE_URL) {
-    return process.env.AUTH_BASE_URL;
+  if (process.env.NEXT_PUBLIC_API_BASE_URL) {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
   }
 
   // Assume localhost
