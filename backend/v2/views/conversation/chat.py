@@ -11,7 +11,7 @@ chat_model = ns.model(
     "ChatRequest",
     {
         "user_input": fields.String(required=True, description="User input text"),
-        "model": fields.String(description="Model to use", default="llama3-70b-8192"),
+        "model": fields.String(description="Model to use", default="openai/gpt-oss-20b"),
     },
 )
 

@@ -1,4 +1,4 @@
-from .chat import agent
-from .route import ns
+from .chat import ns
+from .route import ns as route_ns
 
-__all__ = ["ns", "agent"]
+__all__ = ["ns", "route_ns"]

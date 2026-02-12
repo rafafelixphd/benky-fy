@@ -2,7 +2,7 @@ export type JLPTLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1' | 'EXPERT';
 
 export type Level = {
     jlpt: JLPTLevel | null;
-    custom: number;
+    custom: number | null;
 };
 
 export type PartOfSpeech =

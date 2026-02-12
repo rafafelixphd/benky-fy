@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/core/utils";
+import { cn } from "@/lib/utils/utils";
 import { LoginButtonProps } from "./types";
 
 const providerConfig = {
