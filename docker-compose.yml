@@ -121,8 +121,8 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
       # SSL certificates (uncomment after running certbot)
-      # - /etc/letsencrypt:/etc/letsencrypt:ro
-      # - /var/www/certbot:/var/www/certbot:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost" ]
       interval: 30s
