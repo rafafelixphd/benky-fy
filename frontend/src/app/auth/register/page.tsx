@@ -40,8 +40,9 @@ export default function RegisterPage() {
             const response = await apiClient.register({ name, email, password });
 
             if (response.success) {
-                // Invalidate auth cache to ensure fresh data on next page
-                await queryClient.invalidateQueries({ queryKey: ["auth"] });
+                // Refetch auth data and wait for it to complete before navigating
+                // This ensures the next page sees the authenticated state
+                await queryClient.refetchQueries({ queryKey: ["auth"] });
                 // Redirect to modules
                 router.push("/home");
             } else {

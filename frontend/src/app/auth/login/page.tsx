@@ -53,8 +53,9 @@ export default function LoginPage() {
 
       console.log("Login response:", response);
       if (response.success) {
-        // Invalidate auth cache to ensure fresh data on next page
-        await queryClient.invalidateQueries({ queryKey: ["auth"] });
+        // Refetch auth data and wait for it to complete before navigating
+        // This ensures the next page sees the authenticated state
+        await queryClient.refetchQueries({ queryKey: ["auth"] });
         router.push("/home");
       } else {
         setError(response.message || response.error || "Login failed");
