@@ -71,14 +71,15 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
+      args:
+        # NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+        NEXT_PUBLIC_API_BASE_URL: http://rafa:8080
     container_name: benky-fy-frontend
     environment:
       NODE_ENV: development
       PORT: 3000
-      FLASK_API_URL: ${FLASK_API_URL:-http://backend:8080}
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend:8080}
     # depends_on:
       # backend:
         # condition: service_healthy
