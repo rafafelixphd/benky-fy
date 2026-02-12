@@ -17,7 +17,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY frontend/ .
 
 # Build-time environment variable with fallback
-ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+ARG NEXT_PUBLIC_API_BASE_URL=
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
 
 # Environment variables will be set at runtime
