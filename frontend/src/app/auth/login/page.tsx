@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { FloatingElements } from "@/components/common/layout/background";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { apiClient } from "@/api/private/auth/client";
 
 export default function LoginPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -51,6 +53,8 @@ export default function LoginPage() {
 
       console.log("Login response:", response);
       if (response.success) {
+        // Invalidate auth cache to ensure fresh data on next page
+        await queryClient.invalidateQueries({ queryKey: ["auth"] });
         router.push("/home");
       } else {
         setError(response.message || response.error || "Login failed");
