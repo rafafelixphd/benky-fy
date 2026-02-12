@@ -31,7 +31,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
     const [inputFeedbacks, setInputFeedbacks] = useState<Record<string, 'correct' | 'incorrect'>>({});
     const [attempts, setAttempts] = useState(0);
 
-    const MAX_ATTEMPTS = 3;
+    const MAX_ATTEMPTS = 6;
 
     // Refs for focus management
     const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -126,7 +126,8 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                 handlerValidateAnswer = word.reading.kanji ? [word.reading.kanji] : [];
             }
 
-            const isCorrect = handlerValidateAnswer.some(ans => ans.toLowerCase() === inputVal);
+            // Empty input is always incorrect (doesn't match expected answer)
+            const isCorrect = inputVal.length > 0 && handlerValidateAnswer.some(ans => ans.toLowerCase() === inputVal);
 
             if (isCorrect) {
                 newFeedbacks[mode] = 'correct';
@@ -174,15 +175,18 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                          resultsPayload[mode] = status === 'correct' ? 'correct' : 'incorrect';
                      });
 
-                    wordsApiClient.submitFeedback({
-                        word_id: word.id,
-                        display_mode: settings.display.cardDisplay,
-                        results: resultsPayload
-                    });
+            if (word) {
+                wordsApiClient.submitFeedback({
+                    word_id: word.id,
+                    display_mode: settings.display.cardDisplay,
+                    results: resultsPayload
+                });
+            }
                 }
             }
         }
     };
+
 
     useEffect(() => {
         const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -197,7 +201,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
         };
         window.addEventListener('keydown', handleGlobalKeyDown);
         return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-    }, [handleCheckAnswer]);
+    }, [showAnswer, fetchWord, handleCheckAnswer]);
 
 
 
