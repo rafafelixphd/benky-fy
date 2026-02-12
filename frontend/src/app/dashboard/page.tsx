@@ -32,21 +32,34 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // console.log("📊 Dashboard: Auth data changed", { 
+    //   authenticated: authData?.authenticated,
+    //   user: authData?.user?.email,
+    //   hasAuthData: !!authData 
+    // });
     const fetchStats = async () => {
+      // console.log("📊 Dashboard: Fetching stats...");
       try {
         const response = await dashboardApiClient.getStats();
+        // console.log("📊 Dashboard: Stats response", response);
         if (response.success && response.data) {
           setStats(response.data);
+          // console.log("✅ Dashboard: Stats loaded successfully");
+        } else {
+          console.warn("⚠️ Dashboard: Stats fetch failed", response);
         }
       } catch (error) {
-        console.error("Failed to fetch dashboard stats", error);
+        console.error("❌ Dashboard: Failed to fetch stats", error);
       } finally {
         setLoading(false);
       }
     };
 
     if (authData?.user) {
-        fetchStats();
+      // console.log("✅ Dashboard: User authenticated, fetching stats");
+      fetchStats();
+    } else {
+      // console.log("⏳ Dashboard: Waiting for authentication...");
     }
   }, [authData]);
 

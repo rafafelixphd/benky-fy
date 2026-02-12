@@ -153,7 +153,7 @@ benky-fy/
    GROQ_API_KEY=your_groq_key
    
    # URLs
-   NEXT_PUBLIC_API_URL=http://localhost:8080
+   NEXT_PUBLIC_API_URL=""
    ALLOWED_ORIGINS=http://localhost:3000,http://localhost:80
    ```
 

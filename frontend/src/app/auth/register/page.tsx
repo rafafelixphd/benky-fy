@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { FloatingElements } from "@/components/common/layout/background";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { apiClient } from "@/api/private/auth/client";
 
 export default function RegisterPage() {
     const router = useRouter();
+    const queryClient = useQueryClient();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isMounted, setIsMounted] = useState(false);
@@ -38,6 +40,9 @@ export default function RegisterPage() {
             const response = await apiClient.register({ name, email, password });
 
             if (response.success) {
+                // Refetch auth data and wait for it to complete before navigating
+                // This ensures the next page sees the authenticated state
+                await queryClient.refetchQueries({ queryKey: ["auth"] });
                 // Redirect to modules
                 router.push("/home");
             } else {

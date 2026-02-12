@@ -103,8 +103,11 @@ def seed_table(table_name, model, csv_path, db):
 
 def init_seed_database(app, db):
     if not app.config.get("ENABLE_DB_SEED", False):
-        logger.info("Database seeding is disabled. Skipping...")
+        logger.info("Database seeding is disabled. Seeding words only...")
+        with app.app_context():
+            seed_words(app, db)
         return
+
     logger.info("Seeding database...")
     with app.app_context():
         # Define seeding order to respect foreign key constraints

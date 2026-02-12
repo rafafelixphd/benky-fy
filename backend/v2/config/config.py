@@ -60,7 +60,8 @@ class Config:
     # --------------------------------------------------
 
     SESSION_COOKIE_NAME = "benkyfy_session"
-    SESSION_COOKIE_SECURE = FLASK_ENV == "production"  # HTTPS only in prod
+    # Allow HTTP cookies unless explicitly forced secure (for HTTPS deployments)
+    SESSION_COOKIE_SECURE = os.environ.get("FORCE_SECURE_COOKIES", "false").lower() == "true"
     SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access
     SESSION_COOKIE_SAMESITE = "Lax"  # CSRF protection
     PERMANENT_SESSION_LIFETIME = 86400  # 24 hours
