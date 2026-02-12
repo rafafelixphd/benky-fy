@@ -48,7 +48,7 @@ services:
       GOOGLE_GEMINI_API_KEY: ${GOOGLE_GEMINI_API_KEY}
       GROQ_API_KEY: ${GROQ_API_KEY}
       # CORS origins
-      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-srv1365980.hstgr.cloud,http://localhost:3000,http://localhost:80}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://srv1365980.hstgr.cloud,https://benkyfy.site,https://www.benkyfy.site,http://localhost:3000,http://localhost:80}
       # Enable database seeding
       # ENABLE_DB_SEED: "true"
     depends_on:
