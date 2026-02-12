@@ -72,7 +72,6 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
       args:
-        # Empty string uses relative URLs - nginx proxies /v2/ and /api/ to backend
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_URL:-}
     container_name: benky-fy-frontend
     environment:
