@@ -38,7 +38,7 @@ export async function validateGoogleSession(request: NextRequest, codeParamName:
     });
 
     // Call Flask backend to upsert user in database
-    const flaskApiUrl = process.env.FLASK_API_URL || "http://localhost:8080";
+    const flaskApiUrl = process.env.FLASK_API_URL || "http://backend:8080";
     const upsertResponse = await fetch(`${flaskApiUrl}/v2/auth/upsert-user`, {
       method: "POST",
       headers: {
