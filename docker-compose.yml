@@ -80,6 +80,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
+      AUTH_BASE_URL: https://www.benkyfy.site
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
     depends_on:
