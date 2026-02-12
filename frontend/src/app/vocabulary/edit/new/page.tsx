@@ -19,16 +19,23 @@ function CreateWordContent() {
   const searchParams = useSearchParams();
   const surface = searchParams.get("surface") || "";
   const lemma = searchParams.get("lemma") || "";
+  const kana = searchParams.get("kana") || "";
+  const english = searchParams.get("english") || "";
   const [isSaving, setIsSaving] = useState(false);
 
-  // Pre-fill data from tokenizer params
+  // Parse English meanings (comma-separated from AI)
+  const englishArray = english 
+    ? english.split(",").map(e => ({ value: e.trim() })).filter(e => e.value)
+    : [];
+
+  // Pre-fill data from tokenizer/conversation params
   const initialData: WordFormData = {
       surface: surface,
       level: { jlpt: "N5" },
       reading: { 
           kanji: surface, 
-          kana: lemma, 
-          english: [], 
+          kana: kana || lemma, // Use kana param if available, fallback to lemma
+          english: englishArray, 
           romaji: [] 
       },
       segments: [],

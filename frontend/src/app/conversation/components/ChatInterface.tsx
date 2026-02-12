@@ -8,7 +8,6 @@ import { fetchConversation, fetchSystemTokenization } from "../api";
 import { ConversationalMessagePart, ConversationalToken, TokenizationMode, SystemToken } from "./types";
 import { MessageBubble } from "./MessageBubble";
 import { TokenDetailCard } from "./TokenDetailCard";
-import { SystemTokenDetailCard } from "./SystemTokenDetailCard";
 import { cn } from "@/lib/utils/utils";
 
 type Message = {
@@ -224,7 +223,7 @@ export function ChatInterface() {
       {/* Token Detail Overlays */}
       {displayedToken && tokenizationMode === "ai" && (
          <TokenDetailCard 
-           token={displayedToken} 
+           aiToken={displayedToken} 
            onClose={() => {
              setPinnedToken(null);
              setSelectedToken(null);
@@ -232,8 +231,8 @@ export function ChatInterface() {
          />
       )}
       {displayedSystemToken && tokenizationMode === "system" && (
-         <SystemTokenDetailCard 
-           token={displayedSystemToken} 
+         <TokenDetailCard 
+           systemToken={displayedSystemToken} 
            onClose={() => {
              setPinnedSystemToken(null);
              setSelectedSystemToken(null);
