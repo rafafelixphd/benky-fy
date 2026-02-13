@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../../../lib/utils/api-utils";
+import { getBackendUrl } from "../../../lib/utils/api-utils";
 import { Word } from "@/entities/word";
 import { ApiResponse } from "@/entities/api/auth"; // Reusing ApiResponse generic
 import { FlashcardSettings } from "@/entities/flashcards/settings"; // Correct type
@@ -21,10 +21,7 @@ class WordsApiClient {
     private baseUrl: string;
 
     constructor(baseUrl?: string) {
-        this.baseUrl = baseUrl || API_BASE_URL || "";
-        if (!this.baseUrl) {
-            console.warn("API_BASE_URL is not set, defaulting to empty string (relative paths)");
-        }
+        this.baseUrl = baseUrl || getBackendUrl() || "";
     }
 
     private async request<T>(

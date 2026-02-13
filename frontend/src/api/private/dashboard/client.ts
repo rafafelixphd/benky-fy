@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../../../lib/utils/api-utils";
+import { getBackendUrl } from "../../../lib/utils/api-utils";
 import { ApiResponse } from "@/entities/api/auth";
 
 export interface WordStat {
@@ -24,7 +24,7 @@ class DashboardApiClient {
     private baseUrl: string;
 
     constructor(baseUrl?: string) {
-        this.baseUrl = baseUrl || API_BASE_URL || "";
+        this.baseUrl = baseUrl || getBackendUrl() || "";
     }
 
     private async request<T>(

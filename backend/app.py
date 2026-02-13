@@ -22,7 +22,7 @@ def setup_cors(app):
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    app.add_url_rule("/", "index", lambda: "{'benkyfy': 'ok'}")
+    app.add_url_rule("/", "index", lambda: "benkfy.site: v1.0")
     with app.app_context():
         setup_cors(app)
 
