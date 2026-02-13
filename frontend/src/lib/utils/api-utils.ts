@@ -9,8 +9,11 @@ export function getBaseUrl() {
 }
 
 export function getBackendUrl() {
-  if (process.env.NODE_ENV === 'production') {
-    return process.env.NEXT_PUBLIC_API_BASE_URL || 'https://benkyfy.site';
+  if (typeof window === 'undefined') {
+    if (process.env.NODE_ENV === 'production') {
+      return process.env.NEXT_PUBLIC_API_BASE_URL || 'https://benkyfy.site';
+    }
+    return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://backend:8080';
   }
   return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 }
