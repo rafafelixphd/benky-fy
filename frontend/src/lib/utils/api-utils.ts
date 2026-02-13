@@ -3,7 +3,7 @@ export function getBaseUrl() {
     if (process.env.NODE_ENV === 'production') {
       return process.env.NEXT_PUBLIC_API_BASE_URL || '';
     }
-    return process.env.NEXT_PUBLIC_API_BASE_URL || `https://benkyfy.site`;
+    return process.env.NEXT_PUBLIC_API_BASE_URL || `benkyfy.site`;
   }
   return '';
 }
@@ -12,7 +12,7 @@ export function getBackendUrl() {
   if (process.env.NODE_ENV === 'production') {
     return process.env.NEXT_PUBLIC_API_BASE_URL || '';
   }
-  return process.env.NEXT_PUBLIC_API_BASE_URL || `https://benkyfy.site`;
+  return process.env.NEXT_PUBLIC_API_BASE_URL || `benkyfy.site`;
 }
 
 export async function fetchFromBackend(path: string, options: RequestInit = {}) {
