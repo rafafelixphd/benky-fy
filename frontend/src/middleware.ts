@@ -11,6 +11,7 @@ const publicPaths = [
   "/auth/google",
   "/auth/google/callback",
   "/auth/logout",
+  "/debug-env",
 ];
 
 export function middleware(request: NextRequest) {
