@@ -75,13 +75,14 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
       args:
-        NEXT_PUBLIC_API_BASE_URL: https://benkyfy.site
+        NEXT_PUBLIC_API_BASE_URL: http://benkyfy.site
     container_name: benkyfy-frontend
     environment:
       NODE_ENV: production
       PORT: 3000
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+      NEXT_PUBLIC_API_BASE_URL: http://benkyfy.site
     depends_on:
       backend:
         condition: service_healthy
