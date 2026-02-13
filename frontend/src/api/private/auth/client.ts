@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "@/lib/utils/api-utils";
+import { getBackendUrl } from "@/lib/utils/api-utils";
 
 import {
     ApiResponse,
@@ -10,7 +10,7 @@ class ApiClient {
 
     constructor(baseUrl?: string) {
         // Empty string is valid - it means use relative URLs (nginx will proxy)
-        this.baseUrl = baseUrl || API_BASE_URL || "";
+        this.baseUrl = baseUrl || getBackendUrl() || "";
     }
 
     private async request<T>(

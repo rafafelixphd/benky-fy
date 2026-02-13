@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "@/lib/utils/api-utils";
+import { getBackendUrl } from "@/lib/utils/api-utils";
 import { cookies } from "next/headers";
 
 export const logout = async () => {
@@ -6,7 +6,7 @@ export const logout = async () => {
         const cookieStore = await cookies();
         const session = cookieStore.get("benkyfy_session");
 
-        await fetch(`${API_BASE_URL}/v2/auth/logout`, {
+        await fetch(`${getBackendUrl()}/v2/auth/logout`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

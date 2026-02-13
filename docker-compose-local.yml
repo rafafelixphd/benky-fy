@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: database/Dockerfile
-    container_name: benky-fy-database
+    container_name: benkyfy-database
     environment:
       POSTGRES_DB: ${DB_NAME:-benkyfy_db}
       POSTGRES_USER: ${DB_USER:-benkyfy_user}
@@ -19,7 +19,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - benky-fy-network
+      - benkyfy-network
     restart: unless-stopped
 
   # Flask Backend API
@@ -27,8 +27,8 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    container_name: benky-fy-backend
-    command: ["flask", "run", "--host=0.0.0.0", "--port=8080"]
+    container_name: benkyfy-backend
+    command: ["flask", "run", "--debug", "--host=0.0.0.0", "--port=8080"]
     environment:
       # Database connection
       DB_HOST: database
@@ -38,10 +38,10 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       # Flask configuration
       FLASK_APP: backend.app
-      FLASK_ENV: ${FLASK_ENV:-production}
+      FLASK_ENV: development
       FLASK_SECRET_KEY: ${FLASK_SECRET_KEY:?Flask secret key required}
       PORT: 8080
-      # DEBUG_ENV: "true"
+      DEBUG_ENV: "true"
       # Google OAuth
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
@@ -54,9 +54,8 @@ services:
     depends_on:
       database:
         condition: service_healthy
-    # volumes:
-      # Mount backend source code for hot reload (Flask auto-reloads in debug mode)
-      # - ./backend:/app/backend:delegated
+    volumes:
+      - ./backend:/app/backend:delegated
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     healthcheck:
@@ -66,17 +65,19 @@ services:
       retries: 3
       start_period: 40s
     networks:
-      - benky-fy-network
+      - benkyfy-network
     restart: unless-stopped
 
   # Next.js Frontend
   frontend:
     build:
       context: .
-      dockerfile: frontend/Dockerfile
+      dockerfile: frontend/Dockerfile.dev
       args:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_URL:-}
-    container_name: benky-fy-frontend
+    command: ["npm", "run", "dev"]
+    # command: ["node", "server.js"]
+    container_name: benkyfy-frontend
     environment:
       NODE_ENV: development
       PORT: 3000
@@ -85,13 +86,13 @@ services:
     depends_on:
       backend:
         condition: service_healthy
-    # volumes:
-    #   # Mount source code for hot reload
-    #   - ./frontend/src:/app/src:delegated
-    #   - ./frontend/public:/app/public:delegated
-    #   # Preserve node_modules in container (don't overwrite with host)
-    #   - /app/node_modules
-    #   - /app/.next
+    volumes:
+      # Mount source code for hot reload
+      - ./frontend/src:/app/src:delegated
+      - ./frontend/public:/app/public:delegated
+      # Preserve node_modules in container (don't overwrite with host)
+      - /app/node_modules
+      - /app/.next
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     healthcheck:
@@ -101,7 +102,7 @@ services:
       retries: 3
       start_period: 30s
     networks:
-      - benky-fy-network
+      - benkyfy-network
     restart: unless-stopped
 
   # Nginx Reverse Proxy (optional - comment out if not needed)
@@ -109,7 +110,7 @@ services:
     build:
       context: .
       dockerfile: nginx/Dockerfile
-    container_name: benky-fy-nginx
+    container_name: benkyfy-nginx
     depends_on:
       frontend:
         condition: service_healthy
@@ -120,13 +121,15 @@ services:
       - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost" ]
       interval: 30s
       timeout: 10s
       retries: 3
     networks:
-      - benky-fy-network
+      - benkyfy-network
     restart: unless-stopped
 
 volumes:
@@ -134,5 +137,5 @@ volumes:
     driver: local
 
 networks:
-  benky-fy-network:
+  benkyfy-network:
     driver: bridge

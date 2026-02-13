@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: database/Dockerfile
-    container_name: benky-fy-database
+    container_name: benkyfy-database
     environment:
       POSTGRES_DB: ${DB_NAME:-benkyfy_db}
       POSTGRES_USER: ${DB_USER:-benkyfy_user}
@@ -19,7 +19,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - benky-fy-network
+      - benkyfy-network
     restart: unless-stopped
 
   # Flask Backend API
@@ -27,7 +27,7 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    container_name: benky-fy-backend
+    container_name: benkyfy-backend
     command: ["flask", "run", "--host=0.0.0.0", "--port=8080"]
     environment:
       # Database connection
@@ -66,7 +66,7 @@ services:
       retries: 3
       start_period: 40s
     networks:
-      - benky-fy-network
+      - benkyfy-network
     restart: unless-stopped
 
   # Next.js Frontend
@@ -74,25 +74,16 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
-      args:
-        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_URL:-}
-    container_name: benky-fy-frontend
+    container_name: benkyfy-frontend
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       PORT: 3000
-      AUTH_BASE_URL: https://www.benkyfy.site
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://benkyfy.site}
     depends_on:
       backend:
         condition: service_healthy
-    # volumes:
-    #   # Mount source code for hot reload
-    #   - ./frontend/src:/app/src:delegated
-    #   - ./frontend/public:/app/public:delegated
-    #   # Preserve node_modules in container (don't overwrite with host)
-    #   - /app/node_modules
-    #   - /app/.next
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     healthcheck:
@@ -102,7 +93,7 @@ services:
       retries: 3
       start_period: 30s
     networks:
-      - benky-fy-network
+      - benkyfy-network
     restart: unless-stopped
 
   # Nginx Reverse Proxy (optional - comment out if not needed)
@@ -110,7 +101,7 @@ services:
     build:
       context: .
       dockerfile: nginx/Dockerfile
-    container_name: benky-fy-nginx
+    container_name: benkyfy-nginx
     depends_on:
       frontend:
         condition: service_healthy
@@ -121,7 +112,6 @@ services:
       - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
-      # SSL certificates (uncomment after running certbot)
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/certbot:/var/www/certbot:ro
     healthcheck:
@@ -130,7 +120,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - benky-fy-network
+      - benkyfy-network
     restart: unless-stopped
 
 volumes:
@@ -138,5 +128,5 @@ volumes:
     driver: local
 
 networks:
-  benky-fy-network:
+  benkyfy-network:
     driver: bridge

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
-import { getBaseUrl } from "@/lib/utils/api-utils";
+import { getBaseUrl, getBackendUrl } from "@/lib/utils/api-utils";
 
 
 const client = new OAuth2Client(
@@ -38,7 +38,7 @@ export async function validateGoogleSession(request: NextRequest, codeParamName:
     });
 
     // Call Flask backend to upsert user in database
-    const flaskApiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const flaskApiUrl = getBackendUrl();
     const upsertResponse = await fetch(`${flaskApiUrl}/v2/auth/upsert-user`, {
       method: "POST",
       headers: {
