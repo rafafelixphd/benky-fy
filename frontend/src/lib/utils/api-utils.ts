@@ -2,18 +2,18 @@ export function getBaseUrl() {
   if (typeof window === 'undefined') {
     if (process.env.NODE_ENV === 'production') {
       // return process.env.NEXT_PUBLIC_API_BASE_URL || 'https://benkyfy.site';
-      return 'http://benkyfy.site';
+      return 'https://benkyfy.site';
     }
-    return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://benkyfy.site';
+    return 'https://benkyfy.site'; //process.env.NEXT_PUBLIC_API_BASE_URL || 'http://benkyfy.site';
   }
-  return '';
+  return 'https://benkyfy.site';
 }
 
 export function getBackendUrl() {
   if (process.env.NODE_ENV === 'production') {
-    return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://benkyfy.site';
+    return 'https://benkyfy.site'; //process.env.NEXT_PUBLIC_API_BASE_URL || 'http://benkyfy.site';
   }
-  return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://benkyfy.site';
+  return 'https://benkyfy.site'; //process.env.NEXT_PUBLIC_API_BASE_URL || 'http://benkyfy.site';
 }
 
 export async function fetchFromBackend(path: string, options: RequestInit = {}) {
