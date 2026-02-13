@@ -55,7 +55,6 @@ services:
       database:
         condition: service_healthy
     volumes:
-      Mount backend source code for hot reload (Flask auto-reloads in debug mode)
       - ./backend:/app/backend:delegated
     ports:
       - "${BACKEND_PORT:-8080}:8080"
@@ -73,13 +72,14 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: frontend/Dockerfile
+      dockerfile: frontend/Dockerfile.dev
       args:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_URL:-}
-    command: ["node", "server.js", "--dev"]
+    command: ["npm", "run", "dev"]
+    # command: ["node", "server.js"]
     container_name: benky-fy-frontend
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       PORT: 3000
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
