@@ -193,7 +193,8 @@ flask run --debug --port=8080
 4. **Practice with flashcards** using your preferred display and input modes
 5. **Chat with the AI** to practice natural conversation
 6. **Analyze text** using the tokenizer to understand sentence structure
-
+ 
+ 
 ---
 
 ## 🗺️ Roadmap

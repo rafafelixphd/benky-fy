@@ -82,6 +82,7 @@ services:
       PORT: 3000
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: https://benkyfy.site/auth/google/callback
       NEXT_PUBLIC_API_BASE_URL: http://benkyfy.site
     depends_on:
       backend:

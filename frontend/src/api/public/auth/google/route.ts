@@ -1,15 +1,37 @@
-import { NextResponse } from "next/server";
+// lib/auth/google-oauth.ts
 import { OAuth2Client } from "google-auth-library";
-import { getBaseUrl } from "@/lib/utils/api-utils";
 
-const client = new OAuth2Client(
-  process.env.GOOGLE_OAUTH_CLIENT_ID,
-  process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-  `${getBaseUrl()}/auth/google/callback`
-);
+if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {
+  throw new Error("GOOGLE_OAUTH_CLIENT_ID is not set");
+}
+if (!process.env.GOOGLE_OAUTH_CLIENT_SECRET) {
+  throw new Error("GOOGLE_OAUTH_CLIENT_SECRET is not set");
+}
 
-export async function getGoogleAuthUrl() {
-  const authUrl = client.generateAuthUrl({
+function getRedirectUri(): string {
+  if (process.env.NODE_ENV === 'production') {
+    return process.env.GOOGLE_REDIRECT_URI || 'https://benkyfy.site/auth/google/callback';
+  }
+  return process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback';
+}
+
+let oauthClient: OAuth2Client | null = null;
+
+export function getGoogleOAuthClient(): OAuth2Client {
+  if (!oauthClient) {
+    oauthClient = new OAuth2Client(
+      process.env.GOOGLE_OAUTH_CLIENT_ID,
+      process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+      getRedirectUri()
+    );
+  }
+  return oauthClient;
+}
+
+export function getGoogleAuthUrl(): string {
+  const client = getGoogleOAuthClient();
+  
+  return client.generateAuthUrl({
     access_type: "offline",
     scope: [
       "https://www.googleapis.com/auth/userinfo.profile",
@@ -17,10 +39,4 @@ export async function getGoogleAuthUrl() {
     ],
     prompt: "consent",
   });
-  return authUrl;
-}
-
-export async function GET() {
-  const authUrl = await getGoogleAuthUrl();
-  return NextResponse.redirect(authUrl);
 }
