@@ -21,6 +21,13 @@ export async function getGoogleAuthUrl() {
 }
 
 export async function GET() {
+  console.log("[DEBUG] Google OAuth Flow Start");
+  console.log("[DEBUG] NEXT_PUBLIC_API_BASE_URL:", process.env.NEXT_PUBLIC_API_BASE_URL);
+  console.log("[DEBUG] Computed Base URL:", getBaseUrl());
+  console.log("[DEBUG] Callback URL:", `${getBaseUrl()}/auth/google/callback`);
+  
   const authUrl = await getGoogleAuthUrl();
+  console.log("[DEBUG] Generated Auth URL:", authUrl);
+  
   return NextResponse.redirect(authUrl);
 }
