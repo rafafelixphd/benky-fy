@@ -23,6 +23,7 @@ const CARD_DISPLAY_MODES: { value: CardDisplayMode; label: string }[] = [
     { value: 'english', label: 'English' },
     { value: 'kana', label: 'Kana' },
     { value: 'kanji', label: 'Kanji' },
+    { value: 'furigana', label: 'Furigana' },
 ];
 
 export function FlashcardSettingsModal({
@@ -241,7 +242,7 @@ export function FlashcardSettingsModal({
                             {/* Card Display */}
                             <div className="space-y-3">
                                 <label className="text-sm font-medium text-gray-700">Card Display (Front)</label>
-                                <div className="grid grid-cols-3 gap-3">
+                                <div className="grid grid-cols-2 gap-3">
                                     {CARD_DISPLAY_MODES.map((mode) => (
                                         <label
                                             key={mode.value}

@@ -25,7 +25,7 @@ export type ContentTag =
     | 'everyday'
     | 'small-talk';
 
-export type CardDisplayMode = 'english' | 'kana' | 'kanji';
+export type CardDisplayMode = 'english' | 'kana' | 'kanji' | 'furigana';
 
 export type InputMode = 'english' | 'romaji' | 'kanji' | 'kana';
 

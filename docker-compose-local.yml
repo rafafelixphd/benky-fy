@@ -53,7 +53,7 @@ services:
       # CORS origins
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-srv1365980.hstgr.cloud,http://localhost:3000,http://localhost:80}
       # Enable database seeding
-      # ENABLE_DB_SEED: "true"
+      ENABLE_DB_SEED: "true"
     depends_on:
       database:
         condition: service_healthy
