@@ -11,6 +11,10 @@ import { convertInputForField } from "@/lib/utils/romaji-conversion";
 import { FlashcardFeedback, FeedbackItem, FeedbackStatus } from "./FlashcardFeedback";
 import { FlashcardResult } from "./FlashcardResult";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip";
+import { EnglishDisplay } from "./display/EnglishDisplay";
+import { KanaDisplay } from "./display/KanaDisplay";
+import { KanjiDisplay } from "./display/KanjiDisplay";
+import { FuriganaDisplay } from "./display/FuriganaDisplay";
 
 interface FlashcardProps {
     onExit: () => void;
@@ -205,52 +209,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
 
 
 
-    const getPrimaryDisplay = () => {
-        if (!word) return "?";
-        switch (settings.display.cardDisplay) {
-            case 'english':
-                return word.reading.english?.join(", ") || "?";
-            case 'kana':
-                return word.reading.kana || "?";
-            case 'kanji':
-            default:
-                // Check if we have split data for interactive kanji
-                const { kanji_split, kanji_split_type, kana_split } = word.reading;
-                const kanjiText = word.reading.kanji;
 
-                if (kanjiText && kanji_split && kanji_split_type && kana_split &&
-                    kanji_split.length === kanji_split_type.length &&
-                    kanji_split.length === kana_split.length) {
-
-                    return (
-                        <span className="flex items-center justify-center flex-wrap gap-0.5">
-                            {kanji_split.map((char, index) => {
-                                const type = kanji_split_type[index];
-                                const reading = kana_split[index];
-
-                                if (type === 'kanji') {
-                                    return (
-                                        <Tooltip key={index}>
-                                            <TooltipTrigger asChild>
-                                                <span className="cursor-help hover:text-indigo-300 transition-colors border-b-2 border-transparent hover:border-indigo-300 border-dotted">
-                                                    {char}
-                                                </span>
-                                            </TooltipTrigger>
-                                            <TooltipContent className="bg-indigo-900 border-indigo-500/50 text-white font-bold text-lg">
-                                                {reading}
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    );
-                                }
-                                return <span key={index}>{char}</span>;
-                            })}
-                        </span>
-                    );
-                }
-
-                return kanjiText ? kanjiText : (word.reading.kana || "?");
-        }
-    };
 
     if (sessionComplete) {
         return <FlashcardResult stats={stats} onExit={onExit} />;
@@ -298,7 +257,10 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                                     </Button>
                                 </p>
                                 <div className="text-6xl font-bold text-white mb-4">
-                                    {getPrimaryDisplay()}
+                                    {settings.display.cardDisplay === 'english' && <EnglishDisplay word={word} />}
+                                    {settings.display.cardDisplay === 'kana' && <KanaDisplay word={word} />}
+                                    {settings.display.cardDisplay === 'kanji' && <KanjiDisplay word={word} />}
+                                    {settings.display.cardDisplay === 'furigana' && <FuriganaDisplay word={word} />}
                                 </div>
 
                                 {/* Secondary Display (always show Kana if Kanji is main? Or obey settings strictly? 
