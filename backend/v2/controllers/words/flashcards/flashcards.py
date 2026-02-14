@@ -2,8 +2,8 @@ import random
 
 from sqlalchemy.sql.expression import func
 
-from ...logger import get_logger
-from ...models import Word
+from ....logger import get_logger
+from ....models import Word
 
 logger = get_logger(namespace="flashcards")
 

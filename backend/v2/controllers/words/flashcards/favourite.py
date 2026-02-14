@@ -1,5 +1,5 @@
-from ...logger import get_logger
-from ...models import Word, WordListEntry
+from ....logger import get_logger
+from ....models import Word, WordListEntry
 from .flashcards import FlashCardsDeck
 
 logger = get_logger(namespace="favourite-deck")
