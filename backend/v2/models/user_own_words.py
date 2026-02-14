@@ -1,4 +1,3 @@
-# models/words.py
 from datetime import datetime
 
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
@@ -6,10 +5,15 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from ..config.database import db
 
 
-class Word(db.Model):
-    __tablename__ = "words"
+class UserOwnWord(db.Model):
+    __tablename__ = "user_own_words"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, db.Sequence("user_own_words_id_seq", start=100000), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+
+    # Optional link to the original global word if this is an override/shadow
+    original_word_id = db.Column(db.Integer, db.ForeignKey("words.id"), nullable=True, index=True)
+
     surface = db.Column(db.Text, nullable=False, default="")
 
     # JSONB columns for nested data
@@ -20,8 +24,6 @@ class Word(db.Model):
     part_of_speech = db.Column(ARRAY(db.Text), default=[])
     category = db.Column(ARRAY(db.Text), default=[])
 
-    examples = db.relationship("WordExample", backref="global_word", lazy=True, cascade="all, delete-orphan")
-
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(
         db.DateTime,
@@ -30,9 +32,18 @@ class Word(db.Model):
         nullable=False,
     )
 
+    __table_args__ = (
+        # Ensure efficient lookup for a user's specific override of a word
+        db.Index("ix_user_own_words_user_original", "user_id", "original_word_id"),
+    )
+
+    examples = db.relationship("WordExample", backref="user_word", lazy=True, cascade="all, delete-orphan")
+
     def to_dict(self):
         return {
             "id": self.id,
+            "user_id": self.user_id,
+            "original_word_id": self.original_word_id,
             "surface": self.surface,
             "reading": self.reading,
             "level": self.level,
@@ -40,8 +51,9 @@ class Word(db.Model):
             "category": self.category,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "is_user_word": True,
             "examples": [e.to_dict() for e in self.examples],
         }
 
     def __repr__(self):
-        return f"<Word id={self.id} {self.reading['kanji']}>"
+        return f"<UserOwnWord id={self.id} user={self.user_id} surface='{self.surface}'>"

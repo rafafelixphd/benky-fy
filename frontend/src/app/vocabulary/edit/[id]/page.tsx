@@ -180,6 +180,16 @@ export default function VocabularyEditPage({ params }: { params: Promise<{ id: s
             const res = await wordsApiClient.saveWord(payload);
             if (res.success) {
                 toast.success(isNew ? "Word created!" : "Word updated!");
+                
+                // Check for ID change (Globa -> User Shadow)
+                if (res.data && res.data.id && res.data.id !== parseInt(id)) {
+                    toast.info("Created your personal copy of this word.");
+                    router.replace(`/vocabulary/edit/${res.data.id}`);
+                }
+                
+                if (isNew && res.data && res.data.id) {
+                     router.replace(`/vocabulary/edit/${res.data.id}`);
+                }
             } else {
                 toast.error(res.error || "Failed to save");
             }

@@ -12,7 +12,7 @@ from ..controllers.words.favourite import FavouriteDeck
 from ..controllers.words.flashcards import FlashCardsDeck
 from ..controllers.words.search import WordQuery
 from ..logger import get_logger
-from ..models import Word
+from ..models import UserOwnWord, Word, WordExample
 
 logger = get_logger(namespace="words")
 ns = Namespace("words", description="Words operations")
@@ -124,11 +124,16 @@ class WordListResource(Resource):
             "end_id": end_id,
         }
 
-        query_builder = WordQuery()
+        # Get current user for UserOwnWord lookup
+        ctx, user_controller = get_user_controller()
+        user = check_auth(user_controller)
+        user_id = user["id"] if user else None
+
+        query_builder = WordQuery(user_id=user_id)
         query_builder.apply_filters(filters)
 
         if any(filters.values()):
-            logger.info(f"[WORDS] Searching with filters: {filters}")
+            logger.info(f"[WORDS] Searching with filters: {filters} User: {user_id}")
 
         words = query_builder.execute(limit=limit)
         return [word.to_dict() for word in words]
@@ -141,32 +146,124 @@ class WordResource(Resource):
     @ns.doc("get_word")
     @ns.marshal_with(word_model)
     def get(self, id):
-        """Fetch a word given its identifier."""
+        """Fetch a word given its identifier. Prioritizes UserOwnWord shadow copies."""
+        ctx, user_controller = get_user_controller()
+        user = check_auth(user_controller)
+        user_id = user["id"] if user else None
+
+        # 1. Check if it's a UserOwnWord by ID
+        # We should only return it if it belongs to the user or if we allow sharing?
+        # For now strict ownership.
+        if user_id:
+            user_word = UserOwnWord.query.filter_by(id=id, user_id=user_id).first()
+            if user_word:
+                return user_word.to_dict()
+
+            # 2. Check if it's a Global Word that the user has shadowed
+            # i.e. The user asked for Global ID, but they have a personal copy.
+            shadow_word = UserOwnWord.query.filter_by(original_word_id=id, user_id=user_id).first()
+            if shadow_word:
+                return shadow_word.to_dict()
+
+        # 3. Fallback to Global Word
         word = Word.query.get_or_404(id)
         return word.to_dict()
-        # return "rafa"
 
     @ns.doc("update_word")
     @ns.expect(word_input_model)
     @ns.marshal_with(word_model)
     def put(self, id):
-        """Update a word given its identifier."""
-        word = Word.query.get_or_404(id)
+        """Update a word. If Global, creates a User shadow copy."""
+        ctx, user_controller = get_user_controller()
+        user = check_auth(user_controller)
+        if not user:
+            ns.abort(401, "Unauthorized")
+        user_id = user["id"]
+
         data = request.json
 
-        if "surface" in data:
-            word.surface = data["surface"]
-        if "reading" in data:
-            word.reading = data["reading"]
-        if "level" in data:
-            word.level = data["level"]
-        if "part_of_speech" in data:
-            word.part_of_speech = data["part_of_speech"]
-        if "category" in data:
-            word.category = data["category"]
+        # Helper to process examples
+        def process_examples(word_obj, examples_data):
+            # Clear existing user examples for this word to replace them
+            # (Simplest strategy for now, assuming full list sent)
+            # For Global words we wouldn't delete, but here we only touch UserOwnWord examples
+            # If word_obj is UserOwnWord, we can clear its examples.
+            if isinstance(word_obj, UserOwnWord):
+                for ex in word_obj.examples:
+                    db.session.delete(ex)
 
-        db.session.commit()
-        return word.to_dict()
+            for ex in examples_data:
+                new_ex = WordExample(
+                    user_own_word_id=word_obj.id if isinstance(word_obj, UserOwnWord) else None,
+                    word_id=word_obj.id if isinstance(word_obj, Word) else None,
+                    japanese=ex.get("japanese", ""),
+                    english=ex.get("english", ""),
+                    kana=ex.get("kana", ""),
+                    reading=ex.get("reading", []),
+                    type=ex.get("type", ""),
+                    source=ex.get("source", "user"),
+                )
+                db.session.add(new_ex)
+
+        # Check if it's already a UserOwnWord belonging to this user
+        existing_user_word = UserOwnWord.query.filter_by(id=id, user_id=user_id).first()
+
+        if existing_user_word:
+            # Update existing user word
+            target_word = existing_user_word
+            if "surface" in data:
+                target_word.surface = data["surface"]
+            if "reading" in data:
+                target_word.reading = data["reading"]
+            if "level" in data:
+                target_word.level = data["level"]
+            if "part_of_speech" in data:
+                target_word.part_of_speech = data["part_of_speech"]
+            if "category" in data:
+                target_word.category = data["category"]
+
+            if "examples" in data:
+                process_examples(target_word, data["examples"])
+
+            db.session.commit()
+            return target_word.to_dict()
+        else:
+            # It's likely a Global word (or another user's word, though we shouldn't be editing that)
+            # Fetch global word to copy basic data if needed, or just use payload
+            global_word = Word.query.get(id)
+            if not global_word:
+                # Could be a UserOwnWord of *another* user?
+                # If so, we probably shouldn't be here or we should error.
+                # Or maybe we treat it as creating a new word based on that ID?
+                # For now, assume it's global.
+                ns.abort(404, "Word not found to edit")
+
+            # Create Shadow Copy
+            new_user_word = UserOwnWord(
+                user_id=user_id,
+                original_word_id=global_word.id,
+                surface=data.get("surface", global_word.surface),
+                reading=data.get("reading", global_word.reading),
+                level=data.get("level", global_word.level),
+                part_of_speech=data.get("part_of_speech", global_word.part_of_speech),
+                category=data.get("category", global_word.category),
+            )
+            db.session.add(new_user_word)
+            db.session.flush()  # Get ID
+
+            # For shadow, we might want to copy global examples IF user didn't provide new ones?
+            # Or if user provided examples, use them.
+            if "examples" in data:
+                process_examples(new_user_word, data["examples"])
+            else:
+                # Optional: Copy global examples?
+                # For now let's leave empty unless frontend sends them.
+                pass
+
+            db.session.commit()
+
+            logger.info(f"User {user_id} shadowed global word {global_word.id} -> UserOwnWord {new_user_word.id}")
+            return new_user_word.to_dict()
 
 
 @ns.route("/edit")
@@ -175,22 +272,44 @@ class CreateWord(Resource):
     @ns.expect(word_input_model)
     @ns.marshal_with(word_model)
     def post(self):
-        """Create a new word."""
+        """Create a new word (UserOwnWord)."""
+        ctx, user_controller = get_user_controller()
+        user = check_auth(user_controller)
+        if not user:
+            ns.abort(401, "Unauthorized")
+        user_id = user["id"]
+
         data = request.json
 
-        # Basic validation for required fields beyond what expect provides
         if "reading" not in data:
             ns.abort(400, "Reading data is required")
 
-        new_word = Word(
+        new_word = UserOwnWord(
+            user_id=user_id,
             surface=data.get("surface", ""),
             reading=data.get("reading", {}),
             level=data.get("level", {}),
             part_of_speech=data.get("part_of_speech", []),
             category=data.get("category", []),
+            original_word_id=None,  # Entirely new word
         )
 
         db.session.add(new_word)
+        db.session.flush()  # Get ID
+
+        if "examples" in data:
+            for ex in data["examples"]:
+                new_ex = WordExample(
+                    user_own_word_id=new_word.id,
+                    japanese=ex.get("japanese", ""),
+                    english=ex.get("english", ""),
+                    kana=ex.get("kana", ""),
+                    reading=ex.get("reading", []),
+                    type=ex.get("type", ""),
+                    source=ex.get("source", "user"),
+                )
+                db.session.add(new_ex)
+
         db.session.commit()
 
         return new_word.to_dict(), 201
