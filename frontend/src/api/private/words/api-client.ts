@@ -136,11 +136,19 @@ class WordsApiClient {
     }
 
     async annotateWord(surface: string): Promise<ApiResponse<any>> {
-        return this.request<any>("/v2/lexicon/discover", {
+        return this.request<any>("/v2/lexicon/annotate", {
             method: "POST",
             body: JSON.stringify({ word: surface }),
         });
     }
+
+    async autocomplete(word: string, model?: string): Promise<ApiResponse<any>> {
+        return this.request<any>("/v2/lexicon/autocomplete", {
+            method: "POST",
+            body: JSON.stringify({ word, model }),
+        });
+    }
+
 }
 
 export const wordsApiClient = new WordsApiClient();

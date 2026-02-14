@@ -14,6 +14,15 @@ export interface Segment {
     type: string;
 }
 
+export interface WordExampleFormData {
+    japanese: string;
+    english: string;
+    kana: string;
+    reading: any[];
+    type: string;
+    source: string;
+}
+
 export interface WordFormData {
   surface: string;
   level: {
@@ -29,6 +38,7 @@ export interface WordFormData {
   segments: Segment[];
   part_of_speech: string[];
   category: string[];
+  examples: WordExampleFormData[];
 }
 
 interface WordFormProps {
@@ -45,7 +55,8 @@ export function WordForm({ initialData, onSubmit, isSaving, onCancel }: WordForm
         reading: { kanji: "", kana: "", english: [], romaji: [] },
         segments: [],
         part_of_speech: [],
-        category: []
+        category: [],
+        examples: []
     };
 
     const { register, control, handleSubmit, setValue, watch, formState: { errors } } = useForm<WordFormData>({
@@ -87,6 +98,14 @@ export function WordForm({ initialData, onSubmit, isSaving, onCancel }: WordForm
 
     const [posInputState, setPosInputState] = require("react").useState("");
 
+    const { 
+        fields: exampleFields, 
+        append: appendExample, 
+        remove: removeExample,
+    } = useFieldArray({
+        control,
+        name: "examples"
+    });
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -107,45 +126,92 @@ export function WordForm({ initialData, onSubmit, isSaving, onCancel }: WordForm
                                 variant="secondary"
                                 disabled={isSaving}
                                 onClick={async () => {
+                                    console.log("Autocomplete button clicked");
                                     const surface = watch("surface");
+                                    console.log("Surface:", surface);
                                     if (!surface) {
                                         toast.error("Please enter a word first");
                                         return;
                                     }
                                     
-                                    const toastId = toast.loading("Analyzing word...");
+                                    const toastId = toast.loading("Autocompleting word details...");
                                     try {
-                                        const res = await wordsApiClient.annotateWord(surface);
+                                        console.log("Calling autocomplete API...");
+                                        const res = await wordsApiClient.autocomplete(surface);
+                                        console.log("Autocomplete response:", res);
+
                                         if (res.success && res.data) {
-                                            const d = res.data;
+                                            // Handle potential variations in response structure
+                                            const d = res.data.word || res.data; 
+                                            console.log("Word data to populate:", d);
+
+                                            if (!d || Object.keys(d).length === 0) {
+                                                console.error("No word data found in response");
+                                                toast.error("AI returned empty data", { id: toastId });
+                                                return;
+                                            }
+                                            
+                                            const setOpts = { shouldValidate: true, shouldDirty: true };
                                             
                                             // 1. Level
                                             if (d.level) {
-                                                setValue("level.jlpt", d.level.jlpt || "unknown");
+                                                setValue("level.jlpt", d.level.jlpt || "unknown", setOpts);
+                                                if (d.level.custom !== undefined) setValue("level.custom", d.level.custom, setOpts);
                                             }
                                             
                                             // 2. Reading
                                             if (d.reading) {
-                                                setValue("reading.kanji", d.reading.kanji || surface);
-                                                setValue("reading.kana", d.reading.kana || "");
+                                                setValue("reading.kanji", d.reading.kanji || surface, setOpts);
+                                                setValue("reading.kana", d.reading.kana || "", setOpts);
                                                 
-                                                // English is string[] -> { value: string }[]
-                                                const eng = (d.reading.english || []).map((e: string) => ({ value: e }));
-                                                setValue("reading.english", eng);
+                                                // English is (string | {value: string})[] -> { value: string }[]
+                                                // Handle if AI returns strings or objects
+                                                const rawEng = d.reading.english || [];
+                                                const eng = rawEng.map((e: any) => 
+                                                    typeof e === 'string' ? { value: e } : { value: e.value || "" }
+                                                );
+                                                setValue("reading.english", eng, setOpts);
                                             }
                                             
-                                            // 3. Segments
-                                            if (d.segments) {
-                                                setValue("segments", d.segments);
+                                            // 3. Segments logic
+                                            if (d.reading && d.reading.kanji_split) {
+                                                const segments: Segment[] = d.reading.kanji_split.map((k: string, i: number) => ({
+                                                    kanji: k,
+                                                    kana: d.reading.kana_split?.[i] || "",
+                                                    type: d.reading.kanji_split_type?.[i] || "kanji"
+                                                }));
+                                                setValue("segments", segments, setOpts);
                                             }
                                             
                                             // 4. POS & Category
-                                            if (d.part_of_speech) setValue("part_of_speech", d.part_of_speech);
-                                            if (d.category) setValue("category", d.category);
+                                            if (d.part_of_speech) setValue("part_of_speech", d.part_of_speech, setOpts);
+                                            if (d.category) setValue("category", d.category, setOpts);
 
-                                            toast.success("Word annotated!", { id: toastId });
+                                            // 5. Examples
+                                            // Flatten the examples object { "N5": [...], "N4": [...] } -> WordExample[]
+                                            if (res.data.examples) {
+                                                console.log("Autocomplete Examples:", res.data.examples);
+                                                const flattenedExamples: any[] = [];
+                                                Object.entries(res.data.examples).forEach(([level, exs]: [string, any]) => {
+                                                    if (Array.isArray(exs)) {
+                                                        exs.forEach(ex => {
+                                                            flattenedExamples.push({
+                                                                japanese: ex.japanese,
+                                                                english: ex.english,
+                                                                kana: ex.kana,
+                                                                reading: ex.reading || [], // Segments
+                                                                type: level,
+                                                                source: 'generated'
+                                                            });
+                                                        });
+                                                    }
+                                                });
+                                                setValue("examples", flattenedExamples, setOpts);
+                                            }
+
+                                            toast.success("Word details autocompleted!", { id: toastId });
                                         } else {
-                                            toast.error("Failed to annotate", { id: toastId });
+                                            toast.error("Failed to autocomplete", { id: toastId });
                                         }
                                     } catch (e) {
                                         console.error(e);
@@ -301,6 +367,74 @@ export function WordForm({ initialData, onSubmit, isSaving, onCancel }: WordForm
                     {segmentFields.length === 0 && (
                         <div className="p-4 border border-dashed border-white/10 rounded-md text-center">
                             <p className="text-sm text-white/40">No segments defined.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* --- Examples --- */}
+            <div className="space-y-4">
+                <div className="flex justify-between items-center border-b border-white/10 pb-2">
+                    <h3 className="text-lg font-semibold text-white">Examples</h3>
+                    <Button 
+                        type="button" 
+                        variant="secondary" 
+                        size="sm" 
+                        onClick={() => appendExample({ japanese: "", english: "", kana: "", reading: [], type: "N5", source: "user" })}
+                    >
+                        <Plus className="w-3 h-3 mr-1" /> Add Example
+                    </Button>
+                </div>
+                
+                <div className="space-y-4">
+                    {exampleFields.map((field, index) => (
+                        <div key={field.id} className="p-3 border border-white/10 rounded-md bg-white/5 space-y-2">
+                             <div className="flex justify-between items-start gap-2">
+                                <div className="space-y-2 flex-1">
+                                    <Input
+                                        {...register(`examples.${index}.japanese` as const)}
+                                        className="bg-white/10 border-white/20 text-white"
+                                        placeholder="Japanese Sentence"
+                                    />
+                                    <Input
+                                        {...register(`examples.${index}.kana` as const)}
+                                        className="bg-white/10 border-white/20 text-white text-xs"
+                                        placeholder="Reading (Kana)"
+                                    />
+                                    <Input
+                                        {...register(`examples.${index}.english` as const)}
+                                        className="bg-white/10 border-white/20 text-white"
+                                        placeholder="English Translation"
+                                    />
+                                    <div className="flex gap-2">
+                                        <Input
+                                            {...register(`examples.${index}.type` as const)}
+                                            className="bg-white/10 border-white/20 text-white text-xs w-24"
+                                            placeholder="Type (e.g. N5)"
+                                        />
+                                        <Input
+                                            {...register(`examples.${index}.source` as const)}
+                                            className="bg-white/10 border-white/20 text-white text-xs w-24"
+                                            placeholder="Source"
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-white/50 hover:text-red-400 hover:bg-white/5 mt-1"
+                                    onClick={() => removeExample(index)}
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                             </div>
+                        </div>
+                    ))}
+                    {exampleFields.length === 0 && (
+                        <div className="p-4 border border-dashed border-white/10 rounded-md text-center">
+                            <p className="text-sm text-white/40">No examples added.</p>
                         </div>
                     )}
                 </div>
