@@ -43,23 +43,44 @@ def get_autocomplete_prompt(word: str) -> str:
         "examples": {{
             "N5": [
                 {{
-                    "japanese": ["string"],
-                    "english": ["string"],
-                    "kana": ["string"] # Full sentence in hiragana/katakana
+                    "japanese": "string",
+                    "english": "string",
+                    "kana": "string",
+                    "reading": [
+                        {{
+                            "surface": "string",
+                            "reading": "string",
+                            "type": "string" # e.g. "noun", "particle", "verb", "adjective"
+                        }}
+                    ]
                 }}
             ],
             "N4": [
                 {{
-                    "japanese": ["string"],
-                    "english": ["string"],
-                    "kana": ["string"]
+                    "japanese": "string",
+                    "english": "string",
+                    "kana": "string",
+                    "reading": [
+                         {{
+                            "surface": "string",
+                            "reading": "string",
+                            "type": "string"
+                        }}
+                    ]
                 }}
             ],
             "N3": [
                 {{
-                    "japanese": ["string"],
-                    "english": ["string"],
-                    "kana": ["string"]
+                    "japanese": "string",
+                    "english": "string",
+                    "kana": "string",
+                    "reading": [
+                         {{
+                            "surface": "string",
+                            "reading": "string",
+                            "type": "string"
+                        }}
+                    ]
                 }}
             ]
         }}

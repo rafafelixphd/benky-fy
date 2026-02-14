@@ -21,8 +21,24 @@ export interface Word {
     reading: WordReading;
     level: WordLevel;
     part_of_speech: string[];
-    category: string[];
+    category?: string[];
+    
+    examples?: WordExample[];
+    
     created_at?: string;
     updated_at?: string;
-    surface?: string;
+}
+
+export interface WordExample {
+    id?: number;
+    japanese: string;
+    english: string;
+    kana: string;
+    reading: {
+        surface: string;
+        reading: string;
+        type: string;
+    }[];
+    type?: string;
+    source?: string;
 }

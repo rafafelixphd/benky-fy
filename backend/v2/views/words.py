@@ -12,7 +12,7 @@ from ..controllers.words.favourite import FavouriteDeck
 from ..controllers.words.flashcards import FlashCardsDeck
 from ..controllers.words.search import WordQuery
 from ..logger import get_logger
-from ..models import UserOwnWord, Word
+from ..models import UserOwnWord, Word, WordExample
 
 logger = get_logger(namespace="words")
 ns = Namespace("words", description="Words operations")
@@ -182,6 +182,29 @@ class WordResource(Resource):
 
         data = request.json
 
+        # Helper to process examples
+        def process_examples(word_obj, examples_data):
+            # Clear existing user examples for this word to replace them
+            # (Simplest strategy for now, assuming full list sent)
+            # For Global words we wouldn't delete, but here we only touch UserOwnWord examples
+            # If word_obj is UserOwnWord, we can clear its examples.
+            if isinstance(word_obj, UserOwnWord):
+                for ex in word_obj.examples:
+                    db.session.delete(ex)
+
+            for ex in examples_data:
+                new_ex = WordExample(
+                    user_own_word_id=word_obj.id if isinstance(word_obj, UserOwnWord) else None,
+                    word_id=word_obj.id if isinstance(word_obj, Word) else None,
+                    japanese=ex.get("japanese", ""),
+                    english=ex.get("english", ""),
+                    kana=ex.get("kana", ""),
+                    reading=ex.get("reading", []),
+                    type=ex.get("type", ""),
+                    source=ex.get("source", "user"),
+                )
+                db.session.add(new_ex)
+
         # Check if it's already a UserOwnWord belonging to this user
         existing_user_word = UserOwnWord.query.filter_by(id=id, user_id=user_id).first()
 
@@ -198,6 +221,10 @@ class WordResource(Resource):
                 target_word.part_of_speech = data["part_of_speech"]
             if "category" in data:
                 target_word.category = data["category"]
+
+            if "examples" in data:
+                process_examples(target_word, data["examples"])
+
             db.session.commit()
             return target_word.to_dict()
         else:
@@ -222,6 +249,17 @@ class WordResource(Resource):
                 category=data.get("category", global_word.category),
             )
             db.session.add(new_user_word)
+            db.session.flush()  # Get ID
+
+            # For shadow, we might want to copy global examples IF user didn't provide new ones?
+            # Or if user provided examples, use them.
+            if "examples" in data:
+                process_examples(new_user_word, data["examples"])
+            else:
+                # Optional: Copy global examples?
+                # For now let's leave empty unless frontend sends them.
+                pass
+
             db.session.commit()
 
             logger.info(f"User {user_id} shadowed global word {global_word.id} -> UserOwnWord {new_user_word.id}")
@@ -257,6 +295,21 @@ class CreateWord(Resource):
         )
 
         db.session.add(new_word)
+        db.session.flush()  # Get ID
+
+        if "examples" in data:
+            for ex in data["examples"]:
+                new_ex = WordExample(
+                    user_own_word_id=new_word.id,
+                    japanese=ex.get("japanese", ""),
+                    english=ex.get("english", ""),
+                    kana=ex.get("kana", ""),
+                    reading=ex.get("reading", []),
+                    type=ex.get("type", ""),
+                    source=ex.get("source", "user"),
+                )
+                db.session.add(new_ex)
+
         db.session.commit()
 
         return new_word.to_dict(), 201

@@ -37,6 +37,8 @@ class UserOwnWord(db.Model):
         db.Index("ix_user_own_words_user_original", "user_id", "original_word_id"),
     )
 
+    examples = db.relationship("WordExample", backref="user_word", lazy=True, cascade="all, delete-orphan")
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -50,6 +52,7 @@ class UserOwnWord(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "is_user_word": True,
+            "examples": [e.to_dict() for e in self.examples],
         }
 
     def __repr__(self):

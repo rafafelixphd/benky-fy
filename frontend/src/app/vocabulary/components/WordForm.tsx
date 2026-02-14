@@ -14,6 +14,15 @@ export interface Segment {
     type: string;
 }
 
+export interface WordExampleFormData {
+    japanese: string;
+    english: string;
+    kana: string;
+    reading: any[];
+    type: string;
+    source: string;
+}
+
 export interface WordFormData {
   surface: string;
   level: {
@@ -29,6 +38,7 @@ export interface WordFormData {
   segments: Segment[];
   part_of_speech: string[];
   category: string[];
+  examples: WordExampleFormData[];
 }
 
 interface WordFormProps {
@@ -45,7 +55,8 @@ export function WordForm({ initialData, onSubmit, isSaving, onCancel }: WordForm
         reading: { kanji: "", kana: "", english: [], romaji: [] },
         segments: [],
         part_of_speech: [],
-        category: []
+        category: [],
+        examples: []
     };
 
     const { register, control, handleSubmit, setValue, watch, formState: { errors } } = useForm<WordFormData>({
@@ -87,6 +98,14 @@ export function WordForm({ initialData, onSubmit, isSaving, onCancel }: WordForm
 
     const [posInputState, setPosInputState] = require("react").useState("");
 
+    const { 
+        fields: exampleFields, 
+        append: appendExample, 
+        remove: removeExample,
+    } = useFieldArray({
+        control,
+        name: "examples"
+    });
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -168,8 +187,26 @@ export function WordForm({ initialData, onSubmit, isSaving, onCancel }: WordForm
                                             if (d.part_of_speech) setValue("part_of_speech", d.part_of_speech, setOpts);
                                             if (d.category) setValue("category", d.category, setOpts);
 
+                                            // 5. Examples
+                                            // Flatten the examples object { "N5": [...], "N4": [...] } -> WordExample[]
                                             if (res.data.examples) {
                                                 console.log("Autocomplete Examples:", res.data.examples);
+                                                const flattenedExamples: any[] = [];
+                                                Object.entries(res.data.examples).forEach(([level, exs]: [string, any]) => {
+                                                    if (Array.isArray(exs)) {
+                                                        exs.forEach(ex => {
+                                                            flattenedExamples.push({
+                                                                japanese: ex.japanese,
+                                                                english: ex.english,
+                                                                kana: ex.kana,
+                                                                reading: ex.reading || [], // Segments
+                                                                type: level,
+                                                                source: 'generated'
+                                                            });
+                                                        });
+                                                    }
+                                                });
+                                                setValue("examples", flattenedExamples, setOpts);
                                             }
 
                                             toast.success("Word details autocompleted!", { id: toastId });
@@ -330,6 +367,74 @@ export function WordForm({ initialData, onSubmit, isSaving, onCancel }: WordForm
                     {segmentFields.length === 0 && (
                         <div className="p-4 border border-dashed border-white/10 rounded-md text-center">
                             <p className="text-sm text-white/40">No segments defined.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* --- Examples --- */}
+            <div className="space-y-4">
+                <div className="flex justify-between items-center border-b border-white/10 pb-2">
+                    <h3 className="text-lg font-semibold text-white">Examples</h3>
+                    <Button 
+                        type="button" 
+                        variant="secondary" 
+                        size="sm" 
+                        onClick={() => appendExample({ japanese: "", english: "", kana: "", reading: [], type: "N5", source: "user" })}
+                    >
+                        <Plus className="w-3 h-3 mr-1" /> Add Example
+                    </Button>
+                </div>
+                
+                <div className="space-y-4">
+                    {exampleFields.map((field, index) => (
+                        <div key={field.id} className="p-3 border border-white/10 rounded-md bg-white/5 space-y-2">
+                             <div className="flex justify-between items-start gap-2">
+                                <div className="space-y-2 flex-1">
+                                    <Input
+                                        {...register(`examples.${index}.japanese` as const)}
+                                        className="bg-white/10 border-white/20 text-white"
+                                        placeholder="Japanese Sentence"
+                                    />
+                                    <Input
+                                        {...register(`examples.${index}.kana` as const)}
+                                        className="bg-white/10 border-white/20 text-white text-xs"
+                                        placeholder="Reading (Kana)"
+                                    />
+                                    <Input
+                                        {...register(`examples.${index}.english` as const)}
+                                        className="bg-white/10 border-white/20 text-white"
+                                        placeholder="English Translation"
+                                    />
+                                    <div className="flex gap-2">
+                                        <Input
+                                            {...register(`examples.${index}.type` as const)}
+                                            className="bg-white/10 border-white/20 text-white text-xs w-24"
+                                            placeholder="Type (e.g. N5)"
+                                        />
+                                        <Input
+                                            {...register(`examples.${index}.source` as const)}
+                                            className="bg-white/10 border-white/20 text-white text-xs w-24"
+                                            placeholder="Source"
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-white/50 hover:text-red-400 hover:bg-white/5 mt-1"
+                                    onClick={() => removeExample(index)}
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                             </div>
+                        </div>
+                    ))}
+                    {exampleFields.length === 0 && (
+                        <div className="p-4 border border-dashed border-white/10 rounded-md text-center">
+                            <p className="text-sm text-white/40">No examples added.</p>
                         </div>
                     )}
                 </div>
