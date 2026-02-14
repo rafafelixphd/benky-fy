@@ -1,11 +1,11 @@
 from flask import request
 from flask_restx import Resource
 
-from ...controllers.words.manager import WordManager
-from ...logger import get_logger
 from . import ns
+from ...logger import get_logger
 from .schemas import word_input_model, word_model
 from .utils import check_auth, get_user_controller
+from ...controllers.words.manager import WordManager
 
 logger = get_logger(namespace="words")
 
