@@ -40,7 +40,8 @@ function CreateWordContent() {
       },
       segments: [],
       part_of_speech: [],
-      category: []
+      category: [],
+      examples: []
   };
 
   const onSubmit = async (data: WordFormData) => {

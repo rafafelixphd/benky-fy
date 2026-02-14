@@ -2,16 +2,16 @@
 import { OAuth2Client } from "google-auth-library";
 import { getGoogleRedirectUri } from "@/lib/utils/api-utils";
 
-if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {
-  throw new Error("GOOGLE_OAUTH_CLIENT_ID is not set");
-}
-if (!process.env.GOOGLE_OAUTH_CLIENT_SECRET) {
-  throw new Error("GOOGLE_OAUTH_CLIENT_SECRET is not set");
-}
-
 let oauthClient: OAuth2Client | null = null;
 
 export function getGoogleOAuthClient(): OAuth2Client {
+  if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {
+    throw new Error("GOOGLE_OAUTH_CLIENT_ID is not set");
+  }
+  if (!process.env.GOOGLE_OAUTH_CLIENT_SECRET) {
+    throw new Error("GOOGLE_OAUTH_CLIENT_SECRET is not set");
+  }
+
   if (!oauthClient) {
     oauthClient = new OAuth2Client(
       process.env.GOOGLE_OAUTH_CLIENT_ID,

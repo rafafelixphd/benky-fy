@@ -78,6 +78,9 @@ services:
       dockerfile: frontend/Dockerfile
       args:
         NEXT_PUBLIC_API_BASE_URL: http://benkyfy.site
+        GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+        GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+        GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
     container_name: benkyfy-frontend
     image: benkyfy-frontend:staging
     environment:
