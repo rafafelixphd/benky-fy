@@ -4,10 +4,10 @@ from datetime import datetime
 
 from sqlalchemy.sql.expression import func
 
-from ...config.database import db
-from ...logger import get_logger
-from ...models import Word
-from ...models.user_word_map import UserWordMap
+from ....config.database import db
+from ....logger import get_logger
+from ....models import Word
+from ....models.user_word_map import UserWordMap
 from .flashcards import FlashCardsDeck
 
 logger = get_logger(namespace="anki_deck")
