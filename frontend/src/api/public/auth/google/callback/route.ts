@@ -2,17 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
 import { getBaseUrl, getBackendUrl } from "@/lib/utils/api-utils";
 
-function getRedirectUri(): string {
-  if (process.env.NODE_ENV === 'production') {
-    return process.env.GOOGLE_REDIRECT_URI || 'https://benkyfy.site/auth/google/callback';
-  }
-  return process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback';
-}
 
 const client = new OAuth2Client(
   process.env.GOOGLE_OAUTH_CLIENT_ID,
   process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-  getRedirectUri()
+  `${getBaseUrl()}/auth/google/callback`
 );
 
 export async function validateGoogleSession(request: NextRequest, codeParamName: string = "code", redirectUrl: string = "/home") {
@@ -43,7 +37,9 @@ export async function validateGoogleSession(request: NextRequest, codeParamName:
       google_id: payload.sub,
     });
 
-    const upsertResponse = await fetch(`${getBackendUrl()}/v2/auth/upsert-user`, {
+    // Call Flask backend to upsert user in database
+    const flaskApiUrl = getBackendUrl();
+    const upsertResponse = await fetch(`${flaskApiUrl}/v2/auth/upsert-user`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
