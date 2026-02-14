@@ -136,7 +136,7 @@ class WordsApiClient {
     }
 
     async annotateWord(surface: string): Promise<ApiResponse<any>> {
-        return this.request<any>("/v2/lexicon/discover", {
+        return this.request<any>("/v2/lexicon/annotate", {
             method: "POST",
             body: JSON.stringify({ word: surface }),
         });
