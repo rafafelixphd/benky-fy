@@ -18,6 +18,7 @@ export interface WordLevel {
 
 export interface Word {
     id: number;
+    surface: string;
     reading: WordReading;
     level: WordLevel;
     part_of_speech: string[];

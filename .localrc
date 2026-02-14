@@ -1,0 +1,51 @@
+# Load environment variables
+if [ -f ~/.env/variables/.benkyfy ]; then
+    source ~/.env/variables/.benkyfy
+    export FLASK_ENV=development
+    export FLASK_DEBUG=1
+    export GOOGLE_REDIRECT_URI=http://localhost:3000/auth/google/callback
+    echo "✓ Loaded local .env"
+    PS1="[LOCAL] $PS1"
+
+elif [ -f /env/.env ]; then
+    source /env/.env
+    export FLASK_ENV=production
+    export FLASK_DEBUG=0
+    export GOOGLE_REDIRECT_URI=https://benkyfy.site/auth/google/callback
+    echo "✓ Loaded server .env"
+    PS1="[SERVER] $PS1"
+
+else
+    echo "⚠ No .env file found"
+fi
+
+# Docker aliases
+alias docker-dev='docker compose --file docker-compose-local.yml'
+alias docker-staging='docker compose --file docker-compose-staging.yml'
+alias docker-prod='docker compose --file docker-compose.yml'
+
+tag_benky_images() {
+    if [ -z "$1" ]; then
+        set -- "staging"
+    fi
+
+    if [ -z "$2" ]; then
+        set -- "latest"
+    fi
+
+    local FROM_TAG=$1
+    local TO_TAG=$2
+    local SERVICES=("backend" "frontend" "database" "nginx")
+
+    echo "🏷️  Tagging images with version: $FROM_TAG -> $TO_TAG"
+
+    for SERVICE in "${SERVICES[@]}"; do
+        IMAGE_NAME="benkyfy-$SERVICE"
+        
+        if docker tag "${IMAGE_NAME}:${FROM_TAG}" "${IMAGE_NAME}:${TO_TAG}"; then
+            echo "✅ Tagged ${IMAGE_NAME}:${FROM_TAG} -> ${IMAGE_NAME}:${TO_TAG}"
+        else
+            echo "❌ Failed to tag ${IMAGE_NAME}"
+        fi
+    done
+}

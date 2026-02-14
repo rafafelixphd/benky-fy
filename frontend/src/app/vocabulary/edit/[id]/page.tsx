@@ -127,7 +127,15 @@ export default function VocabularyEditPage({ params }: { params: Promise<{ id: s
                     },
                     segments: segments,
                     part_of_speech: w.part_of_speech || [],
-                    category: w.category || []
+                    category: w.category || [],
+                    examples: w.examples?.map(e => ({
+                        japanese: e.japanese,
+                        english: e.english,
+                        kana: e.kana,
+                        reading: e.reading || [],
+                        type: e.type || "",
+                        source: e.source || "user"
+                    })) || []
                 });
             } else {
                 toast.error("Failed to load word");

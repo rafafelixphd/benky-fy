@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: database/Dockerfile
     container_name: benkyfy-database
+    image: benkyfy-database:latest
     environment:
       POSTGRES_DB: ${DB_NAME:-benkyfy_db}
       POSTGRES_USER: ${DB_USER:-benkyfy_user}
@@ -28,6 +29,7 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     container_name: benkyfy-backend
+    image: benkyfy-backend:latest
     command: ["flask", "run", "--host=0.0.0.0", "--port=8080"]
     environment:
       # Database connection
@@ -76,7 +78,11 @@ services:
       dockerfile: frontend/Dockerfile
       args:
         NEXT_PUBLIC_API_BASE_URL: http://benkyfy.site
+        GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+        GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+        GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
     container_name: benkyfy-frontend
+    image: benkyfy-frontend:latest
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -105,6 +111,7 @@ services:
       context: .
       dockerfile: nginx/Dockerfile
     container_name: benkyfy-nginx
+    image: benkyfy-nginx:latest
     depends_on:
       frontend:
         condition: service_healthy
