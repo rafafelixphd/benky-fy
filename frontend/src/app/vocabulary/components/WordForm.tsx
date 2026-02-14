@@ -107,45 +107,74 @@ export function WordForm({ initialData, onSubmit, isSaving, onCancel }: WordForm
                                 variant="secondary"
                                 disabled={isSaving}
                                 onClick={async () => {
+                                    console.log("Autocomplete button clicked");
                                     const surface = watch("surface");
+                                    console.log("Surface:", surface);
                                     if (!surface) {
                                         toast.error("Please enter a word first");
                                         return;
                                     }
                                     
-                                    const toastId = toast.loading("Analyzing word...");
+                                    const toastId = toast.loading("Autocompleting word details...");
                                     try {
-                                        const res = await wordsApiClient.annotateWord(surface);
+                                        console.log("Calling autocomplete API...");
+                                        const res = await wordsApiClient.autocomplete(surface);
+                                        console.log("Autocomplete response:", res);
+
                                         if (res.success && res.data) {
-                                            const d = res.data;
+                                            // Handle potential variations in response structure
+                                            const d = res.data.word || res.data; 
+                                            console.log("Word data to populate:", d);
+
+                                            if (!d || Object.keys(d).length === 0) {
+                                                console.error("No word data found in response");
+                                                toast.error("AI returned empty data", { id: toastId });
+                                                return;
+                                            }
+                                            
+                                            const setOpts = { shouldValidate: true, shouldDirty: true };
                                             
                                             // 1. Level
                                             if (d.level) {
-                                                setValue("level.jlpt", d.level.jlpt || "unknown");
+                                                setValue("level.jlpt", d.level.jlpt || "unknown", setOpts);
+                                                if (d.level.custom !== undefined) setValue("level.custom", d.level.custom, setOpts);
                                             }
                                             
                                             // 2. Reading
                                             if (d.reading) {
-                                                setValue("reading.kanji", d.reading.kanji || surface);
-                                                setValue("reading.kana", d.reading.kana || "");
+                                                setValue("reading.kanji", d.reading.kanji || surface, setOpts);
+                                                setValue("reading.kana", d.reading.kana || "", setOpts);
                                                 
-                                                // English is string[] -> { value: string }[]
-                                                const eng = (d.reading.english || []).map((e: string) => ({ value: e }));
-                                                setValue("reading.english", eng);
+                                                // English is (string | {value: string})[] -> { value: string }[]
+                                                // Handle if AI returns strings or objects
+                                                const rawEng = d.reading.english || [];
+                                                const eng = rawEng.map((e: any) => 
+                                                    typeof e === 'string' ? { value: e } : { value: e.value || "" }
+                                                );
+                                                setValue("reading.english", eng, setOpts);
                                             }
                                             
-                                            // 3. Segments
-                                            if (d.segments) {
-                                                setValue("segments", d.segments);
+                                            // 3. Segments logic
+                                            if (d.reading && d.reading.kanji_split) {
+                                                const segments: Segment[] = d.reading.kanji_split.map((k: string, i: number) => ({
+                                                    kanji: k,
+                                                    kana: d.reading.kana_split?.[i] || "",
+                                                    type: d.reading.kanji_split_type?.[i] || "kanji"
+                                                }));
+                                                setValue("segments", segments, setOpts);
                                             }
                                             
                                             // 4. POS & Category
-                                            if (d.part_of_speech) setValue("part_of_speech", d.part_of_speech);
-                                            if (d.category) setValue("category", d.category);
+                                            if (d.part_of_speech) setValue("part_of_speech", d.part_of_speech, setOpts);
+                                            if (d.category) setValue("category", d.category, setOpts);
 
-                                            toast.success("Word annotated!", { id: toastId });
+                                            if (res.data.examples) {
+                                                console.log("Autocomplete Examples:", res.data.examples);
+                                            }
+
+                                            toast.success("Word details autocompleted!", { id: toastId });
                                         } else {
-                                            toast.error("Failed to annotate", { id: toastId });
+                                            toast.error("Failed to autocomplete", { id: toastId });
                                         }
                                     } catch (e) {
                                         console.error(e);
