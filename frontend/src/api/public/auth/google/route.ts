@@ -1,18 +1,12 @@
 // lib/auth/google-oauth.ts
 import { OAuth2Client } from "google-auth-library";
+import { getGoogleRedirectUri } from "@/lib/utils/api-utils";
 
 if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {
   throw new Error("GOOGLE_OAUTH_CLIENT_ID is not set");
 }
 if (!process.env.GOOGLE_OAUTH_CLIENT_SECRET) {
   throw new Error("GOOGLE_OAUTH_CLIENT_SECRET is not set");
-}
-
-function getRedirectUri(): string {
-  if (process.env.NODE_ENV === 'production') {
-    return process.env.GOOGLE_REDIRECT_URI || 'https://benkyfy.site/auth/google/callback';
-  }
-  return process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback';
 }
 
 let oauthClient: OAuth2Client | null = null;
@@ -22,7 +16,7 @@ export function getGoogleOAuthClient(): OAuth2Client {
     oauthClient = new OAuth2Client(
       process.env.GOOGLE_OAUTH_CLIENT_ID,
       process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-      getRedirectUri()
+      getGoogleRedirectUri()
     );
   }
   return oauthClient;
