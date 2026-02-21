@@ -66,10 +66,10 @@ export const DEFAULT_FLASHCARD_SETTINGS: FlashcardSettings = {
     learningRatio: 0.3,
     partOfSpeech: [],
     tag: [],
-    maxCards: 10,
+    maxCards: 5,
     display: {
-        cardDisplay: 'kanji',
-        inputMode: ['english', 'kana'],
+        cardDisplay: 'furigana',
+        inputMode: ['kana', 'english'],
     },
 };
 
