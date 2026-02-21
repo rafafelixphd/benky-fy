@@ -28,7 +28,13 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
     const [showAnswer, setShowAnswer] = useState(false);
     const [gaveUp, setGaveUp] = useState(false);
     const [sessionComplete, setSessionComplete] = useState(false);
-    const [stats, setStats] = useState<SessionStats | null>(null);
+    const [stats, setStats] = useState<SessionStats>({
+        total_cards: 0,
+        correct: 0,
+        incorrect: 0,
+        half: 0,
+        gave_up: 0,
+    });
 
     // Input state - mapped by InputMode
     const [userInputs, setUserInputs] = useState<Record<string, string>>({});
@@ -66,19 +72,10 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                 }
             } else {
                 if (response.error === "not_found") {
-                   setSessionComplete(true);
-                   let jsStats = stats;
-                   wordsApiClient.getSessionStats().then(res => {
-                       if (res.success && res.data) setStats(res.data);
-                   });
-                   let pyStats = stats;
-                   if (jsStats == pyStats) {
-                    console.log("Stats are equal");
-                   } else{
-                    console.log("Stats are not equal");
-                    console.log("jsStats: ", jsStats);
-                    console.log("pyStats: ", pyStats);
-                   }
+                    // wordsApiClient.getSessionStats().then(res => {
+                    //     if (res.success && res.data) setStats(res.data);
+                    // });
+                    setSessionComplete(true);
                 } else {
                    setError(response.error || "Failed to fetch word");
                 }
@@ -167,6 +164,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
 
         const { newFeedbacks } = validateEachAnswer(word);
         console.log("newFeedbacks: ", newFeedbacks);
+        console.log("stats: ", stats);
         setInputFeedbacks(newFeedbacks);
         
         const allCorrect = Object.values(newFeedbacks).every(feedback => feedback === 'correct');
@@ -174,13 +172,11 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
         if (allCorrect) {
             console.log("Completing due to all being correct.");
             
-            setStats(prev => {
-                if (!prev) return null;
-                return {
-                    ...prev,
-                    correct: prev.correct + 1
-                };
-            });
+            setStats(prev => ({
+                ...prev,
+                total_cards: prev.total_cards + 1,
+                correct: prev.correct + 1
+            }));
             setShowAnswer(true);
             wordsApiClient.submitFeedback({
                 word_id: word.id,
@@ -188,14 +184,12 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                 results: resultsPayload
             });
         } else if (isGiveUp) {
-            console.log("Completing due to giving up.");
-            setStats(prev => {
-                if (!prev) return null;
-                return {
-                    ...prev,
-                    gave_up: prev.gave_up + 1
-                };
-            });
+            console.log("[GIVING UP] Completing due to giving up.");
+            setStats(prev => ({
+                ...prev,
+                total_cards: prev.total_cards + 1,
+                gave_up: prev.gave_up + 1
+            }));
             setGaveUp(true);
             setShowAnswer(true);
             wordsApiClient.submitFeedback({
@@ -211,21 +205,17 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                 console.log("Max attempts reached.");
                 const hasHalfCorrect = Object.values(resultsPayload).some(result => result === 'correct');
                 if (hasHalfCorrect) {
-                    setStats(prev => {
-                        if (!prev) return null;
-                        return {
-                            ...prev,
-                            half: prev.half + 1
-                        };
-                    });
+                    setStats(prev => ({
+                        ...prev,
+                        total_cards: prev.total_cards + 1,
+                        half: prev.half + 1
+                    }));
                 } else {
-                    setStats(prev => {
-                        if (!prev) return null;
-                        return {
-                            ...prev,
-                            incorrect: prev.incorrect + 1
-                        };
-                    });
+                    setStats(prev => ({
+                        ...prev,
+                        total_cards: prev.total_cards + 1,
+                        incorrect: prev.incorrect + 1
+                    }));
                 }
                 setShowAnswer(true);
 
@@ -252,7 +242,9 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                     handleCheckAnswer(false);
                 }
             } else if (isEnter){
-                handleCheckAnswer(false);
+                if (!showAnswer) {
+                    handleCheckAnswer(false);
+                }
             } else if (isEsc) {
                 e.preventDefault();
                 handleCheckAnswer(true);
