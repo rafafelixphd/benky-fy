@@ -28,14 +28,20 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
     const [showAnswer, setShowAnswer] = useState(false);
     const [gaveUp, setGaveUp] = useState(false);
     const [sessionComplete, setSessionComplete] = useState(false);
-    const [stats, setStats] = useState<SessionStats | null>(null);
+    const [stats, setStats] = useState<SessionStats>({
+        total_cards: 0,
+        correct: 0,
+        incorrect: 0,
+        half: 0,
+        gave_up: 0,
+    });
 
     // Input state - mapped by InputMode
     const [userInputs, setUserInputs] = useState<Record<string, string>>({});
     const [inputFeedbacks, setInputFeedbacks] = useState<Record<string, 'correct' | 'incorrect'>>({});
     const [attempts, setAttempts] = useState(0);
 
-    const MAX_ATTEMPTS = 6;
+    const MAX_ATTEMPTS = 3;
 
     // Refs for focus management
     const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -66,17 +72,10 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                 }
             } else {
                 if (response.error === "not_found") {
-                   // Session exhausted
-                   // We should exit or show summary.
-                   // Since we don't have a summary screen design yet, let's call onExit() which goes back to settings?
-                   // Or show a message "Session Complete!" and a button to exit.
-                   // I'll set a local state "sessionComplete" and render that.
-                   // I'll set a local state "sessionComplete" and render that.
-                   setSessionComplete(true);
-                   // Fetch stats
-                   wordsApiClient.getSessionStats().then(res => {
-                       if (res.success && res.data) setStats(res.data);
-                   });
+                    // wordsApiClient.getSessionStats().then(res => {
+                    //     if (res.success && res.data) setStats(res.data);
+                    // });
+                    setSessionComplete(true);
                 } else {
                    setError(response.error || "Failed to fetch word");
                 }
@@ -88,12 +87,15 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
         }
     };
 
-    useEffect(() => {
-        fetchWord();
+   useEffect(() => {
+    fetchWord();
     }, []);
 
-    const handleKeyDown = (e: React.KeyboardEvent, mode: string) => {
+
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {
+            e.preventDefault();
             if (showAnswer) {
                 fetchWord();
             } else {
@@ -102,11 +104,11 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
         }
     };
 
-    const handleCheckAnswer = (isGiveUp = false) => {
-        if (!word) return;
 
+
+
+    const validateEachAnswer = (word: Word) => {
         const newFeedbacks: Record<string, 'correct' | 'incorrect'> = {};
-        let allCorrect = true;
 
         activeModes.forEach(mode => {
             let inputVal = (userInputs[mode] || "").trim().toLowerCase();
@@ -132,84 +134,125 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
 
             // Empty input is always incorrect (doesn't match expected answer)
             const isCorrect = inputVal.length > 0 && handlerValidateAnswer.some(ans => ans.toLowerCase() === inputVal);
-
             if (isCorrect) {
                 newFeedbacks[mode] = 'correct';
             } else {
                 newFeedbacks[mode] = 'incorrect';
-                allCorrect = false;
             }
         });
+        return { newFeedbacks };
+    }
 
+    const fieldFeedback = (newFeedbacks: Record<string, 'correct' | 'incorrect'>, isGiveUp: boolean) => {
+        const resultsPayload: Record<string, 'correct' | 'incorrect' | 'gave_up'> = {};
+        
+        activeModes.forEach(mode => {
+            const status = newFeedbacks[mode];
+            if (isGiveUp){
+                resultsPayload[mode] = 'gave_up';
+            } else if (status === 'correct') {
+                resultsPayload[mode] = 'correct';
+            } else {
+                resultsPayload[mode] = 'incorrect';
+            }
+        });
+        return resultsPayload;
+    }
+
+    const handleCheckAnswer = (isGiveUp = false) => {
+        if (!word) return;
+
+        const { newFeedbacks } = validateEachAnswer(word);
+        console.log("newFeedbacks: ", newFeedbacks);
+        console.log("stats: ", stats);
         setInputFeedbacks(newFeedbacks);
-
-        if (allCorrect || isGiveUp) {
-            if (isGiveUp) setGaveUp(true);
+        
+        const allCorrect = Object.values(newFeedbacks).every(feedback => feedback === 'correct');
+        const resultsPayload = fieldFeedback(newFeedbacks, isGiveUp);
+        if (allCorrect) {
+            console.log("Completing due to all being correct.");
+            
+            setStats(prev => ({
+                ...prev,
+                total_cards: prev.total_cards + 1,
+                correct: prev.correct + 1
+            }));
             setShowAnswer(true);
-
-            // Submit Feedback
-            // Construct results map
-            const resultsPayload: Record<string, 'correct' | 'incorrect' | 'gave_up'> = {};
-            activeModes.forEach(mode => {
-                const status = newFeedbacks[mode];
-                if (status === 'correct') {
-                    resultsPayload[mode] = 'correct';
-                } else {
-                    resultsPayload[mode] = isGiveUp ? 'gave_up' : 'incorrect';
-                }
+            wordsApiClient.submitFeedback({
+                word_id: word.id,
+                display_mode: settings.display.cardDisplay,
+                results: resultsPayload
             });
-
-            if (word) {
-                wordsApiClient.submitFeedback({
-                    word_id: word.id,
-                    display_mode: settings.display.cardDisplay,
-                    results: resultsPayload
-                });
-            }
+        } else if (isGiveUp) {
+            console.log("[GIVING UP] Completing due to giving up.");
+            setStats(prev => ({
+                ...prev,
+                total_cards: prev.total_cards + 1,
+                gave_up: prev.gave_up + 1
+            }));
+            setGaveUp(true);
+            setShowAnswer(true);
+            wordsApiClient.submitFeedback({
+                word_id: word.id,
+                display_mode: settings.display.cardDisplay,
+                results: resultsPayload
+            });
         } else {
-            const nextAttempts = attempts + 1;
-            setAttempts(nextAttempts);
-            if (nextAttempts >= MAX_ATTEMPTS) {
-                setShowAnswer(true);
-                 if (word) {
-                     // Max attempts reached, so everything not correct is incorrect
-                     const resultsPayload: Record<string, 'correct' | 'incorrect' | 'gave_up'> = {};
-                     activeModes.forEach(mode => {
-                         const status = newFeedbacks[mode];
-                         resultsPayload[mode] = status === 'correct' ? 'correct' : 'incorrect';
-                     });
+            setAttempts(attempts + 1);
+            console.log("Incrementing attempts. attempts: ", attempts + 1, "MAX Attempts: ", MAX_ATTEMPTS);
 
-            if (word) {
+            if (attempts >= MAX_ATTEMPTS) {
+                console.log("Max attempts reached.");
+                const hasHalfCorrect = Object.values(resultsPayload).some(result => result === 'correct');
+                if (hasHalfCorrect) {
+                    setStats(prev => ({
+                        ...prev,
+                        total_cards: prev.total_cards + 1,
+                        half: prev.half + 1
+                    }));
+                } else {
+                    setStats(prev => ({
+                        ...prev,
+                        total_cards: prev.total_cards + 1,
+                        incorrect: prev.incorrect + 1
+                    }));
+                }
+                setShowAnswer(true);
+
                 wordsApiClient.submitFeedback({
                     word_id: word.id,
                     display_mode: settings.display.cardDisplay,
                     results: resultsPayload
                 });
-            }
-                }
             }
         }
     };
 
-
     useEffect(() => {
         const handleGlobalKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Enter") {
+            const isShiftEnter = e.key === 'Enter' && e.shiftKey;
+            const isRightArrow = e.key === 'ArrowRight';
+            const isEsc = e.key === 'Escape';
+            const isEnter = e.key === 'Enter';
+            if (isShiftEnter || isRightArrow) {
                 e.preventDefault();
                 if (showAnswer) {
                     fetchWord();
                 } else {
                     handleCheckAnswer(false);
                 }
+            } else if (isEnter){
+                if (!showAnswer) {
+                    handleCheckAnswer(false);
+                }
+            } else if (isEsc) {
+                e.preventDefault();
+                handleCheckAnswer(true);
             }
         };
         window.addEventListener('keydown', handleGlobalKeyDown);
         return () => window.removeEventListener('keydown', handleGlobalKeyDown);
     }, [showAnswer, fetchWord, handleCheckAnswer]);
-
-
-
-
 
     if (sessionComplete) {
         return <FlashcardResult stats={stats} onExit={onExit} />;
@@ -302,7 +345,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                                                                             });
                                                                         }
                                                                     }}
-                                                                    onKeyDown={(e) => handleKeyDown(e, mode)}
+                                                                    onKeyDown={(e) => handleKeyDown(e)}
                                                                     placeholder="Type romaji..."
                                                                     outputType={shouldUseKatakana ? "katakana" : "hiragana"}
                                                                     className={`
@@ -331,7 +374,7 @@ export function Flashcard({ onExit, settings }: FlashcardProps) {
                                                                 });
                                                             }
                                                         }}
-                                                        onKeyDown={(e) => handleKeyDown(e, mode)}
+                                                        onKeyDown={(e) => handleKeyDown(e)}
                                                         placeholder={`Type ${mode}...`}
                                                         className={`
                                                             bg-white/10 border-white/20 text-white placeholder:text-white/30 text-center text-lg h-12

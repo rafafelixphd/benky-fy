@@ -8,11 +8,12 @@ export type Level = {
 export type PartOfSpeech =
     | 'noun'
     | 'verb'
-    | 'adjectives'
-    | 'particles'
-    | 'sentence-end'
-    | 'functional'
-    | 'context'
+    | 'adjective'
+    | 'adverb'
+    // | 'particles'
+    // | 'sentence-end'
+    // | 'functional'
+    // | 'context'
     | 'expressions';
 
 export type ContentTag =
@@ -65,22 +66,22 @@ export const DEFAULT_FLASHCARD_SETTINGS: FlashcardSettings = {
     learningRatio: 0.3,
     partOfSpeech: [],
     tag: [],
-    maxCards: 10,
+    maxCards: 5,
     display: {
-        cardDisplay: 'kanji',
-        inputMode: ['english', 'kana'],
+        cardDisplay: 'furigana',
+        inputMode: ['kana', 'english'],
     },
 };
 
 export const PARTS_OF_SPEECH: { value: PartOfSpeech; label: string }[] = [
     { value: 'noun', label: 'Noun' },
     { value: 'verb', label: 'Verb' },
-    { value: 'adjectives', label: 'Adjectives' },
-    { value: 'particles', label: 'Particles' },
-    { value: 'sentence-end', label: 'Sentence End' },
-    { value: 'functional', label: 'Functional' },
-    { value: 'context', label: 'Context' },
-    { value: 'expressions', label: 'Expressions' },
+    { value: 'adjective', label: 'Adjectives' },
+    { value: 'adverb', label: 'Adverbs' },
+    // { value: 'sentence-end', label: 'Sentence End' },
+    // { value: 'functional', label: 'Functional' },
+    // { value: 'context', label: 'Context' },
+    { value: 'expressions', label: 'Expressions (Not implemented)' },
 ];
 
 export const JLPT_LEVELS: { value: JLPTLevel; label: string; color: string }[] = [

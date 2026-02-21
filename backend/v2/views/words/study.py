@@ -22,6 +22,8 @@ class WordSettings(Resource):
         session_settings = request.json
         session_id = str(uuid.uuid4())
 
+        logger.info(f"Session settings: {session_settings}")
+
         flask_session["flashcard_settings"] = session_settings
         flask_session["session_id"] = session_id
         flask_session.pop("word_queue", None)
@@ -43,6 +45,7 @@ class NextWord(Resource):
     def get(self):
         settings = flask_session.get("flashcard_settings", {})
 
+        logger.info(f"{settings=}")
         # Ensure user_id is available for deck logic
         ctx, user_controller = get_user_controller()
         user = check_auth(user_controller)
@@ -52,11 +55,17 @@ class NextWord(Resource):
         if user_id:
             flask_session["user_id"] = user_id
 
-        if settings.get("mode") == "anki" or settings.get("learningRatio") is not None:
+        if settings.get("mode") == "anki":
+            logger.info("Dealing with AnkiDeck")
             deck = AnkiDeck(settings, user_id=user_id)
         elif settings.get("mode") == "custom-list":
+            logger.info("Dealing with FavouriteDeck")
             deck = FavouriteDeck(settings, user_id=user_id)
+        elif settings.get("mode") == "random":
+            logger.info("Dealing with RandomDeck")
+            deck = FlashCardsDeck(settings)
         else:
+            logger.info("Dealing with FlashCardsDeck")
             deck = FlashCardsDeck(settings)
 
         word = deck.draw_next(flask_session)
